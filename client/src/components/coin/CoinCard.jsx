@@ -52,7 +52,7 @@ export default function CoinCard({ name, symbol, price, change, onClick }) {
                             <h2 className="font-semibold">
 
                                 {name == 'Loading...' && (
-                                    <ClipLoader color="#2196F3" size={25} />
+                                    <ClipLoader color="#32a852" size={25} />
                                 )}
                                 {name !== 'Loading...' && (
                                     name.charAt(0).toUpperCase() + name.slice(1)

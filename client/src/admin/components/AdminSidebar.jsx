@@ -28,19 +28,20 @@ export default function AdminSidebar({ activeTab, setActiveTab, mobileMenuOpen, 
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const adminNavItems = [
-    { tab: 'dashboard', icon: Home, label: 'Dashboard' },
+   // { tab: 'dashboard', icon: Home, label: 'Dashboard' },
+      { tab: 'users', icon: Users, label: 'Users Management' },
     { tab: 'news', icon: Newspaper, label: 'News Management' },
-    { tab: 'users', icon: Users, label: 'Users Management' },
+  
     { tab: 'kyc', icon: ShieldCheck, label: 'KYC Verification' },
-    { tab: 'transactions', icon: Repeat, label: 'Transactions' },
+    //{ tab: 'transactions', icon: Repeat, label: 'Transactions' },
     { tab: 'deposits', icon: ArrowDownCircle, label: 'Deposits' },
     { tab: 'withdrawals', icon: ArrowUpCircle, label: 'Withdrawals' },
-    { tab: 'expired-loans', icon: Clock, label: 'Expired Loans' },
+   // { tab: 'expired-loans', icon: Clock, label: 'Expired Loans' },
    // { tab: 'analytics', icon: BarChart3, label: 'Analytics' },
     //{ tab: 'predictions', icon: LineChart, label: 'Predictions' },
-    { tab: 'loans', icon: PiggyBank, label: 'Loans' },
-    {tab:'AdminLoanPaymentReview', icon:CircleDollarSign , label: 'Loan Payment Reviews' },
-    { tab: 'settings', icon: Settings, label: 'System Settings' },
+  //  { tab: 'loans', icon: PiggyBank, label: 'Loans' },
+    //{tab:'AdminLoanPaymentReview', icon:CircleDollarSign , label: 'Loan Payment Reviews' },
+  //  { tab: 'settings', icon: Settings, label: 'System Settings' },
     
   ];
 

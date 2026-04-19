@@ -47,7 +47,7 @@ export default function NewsPage() {
 
   const categories = {
     "Market Analysis": { icon: <TrendingUp size={14} />, color: "text-green-400" },
-    "Regulation": { icon: <Shield size={14} />, color: "text-blue-400" },
+    "Regulation": { icon: <Shield size={14} />, color: "text-green-400" },
     "Market Update": { icon: <Globe size={14} />, color: "text-purple-400" },
     "DeFi": { icon: <TrendingUp size={14} />, color: "text-orange-400" },
     "CBDC": { icon: <Shield size={14} />, color: "text-cyan-400" },
@@ -95,8 +95,8 @@ export default function NewsPage() {
 
             {/* Title - Centered on mobile, left on larger screens */}
             <div className="flex items-center gap-3 mx-auto sm:mx-0">
-              <div className="p-2 bg-blue-500/10 rounded-2xl border border-blue-500/20">
-                <Megaphone size={24} className="text-blue-400" />
+              <div className="p-2 bg-green-500/10 rounded-2xl border border-green-500/20">
+                <Megaphone size={24} className="text-green-400" />
               </div>
               <div className="text-center sm:text-left">
                 <h1 className="text-xl sm:text-2xl font-bold">Financial News</h1>
@@ -118,7 +118,7 @@ export default function NewsPage() {
         {/* Loading State */}
         {loading && (
           <div className="flex justify-center items-center py-8 animate-pulse">
-            <Loader className="h-8 w-8 text-blue-400 animate-spin" />
+            <Loader className="h-8 w-8 text-green-400 animate-spin" />
             <span className="ml-2 text-gray-400">Loading...</span>
           </div>
         )}
@@ -168,7 +168,7 @@ export default function NewsPage() {
 
               {/* Content */}
               <div className="p-4 sm:p-6 flex flex-col flex-grow">
-                <h2 className="font-bold text-lg sm:text-xl mb-2 sm:mb-3 line-clamp-2 group-hover:text-blue-300 transition-colors">
+                <h2 className="font-bold text-lg sm:text-xl mb-2 sm:mb-3 line-clamp-2 group-hover:text-green-300 transition-colors">
                   {item.title}
                 </h2>
 
@@ -187,7 +187,7 @@ export default function NewsPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleReadMore(item)}
-                      className="flex items-center gap-1 text-blue-400 hover:text-blue-300 text-xs sm:text-sm font-medium transition-colors"
+                      className="flex items-center gap-1 text-green-400 hover:text-green-300 text-xs sm:text-sm font-medium transition-colors"
                     >
                       {expandedArticle?.id === item.id ? "Read Less" : "Read More"}
                       <ArrowRight
@@ -232,7 +232,7 @@ export default function NewsPage() {
                   onClick={() => setPage(i + 1)}
                   className={`px-3 py-2 text-sm rounded-lg border ${
                     page === i + 1
-                      ? 'bg-blue-500 text-white border-blue-500 shadow'
+                      ? 'bg-green-500 text-white border-green-500 shadow'
                       : 'bg-gray-900 text-white border-gray-300 hover:bg-gray-600'
                   }`}
                 >

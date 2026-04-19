@@ -463,6 +463,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Quick Actions */}
+         {/*
           <div className="p-3 smp-6">
             <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -492,6 +493,7 @@ export default function ProfilePage() {
               />
             </div>
           </div>
+         */}
 
           {/* Security & Settings */}
           <div className="bg-gray-900 rounded-2xl sm:border sm:border-gray-700 p-2 sm:p-6">

@@ -1,5 +1,6 @@
-import { Home, Megaphone, User, PiggyBank, Wallet } from "lucide-react";
+import { Home, Megaphone, User, PiggyBank, Wallet,ChartNoAxesCombined, History  } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+
 
 export default function MobileNav() {
   const navigate = useNavigate();
@@ -14,8 +15,11 @@ export default function MobileNav() {
       path: "/news", 
       isCenter: true 
     },
-    { icon: <PiggyBank size={18} />, label: "Loans", path: "/loan" },
+    // {icon:<ChartNoAxesCombined size={18}/>, label: "Market", path: "/market"},
+    {icon:<History/>, label: "History", path: "/history"},
+    //{ icon: <PiggyBank size={18} />, label: "Loans", path: "/loan" },
     { icon: <User size={18} />, label: "Profile", path: "/profile" },
+   ,
   ];
 
   return (
@@ -42,10 +46,10 @@ function Tab({ icon, label, active, onClick, isCenter }) {
     return (
       <button
         onClick={onClick}
-        className={`relative flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-[20px] transition-all duration-300 ease-out flex-1 min-w-0 mx-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
+        className={`relative flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-[20px] transition-all duration-300 ease-out flex-1 min-w-0 mx-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
           active
-            ? "text-white bg-blue-500 shadow-xl shadow-blue-500/30 border-2 border-blue-400"
-            : "text-white bg-blue-600 hover:bg-blue-500 shadow-lg border-2 border-blue-500/50"
+            ? "text-white bg-green-500 shadow-xl shadow-green-500/30 border-2 border-green-400"
+            : "text-white bg-green-600 hover:bg-green-500 shadow-lg border-2 border-green-500/50"
         }`}
         aria-current={active ? "page" : undefined}
         aria-label={label}
@@ -70,7 +74,7 @@ function Tab({ icon, label, active, onClick, isCenter }) {
         {/* Active indicator */}
         {active && (
           <div
-            className="absolute -top-1.5 w-2.5 h-2.5 bg-white rounded-full animate-pulse ring-1 ring-blue-400"
+            className="absolute -top-1.5 w-2.5 h-2.5 bg-white rounded-full animate-pulse ring-1 ring-green-400"
             aria-hidden="true"
           />
         )}
@@ -88,9 +92,9 @@ function Tab({ icon, label, active, onClick, isCenter }) {
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 ease-out flex-1 min-w-0 mx-0.5 focus:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
+      className={`relative flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 ease-out flex-1 min-w-0 mx-0.5 focus:outline-none focus-visible:ring-1 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
         active
-          ? "text-blue-400 bg-blue-500/10"
+          ? "text-green-400 bg-green-500/10"
           : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/20"
       }`}
       aria-current={active ? "page" : undefined}
@@ -107,7 +111,7 @@ function Tab({ icon, label, active, onClick, isCenter }) {
 
       <span
         className={`text-[11px] font-medium truncate max-w-full transition-all duration-200 ${
-          active ? "text-blue-400" : ""
+          active ? "text-green-400" : ""
         }`}
       >
         {label}
@@ -116,7 +120,7 @@ function Tab({ icon, label, active, onClick, isCenter }) {
       {/* Active indicator */}
       {active && (
         <div
-          className="absolute -top-1 w-1.5 h-1.5 bg-blue-400 rounded-full"
+          className="absolute -top-1 w-1.5 h-1.5 bg-green-400 rounded-full"
           aria-hidden="true"
         />
       )}

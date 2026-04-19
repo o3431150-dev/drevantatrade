@@ -65,7 +65,7 @@ export default function ConfirmationModal({
           <button
             onClick={onConfirm}
             disabled={isSubmitting}
-            className="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-medium transition-all disabled:opacity-50"
+            className="flex-1 py-3 rounded-xl bg-green-600 hover:bg-green-500 text-white font-medium transition-all disabled:opacity-50"
           >
             {isSubmitting ? "Processing..." : "Confirm"}
           </button>

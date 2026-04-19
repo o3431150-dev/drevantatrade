@@ -147,7 +147,7 @@ const SignUp = () => {
                     <div className="bg-gradient-to-br sm:from-gray-800 sm:to-gray-900 sm:border sm:border-gray-800 rounded-2xl p-3 sm:p-5 shadow-lg">
                         <div className="text-center mb-6">
                             <motion.div
-                                className="inline-flex items-center px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium mb-3"
+                                className="inline-flex items-center px-3 py-1 rounded-full bg-green-500/10 text-green-400 text-xs font-medium mb-3"
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.4 }}
@@ -174,7 +174,7 @@ const SignUp = () => {
                                             placeholder="Enter your first name"
                                             value={formData.firstName}
                                             onChange={handleChange}
-                                            className="w-full py-3 pl-10 pr-4 bg-gray-900 border border-gray-800 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+                                            className="w-full py-3 pl-10 pr-4 bg-gray-900 border border-gray-800 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 text-sm"
                                             required
                                             autoComplete="firstName"
                                         />
@@ -191,7 +191,7 @@ const SignUp = () => {
                                             placeholder="Enter your last name"
                                             value={formData.lastName}
                                             onChange={handleChange}
-                                            className="w-full py-3 pl-10 pr-4 bg-gray-900 border border-gray-800 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+                                            className="w-full py-3 pl-10 pr-4 bg-gray-900 border border-gray-800 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 text-sm"
                                             required
                                             autoComplete="lastName"
 
@@ -214,7 +214,7 @@ const SignUp = () => {
                                         placeholder="Enter your email address"
                                         value={formData.email}
                                         onChange={handleChange}
-                                        className="w-full py-3 pl-10 pr-4 bg-gray-900 border border-gray-800 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+                                        className="w-full py-3 pl-10 pr-4 bg-gray-900 border border-gray-800 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 text-sm"
                                         autoComplete="email"
                                         required
                                     />
@@ -235,7 +235,7 @@ const SignUp = () => {
                                         type={showPassword ? "text" : "password"}
                                         onChange={handleChange}
                                         placeholder="••••••••"
-                                        className="w-full py-3 pl-10 pr-10 bg-gray-900 border border-gray-800 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 text-sm"
+                                        className="w-full py-3 pl-10 pr-10 bg-gray-900 border border-gray-800 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 text-sm"
                                         autoComplete="password"
                                         required
                                     />
@@ -252,7 +252,7 @@ const SignUp = () => {
                             <motion.button
                                 disabled={loading}
                                 type="submit"
-                                className="w-full bg-blue-500  hover:to-blue-700 text-white font-medium py-3 mt-4 rounded-lg flex items-center justify-center transition-all shadow-md mb-5"
+                                className="w-full bg-green-500  hover:to-green-700 text-white font-medium py-3 mt-4 rounded-lg flex items-center justify-center transition-all shadow-md mb-5"
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.97 }}
                             >
@@ -274,7 +274,7 @@ const SignUp = () => {
                                 {socialLogins.map((social) => (
                                     <motion.button
                                         key={social.name}
-                                        className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm rounded-lg border border-blue-400 hover:border-blue-400/60 transition"
+                                        className="flex items-center justify-center gap-2 py-2.5 px-4 text-sm rounded-lg border border-green-400 hover:border-green-400/60 transition"
                                         whileHover={{ y: -2 }}
                                         whileTap={{ scale: 0.97 }}
                                     >
@@ -287,7 +287,7 @@ const SignUp = () => {
                         {/* Already have account */}
                         <div className="text-center text-sm text-gray-500">
                             Already have an account?{" "}
-                            <Link to="/login" className="text-blue-500 hover:text-blue-400 font-medium">
+                            <Link to="/login" className="text-green-500 hover:text-green-400 font-medium">
                                 Sign in
                             </Link>
                         </div>
@@ -314,7 +314,7 @@ const SignUp = () => {
                                        { loadingGoogle ? <ClipLoader size={20} /> :'Continue with Google'}
                                         
                                     </span>
-                                    <span className="text-black group-hover:text-blue-500 transition-colors pr-2">→</span>
+                                    <span className="text-black group-hover:text-green-500 transition-colors pr-2">→</span>
                                 </div>
                             </button>
 
@@ -325,7 +325,7 @@ const SignUp = () => {
                                         </div>
                                         <div className="flex-1 p-2 flex items-center justify-between">
                                           <span className="font-semibold text-gray-700 ml-2">Continue with Telegram</span>
-                                          <span className="text-black group-hover:text-blue-500 transition-colors pr-2">→</span>
+                                          <span className="text-black group-hover:text-green-500 transition-colors pr-2">→</span>
                                         </div>
                                       </button> */}
 

@@ -70,7 +70,7 @@ const ChangePasswordModal = ({
                             </div>
                             <input
                                 type={showPassword ? "text" : "password"}
-                                className="w-full pl-10 pr-10 py-3 mt-2  bg-gray-900 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition"
+                                className="w-full pl-10 pr-10 py-3 mt-2  bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition"
                                 placeholder="••••••••"
                                 required
                                 value={passwordData.currentPassword}
@@ -109,7 +109,7 @@ const ChangePasswordModal = ({
                             </div>
                             <input
                                 type={showPassword ? "text" : "password"}
-                                className={`w-full pl-10 pr-10 py-3 mt-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition ${passwordErrors.newPassword
+                                className={`w-full pl-10 pr-10 py-3 mt-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition ${passwordErrors.newPassword
                                     ? "border-red-500"
                                     : "border-gray-700"
                                     }`}
@@ -159,7 +159,7 @@ const ChangePasswordModal = ({
                             </div>
                             <input
                                 type={showPassword ? "text" : "password"}
-                                className={`w-full pl-10 pr-10 py-3 mt-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition ${passwordErrors.confirmPassword
+                                className={`w-full pl-10 pr-10 py-3 mt-2 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition ${passwordErrors.confirmPassword
                                     ? "border-red-500"
                                     : "border-gray-700"
                                     }`}
@@ -197,8 +197,8 @@ const ChangePasswordModal = ({
                     </div>
 
                     {/* Password Info */}
-                    <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
-                        <p className="text-xs text-blue-400 leading-relaxed">
+                    <div className="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                        <p className="text-xs text-green-400 leading-relaxed">
                             Password must contain at least 8 characters, one uppercase letter, and one number.
                         </p>
                     </div>
@@ -216,7 +216,7 @@ const ChangePasswordModal = ({
                         <button
                             type="submit"
                             disabled={updatingPassword}
-                            className="flex-1 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                             {updatingPassword ? (
                                 <>

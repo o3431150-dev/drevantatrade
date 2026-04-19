@@ -109,8 +109,8 @@ export default function KycPage() {
           className="text-center py-8"
         >
           <div className="flex justify-center mb-6">
-            <div className="bg-blue-500/20 p-4 rounded-full">
-              <CheckCircle className="w-10 h-10 text-blue-500" />
+            <div className="bg-green-500/20 p-4 rounded-full">
+              <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
           </div>
           <h3 className="text-xl font-bold mb-3">Verification Submitted!</h3>
@@ -126,7 +126,7 @@ export default function KycPage() {
             }
 
             }
-            className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition font-medium">
+            className="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg transition font-medium">
               ok
             {/* ok<ArrowRight className="ml-2 w-5 h-5" /> */}
           </button>
@@ -144,7 +144,7 @@ export default function KycPage() {
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-4">
-              <ShieldCheck className="w-10 h-10 text-blue-500" />
+              <ShieldCheck className="w-10 h-10 text-green-500" />
               <h2 className="text-2xl font-bold">Identity Verification</h2>
             </div>
             <p className="text-gray-400 text-sm">
@@ -156,12 +156,12 @@ export default function KycPage() {
           {/* Progress Bar */}
           <div className="mb-6">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-blue-400">Step 1 of 2</span>
+              <span className="text-green-400">Step 1 of 2</span>
               <span className="text-gray-500">Personal Information</span>
             </div>
             <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-blue-500"
+                className="h-full bg-green-500"
                 initial={{ width: "0%" }}
                 animate={{ width: "50%" }}
                 transition={{ duration: 0.5 }}
@@ -183,7 +183,7 @@ export default function KycPage() {
 
                 required
                 disabled={true}
-                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition cursor-not-allowed"
+                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition cursor-not-allowed"
               />
             </div>
 
@@ -199,7 +199,7 @@ export default function KycPage() {
                 value={form.email}
                 onChange={handleChange}
                 required
-                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition cursor-not-allowed"
+                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition cursor-not-allowed"
               />
             </div>
 
@@ -213,7 +213,7 @@ export default function KycPage() {
                 value={form.user}
                 onChange={handleChange}
                 required
-                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition"
+                className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-xl focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition"
               />
             </div> */}
 
@@ -221,7 +221,7 @@ export default function KycPage() {
             <motion.button
               whileTap={{ scale: 0.98 }}
               type="submit"
-              className="w-full py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl transition font-semibold flex items-center justify-center shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30"
+              className="w-full py-3.5 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-xl transition font-semibold flex items-center justify-center shadow-lg shadow-green-500/20 hover:shadow-green-500/30"
             >
               Continue to Verification <ArrowRight className="ml-2 w-5 h-5" />
             </motion.button>
@@ -240,7 +240,7 @@ export default function KycPage() {
           {/* Header */}
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-4">
-              <FileText className="w-10 h-10 text-blue-500" />
+              <FileText className="w-10 h-10 text-green-500" />
               <h2 className="text-xl font-bold">Document Verification</h2>
             </div>
             <p className="text-gray-400 text-sm">
@@ -252,12 +252,12 @@ export default function KycPage() {
           {/* Progress Bar */}
           <div className="mb-6">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-blue-400">Step 2 of 2</span>
+              <span className="text-green-400">Step 2 of 2</span>
               <span className="text-gray-500">Document Upload</span>
             </div>
             <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-blue-500"
+                className="h-full bg-green-500"
                 initial={{ width: "50%" }}
                 animate={{ width: "100%" }}
                 transition={{ duration: 0.5 }}
@@ -278,7 +278,7 @@ export default function KycPage() {
                     name="idType"
                     value={form.idType}
                     onChange={handleChange}
-                    className="w-full py-3 pl-10 pr-4 bg-gray-900 border border-gray-800 rounded-xl focus:outline-none focus:border-blue-500 text-sm"
+                    className="w-full py-3 pl-10 pr-4 bg-gray-900 border border-gray-800 rounded-xl focus:outline-none focus:border-green-500 text-sm"
                   >
                    
                     <option value={'national_id'} >National ID</option>
@@ -300,7 +300,7 @@ export default function KycPage() {
                   value={form.idNumber}
                   onChange={handleChange}
                   // optional
-                  className="w-full py-3 px-4 bg-gray-900 border border-gray-800 rounded-xl focus:border-blue-500 focus:outline-none text-sm"
+                  className="w-full py-3 px-4 bg-gray-900 border border-gray-800 rounded-xl focus:border-green-500 focus:outline-none text-sm"
                 />
               </div>
             </div>
@@ -317,19 +317,19 @@ export default function KycPage() {
                   <div
                     onClick={() => handleFileClick("front")}
                     className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors h-full flex flex-col items-center justify-center ${form.idFrontFile
-                      ? "border-blue-500 bg-blue-500/10"
-                      : "border-gray-300 hover:border-blue-500/50"
+                      ? "border-green-500 bg-green-500/10"
+                      : "border-gray-300 hover:border-green-500/50"
                       }`}
                   >
                     <div className="mb-3">
-                      <IdCard className="w-8 h-8 mx-auto text-blue-500" />
+                      <IdCard className="w-8 h-8 mx-auto text-green-500" />
                     </div>
                     {form.idFrontFile ? (
                       <>
                         <p className="text-gray-300 text-sm truncate w-full">
                           {form.idFrontFile.name}
                         </p>
-                        <span className="text-blue-400 text-xs mt-1">
+                        <span className="text-green-400 text-xs mt-1">
                           Uploaded
                         </span>
                       </>
@@ -358,14 +358,14 @@ export default function KycPage() {
                   <div
                     onClick={() => handleFileClick("back")}
                     className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition-colors h-full flex flex-col items-center justify-center ${form.idBackFile
-                      ? "border-blue-500 bg-blue-500/10"
-                      : "border-gray-300 hover:border-blue-500/50"
+                      ? "border-green-500 bg-green-500/10"
+                      : "border-gray-300 hover:border-green-500/50"
                       }`}
                   >
                     {/* <div className="mb-3">
-                      <IdCard className="w-8 h-8 mx-auto text-blue-500 " />
+                      <IdCard className="w-8 h-8 mx-auto text-green-500 " />
                     </div> */}
-                    <div className="w-8 h-5 mx-auto border border-blue-500 text-blue-500 mb-3 rounded">
+                    <div className="w-8 h-5 mx-auto border border-green-500 text-green-500 mb-3 rounded">
                       ---
                     </div>
                     {form.idBackFile ? (
@@ -373,7 +373,7 @@ export default function KycPage() {
                         <p className="text-gray-300 text-sm truncate w-full">
                           {form.idBackFile.name}
                         </p>
-                        <span className="text-blue-400 text-xs mt-1">
+                        <span className="text-green-400 text-xs mt-1">
                           Uploaded
                         </span>
                       </>
@@ -407,13 +407,13 @@ export default function KycPage() {
                   <span className="text-sm text-gray-300">
                     {uploadProgress < 100 ? "Uploading documents..." : "Processing..."}
                   </span>
-                  <span className="text-sm text-blue-400">
+                  <span className="text-sm text-green-400">
                     {uploadProgress < 100 ? `${uploadProgress}%` : "Please wait"}
                   </span>
                 </div>
                 <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
                   <motion.div
-                    className="h-full bg-blue-500"
+                    className="h-full bg-green-500"
                     initial={{ width: "0%" }}
                     animate={{ width: `${uploadProgress}%` }}
                     transition={{ duration: 0.3 }}
@@ -430,7 +430,7 @@ export default function KycPage() {
                 type="submit"
                 disabled={!form.idFrontFile || !form.idBackFile || isUploading}
                 className={`w-full py-3.5 text-white rounded-xl transition font-semibold flex items-center justify-center shadow-lg ${(form.idFrontFile && form.idBackFile && !isUploading)
-                  ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-blue-500/20 hover:shadow-blue-500/30"
+                  ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 shadow-green-500/20 hover:shadow-green-500/30"
                   : "bg-gray-800 cursor-not-allowed"
                   }`}
               >
@@ -475,7 +475,7 @@ export default function KycPage() {
           <div className="mt-6 text-center text-sm text-gray-500">
             <p>Your information is securely encrypted</p>
             <div className="flex items-center justify-center mt-1">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 text-green-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span>256-bit SSL encryption</span>

@@ -1,4 +1,5 @@
-import React from 'react';
+{/*
+  import React from 'react';
 import { Users, TrendingUp, DollarSign, Activity,Smartphone,Laptop,Tablet} from 'lucide-react';
 export default function AdminDashboard() {
   const stats = [
@@ -58,14 +59,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-4 lg:p-6 space-y-6">
-      {/* Header */}
+      
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-xl lg:text-2xl font-bold text-white">Dashboard Overview</h1>
         </div>
       </div>
 
-      {/* Stats Grid */}
+     
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
         {stats.map((stat, index) => (
           <div key={index} className="rounded-xl p-1 lg:p-6 border border-gray-800 hover:border-gray-600 transition">
@@ -81,7 +82,7 @@ export default function AdminDashboard() {
                   {stat.changeType === 'negative' && <ArrowDown className="h-3 w-3 lg:h-4 lg:w-4" />}
                   <span>{stat.change}</span>
                   <span className="text-gray-500 ml-1 hidden sm:inline">from last month</span>
-                </div> */}
+                </div> 
               </div>
               <div className="p-2 lg:p-3 rounded-lg bg-indigo-500/10">
                 <stat.icon className="h-4 w-4 lg:h-6 lg:w-6 text-indigo-400" />
@@ -92,9 +93,8 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-        {/* User Growth Chart - Improved */}
+      
         <div className=" rounded-xl p-3 lg:p-6 sm:border sm:border-gray-700 ">
           <div className="flex items-center justify-between mb-4 lg:mb-6">
             <h3 className="text-base lg:text-lg font-semibold text-white">User Growth</h3>
@@ -103,7 +103,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           
-          {/* Bar Chart */}
+       
           <div className="space-y-3 lg:space-y-4">
             {userGrowthData.map((item, index) => (
               <div key={index} className="flex items-center gap-3 lg:gap-4">
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Device Usage */}
+      
         <div className=" rounded-xl p-4 lg:p-6 sm:border sm:border-gray-700">
           <div className="flex items-center justify-between mb-4 lg:mb-6">
             <h3 className="text-base lg:text-lg font-semibold text-white">Device Usage</h3>
@@ -204,3 +204,16 @@ export default function AdminDashboard() {
     </div>
   );
 }
+
+  */}
+
+  import React from 'react'
+  
+  export default function AdminDashboard() {
+    return (
+      <div>
+        
+      </div>
+    )
+  }
+  

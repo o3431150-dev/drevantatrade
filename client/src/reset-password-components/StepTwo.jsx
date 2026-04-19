@@ -137,18 +137,18 @@ const StepTwo = ({ email, otp, setOtp, step, setStep, verificationStatus, setVer
                             damping: 10
                         }}
                         className={`p-3 rounded-full ${verificationStatus === 'success'
-                            ? 'bg-blue-900/30'
+                            ? 'bg-green-900/30'
                             : verificationStatus === 'error'
                                 ? 'bg-rose-900/30'
-                                : 'bg-blue-600/20'
+                                : 'bg-green-600/20'
                             }`}
                     >
                         {verificationStatus === 'success' ? (
-                            <CheckCircle className="h-6 w-6 text-blue-400" />
+                            <CheckCircle className="h-6 w-6 text-green-400" />
                         ) : verificationStatus === 'error' ? (
                             <XCircle className="h-6 w-6 text-rose-400" />
                         ) : (
-                            <Mail className="h-6 w-6 text-blue-400" />
+                            <Mail className="h-6 w-6 text-green-400" />
                         )}
                     </motion.div>
 
@@ -158,7 +158,7 @@ const StepTwo = ({ email, otp, setOtp, step, setStep, verificationStatus, setVer
                                 initial={{ opacity: 0, height: 0 }}
                                 animate={{ opacity: 1, height: 'auto' }}
                                 exit={{ opacity: 0, height: 0 }}
-                                className="text-blue-300 text-center text-xs bg-blue-900/30 py-2 px-2 rounded mt-4"
+                                className="text-green-300 text-center text-xs bg-green-900/30 py-2 px-2 rounded mt-4"
                             >
                                 Verification code sent to {email}
                             </motion.p>
@@ -221,11 +221,11 @@ const StepTwo = ({ email, otp, setOtp, step, setStep, verificationStatus, setVer
                                     disabled={isLoading || verificationStatus === 'success'}
                                     className={`w-12 h-12 text-xl font-bold text-white text-center bg-gray-800/70 border-2 ${verificationStatus === 'error'
                                         ? 'border-rose-500 shake'
-                                        : 'border-blue-500/30'
-                                        } rounded-xl focus:border-blue-400 focus:ring-2 focus:ring-blue-500/30 outline-none transition-all duration-200`}
+                                        : 'border-green-500/30'
+                                        } rounded-xl focus:border-green-400 focus:ring-2 focus:ring-green-500/30 outline-none transition-all duration-200`}
                                 />
                                 {/* {i === 3 && (
-                                    <div className="absolute top-1/2 right-0 translate-x-3 -translate-y-1/2 text-blue-500">-</div>
+                                    <div className="absolute top-1/2 right-0 translate-x-3 -translate-y-1/2 text-green-500">-</div>
                                 )} */}
                             </motion.div>
                         ))}
@@ -239,10 +239,10 @@ const StepTwo = ({ email, otp, setOtp, step, setStep, verificationStatus, setVer
                         type="submit"
                         disabled={isLoading || otp.includes("") || verificationStatus === 'success'}
                         className={`w-full py-4 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${verificationStatus === 'success'
-                            ? 'bg-blue-600/30 text-blue-400'
+                            ? 'bg-green-600/30 text-green-400'
                             : verificationStatus === 'error'
                                 ? 'bg-gradient-to-r from-rose-600 to-rose-700 text-white'
-                                : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white shadow-lg shadow-green-500/20'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                         {isLoading ? (
@@ -273,7 +273,7 @@ const StepTwo = ({ email, otp, setOtp, step, setStep, verificationStatus, setVer
                             onClick={handleResend}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="text-blue-500 hover:text-blue-400 font-medium hover:underline"
+                            className="text-green-500 hover:text-green-400 font-medium hover:underline"
                         >
                             Resend OTP
                         </motion.button>

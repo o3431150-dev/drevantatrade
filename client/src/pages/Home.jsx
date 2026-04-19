@@ -23,7 +23,7 @@ const Home = () => {
       <Hero />
       <CoinList />
       <MobileNav />
-      <TawkButton/>
+      {/* <TawkButton/> */}
 
 
       {!isLogin && <GetStart />}

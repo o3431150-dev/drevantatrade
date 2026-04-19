@@ -80,14 +80,14 @@ const StepThree = ({ verificationStatus, setVerificationStatus, email, otp }) =>
                             damping: 10
                         }}
                         className={`p-4 rounded-full ${verificationStatus === 'success'
-                            ? 'bg-blue-900/30'
-                            : 'bg-blue-600/20'
+                            ? 'bg-green-900/30'
+                            : 'bg-green-600/20'
                             }`}
                     >
                         {verificationStatus === 'success' ? (
-                            <CheckCircle className="h-8 w-8 text-blue-400" />
+                            <CheckCircle className="h-8 w-8 text-green-400" />
                         ) : (
-                            <Lock className="h-8 w-8 text-blue-400" />
+                            <Lock className="h-8 w-8 text-green-400" />
                         )}
                     </motion.div>
                 </div>
@@ -116,26 +116,26 @@ const StepThree = ({ verificationStatus, setVerificationStatus, email, otp }) =>
                 </AnimatePresence>
 
                 <div>
-                    <label htmlFor="password" className="block text-blue-200 text-sm mb-2 font-medium">
+                    <label htmlFor="password" className="block text-green-200 text-sm mb-2 font-medium">
                         New Password
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Lock className="h-5 w-5 text-blue-400" />
+                            <Lock className="h-5 w-5 text-green-400" />
                         </div>
                         <input
                             type={showPassword ? "text" : "password"}
                             id="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full pl-10 pr-10 py-3 bg-gray-800/50 border border-blue-500/30 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition placeholder:text-blue-200/40"
+                            className="w-full pl-10 pr-10 py-3 bg-gray-800/50 border border-green-500/30 rounded-xl text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition placeholder:text-green-200/40"
                             placeholder="••••••••"
                             disabled={isLoading || verificationStatus === 'success'}
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-blue-400 hover:text-blue-300"
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-green-400 hover:text-green-300"
                         >
                             {showPassword ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
                         </button>
@@ -143,19 +143,19 @@ const StepThree = ({ verificationStatus, setVerificationStatus, email, otp }) =>
                 </div>
 
                 <div>
-                    <label htmlFor="confirmPassword" className="block text-blue-200 text-sm mb-2 font-medium">
+                    <label htmlFor="confirmPassword" className="block text-green-200 text-sm mb-2 font-medium">
                         Confirm Password
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Lock className="h-5 w-5 text-blue-400" />
+                            <Lock className="h-5 w-5 text-green-400" />
                         </div>
                         <input
                             type={showPassword ? "text" : "password"}
                             id="confirmPassword"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
-                            className="w-full pl-10 pr-3 py-3 bg-gray-800/50 border border-blue-500/30 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition placeholder:text-blue-200/40"
+                            className="w-full pl-10 pr-3 py-3 bg-gray-800/50 border border-green-500/30 rounded-xl text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition placeholder:text-green-200/40"
                             placeholder="••••••••"
                             disabled={isLoading || verificationStatus === 'success'}
                         />
@@ -166,8 +166,8 @@ const StepThree = ({ verificationStatus, setVerificationStatus, email, otp }) =>
                     onClick={handlePasswordReset}
                     disabled={isLoading || password === "" || confirmPassword === "" || verificationStatus === 'success'}
                     className={`w-full py-4 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${verificationStatus === 'success'
-                        ? 'bg-blue-600/30 text-blue-400'
-                        : 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg shadow-blue-500/20'
+                        ? 'bg-green-600/30 text-green-400'
+                        : 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white shadow-lg shadow-green-500/20'
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                     {isLoading ? (

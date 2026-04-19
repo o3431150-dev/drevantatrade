@@ -204,7 +204,7 @@ export default function DepositsPanel() {
 
   const formatAmount = (amount, currency) => {
     if (!amount) return "0";
-    const decimals = currency === 'BTC' ? 8 : currency === 'ETH' ? 6 : 2;
+    const decimals = currency === 'BTCNON' ? 8 : currency === 'ETHNON' ? 6 : 2;
     return parseFloat(amount).toFixed(decimals);
   };
 

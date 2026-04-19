@@ -163,7 +163,7 @@ const Login = () => {
           <div className="bg-gradient-to-br sm:from-gray-800 to-gray-900 sm:border sm:border-gray-800 sm:rounded-2xl p-3 sm:p-5 shadow-xl">
             <div className="text-center mb-5">
               <motion.div
-                className="inline-flex items-center px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-xs font-medium mb-3"
+                className="inline-flex items-center px-3 py-1.5 rounded-full bg-green-500/10 text-green-400 text-xs font-medium mb-3"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
@@ -191,7 +191,7 @@ const Login = () => {
                     </div>
                     <input
                       type="email"
-                      className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition"
+                      className="w-full pl-10 pr-4 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition"
                       placeholder="your@email.com"
                       required
                       onChange={e => setEmail(e.target.value)}
@@ -211,7 +211,7 @@ const Login = () => {
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
-                    className="w-full pl-10 pr-10 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition"
+                    className="w-full pl-10 pr-10 py-3 bg-gray-900 border border-gray-700 rounded-lg focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition"
                     placeholder="••••••••"
                     required
                     onChange={e => setPas(e.target.value)}
@@ -235,20 +235,20 @@ const Login = () => {
                 <label className="flex items-center cursor-pointer">
                   <input
                     type="checkbox"
-                    className="form-checkbox rounded bg-gray-800 border-gray-700 text-blue-500 focus:ring-blue-500"
+                    className="form-checkbox rounded bg-gray-800 border-gray-700 text-green-500 focus:ring-green-500"
                     checked={rememberMe}
                     onChange={() => setRememberMe(!rememberMe)}
                   />
                   <span className="ml-2 text-sm text-gray-400">Remember me</span>
                 </label>
 
-                <Link to="/reset" className="text-xs text-white-500 hover:text-blue-400 transition-colors">
+                <Link to="/reset" className="text-xs text-white-500 hover:text-green-400 transition-colors">
                   Forgot password?
                 </Link>
               </div>
 
               <motion.button
-                className="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md shadow-blue-500/20 hover:shadow-blue-500/30 mb-5"
+                className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-3 rounded-lg flex items-center justify-center transition-all duration-300 shadow-md shadow-green-500/20 hover:shadow-green-500/30 mb-5"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
 
@@ -262,7 +262,7 @@ const Login = () => {
 
             <div className="text-center text-xs text-gray-500">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-blue-500 font-medium hover:text-blue-400 transition-colors">
+              <Link to="/signup" className="text-green-500 font-medium hover:text-green-400 transition-colors">
                 Sign up now
               </Link>
             </div>
@@ -287,7 +287,7 @@ const Login = () => {
                   <span className="font-semibold text-gray-700 ml-2">
                     {loadingGoogle ? 'Processing...' : 'Continue with Google'}
                   </span>
-                  <span className="text-black group-hover:text-blue-500 transition-colors pr-2">→</span>
+                  <span className="text-black group-hover:text-green-500 transition-colors pr-2">→</span>
                 </div>
               </button>
 
@@ -298,7 +298,7 @@ const Login = () => {
                 </div>
                 <div className="flex-1 p-2 flex items-center justify-between">
                   <span className="font-semibold text-gray-700 ml-2">Continue with Telegram</span>
-                  <span className="text-black group-hover:text-blue-500 transition-colors pr-2">→</span>
+                  <span className="text-black group-hover:text-green-500 transition-colors pr-2">→</span>
                 </div>
               </button> */}
 

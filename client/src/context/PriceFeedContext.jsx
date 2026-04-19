@@ -2,18 +2,34 @@ import { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
 
 const PriceFeedContext = createContext();
-const socket = io("https://trading-app-fdzj.onrender.com", { transports: ["websocket"] });
 
 export const PriceFeedProvider = ({ children }) => {
   const [prices, setPrices] = useState({});
 
   useEffect(() => {
-    socket.on("priceUpdate", (data) => {
-      setPrices({ ...data }); // always new reference
-     // console.log("Received price update:", data);
+    // FIX: Point to port 5000 (your backend port)
+    const socket = io("http://localhost:3000", { 
+      transports: ["websocket", "polling"], // Allow fallback
+      withCredentials: true 
     });
 
-    return () => socket.off("priceUpdate");
+    socket.on("connect", () => {
+      console.log("Connected to Backend Socket.IO");
+    });
+
+    socket.on("priceUpdate", (data) => {
+      // console.log("Received update:", data);
+      setPrices(data); 
+    });
+
+    socket.on("connect_error", (err) => {
+      console.error("Socket Connection Error:", err.message);
+    });
+
+    return () => {
+      socket.off("priceUpdate");
+      socket.disconnect();
+    };
   }, []);
 
   return (
@@ -24,6 +40,3 @@ export const PriceFeedProvider = ({ children }) => {
 };
 
 export const usePriceFeed = () => useContext(PriceFeedContext);
-
-
-

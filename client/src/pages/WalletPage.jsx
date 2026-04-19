@@ -141,10 +141,10 @@ export default function WalletPage() {
   };
 
   const quickActions = [
-    { icon: <ArrowDownCircle size={20} />, label: "Deposit", color: "text-blue-400", route: "/deposit" },
+    { icon: <ArrowDownCircle size={20} />, label: "Deposit", color: "text-green-400", route: "/deposit" },
     { icon: <ArrowUpCircle size={20} />, label: "Withdraw", color: "text-green-400", route: "/withdraw" },
-    { icon: <BadgeDollarSign size={20} />, label: "Loan", color: "text-purple-400", route: "/loan" },
-    { icon: <Clock4 size={20} />, label: "History", color: "text-gray-400", route: "/history" }
+    //{ icon: <BadgeDollarSign size={20} />, label: "Loan", color: "text-purple-400", route: "/loan" },
+    //{ icon: <Clock4 size={20} />, label: "History", color: "text-gray-400", route: "/history" }
   ];
 
   return (
@@ -209,7 +209,7 @@ export default function WalletPage() {
                     <button
                       onClick={getMarketPrices}
                       disabled={priceLoading}
-                      className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1 text-xs text-green-400 hover:text-green-300 transition-colors disabled:opacity-50"
                       title="Refresh prices"
                     >
                       <RefreshCw size={12} className={priceLoading ? "animate-spin" : ""} />
@@ -243,24 +243,24 @@ export default function WalletPage() {
 
               {/* Balance Breakdown */}
               <div className="grid grid-cols-3 gap-4 mb-6">
-                <BalanceCard
+                {/* <BalanceCard
                   label="Available"
                   value={walletData.usdt}
                   showBalance={showBalance}
                   color="text-green-400"
-                />
-                <BalanceCard
+                /> */}
+                {/* <BalanceCard
                   label="Crypto"
                   value={calculateTotalBalance() - walletData.usdt - walletData.loanUsdt}
                   showBalance={showBalance}
-                  color="text-blue-400"
-                />
-                <BalanceCard
+                  color="text-green-400"
+                /> */}
+                {/* <BalanceCard
                   label="Loans"
                   value={walletData.loanUsdt}
                   showBalance={showBalance}
                   color="text-purple-400"
-                />
+                /> */}
               </div>
 
               {/* Wallet Assets */}
@@ -299,7 +299,7 @@ export default function WalletPage() {
                   />
 
                   {/* Loan Assets Section */}
-                  <div className="mt-6 pt-4 border-t border-gray-700">
+                  {/* <div className="mt-6 pt-4 border-t border-gray-700">
                     <h3 className="font-semibold text-white mb-4">Loan Assets</h3>
                     <AssetRow
                       currency="USDT Loan"
@@ -312,7 +312,7 @@ export default function WalletPage() {
                       marketPrices={marketPrices}
                       isLoan={true}
                     />
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -359,7 +359,7 @@ function AssetRow({ currency, balance, showBalance, logo, usdValue, price, chang
   return (
     <div className={`flex items-center justify-between p-3 hover:bg-gray-700/50 rounded-lg transition-colors border ${isLoan ? "border-purple-500/30" : "border-transparent hover:border-gray-600"}`}>
       <div className="flex items-center gap-3">
-        <div className="relative">
+        {/* <div className="relative">
           <img
             src={logo}
             alt={currency}
@@ -370,7 +370,8 @@ function AssetRow({ currency, balance, showBalance, logo, usdValue, price, chang
               <BadgeDollarSign size={10} className="text-white" />
             </div>
           )}
-        </div>
+        </div> */}
+
         <div>
           <div className="font-medium text-white">{currency}</div>
           <div className="text-gray-400 text-sm">

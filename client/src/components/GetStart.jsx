@@ -25,7 +25,7 @@ const GetStart = () => {
 
                         <div className="flex flex-row justify-center gap-4">
                             <Link to="/signup">
-                                <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02]">
+                                <button className="bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-all duration-300 shadow-lg shadow-green-500/20 hover:shadow-green-500/30 hover:scale-[1.02]">
                                     Create Account
                                 </button>
                             </Link>

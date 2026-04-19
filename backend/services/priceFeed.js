@@ -9,174 +9,124 @@ class PriceFeedService {
     this.retryCount = 0;
     this.maxRetries = 5;
     this.retryDelay = 5000;
+    this.pingInterval = null; 
+    this.lastLogTime = 0; // To throttle logs
 
-    // Tracked symbols
-    this.tracked = [
-      "BTCUSDT",
-      "ETHUSDT",
-      "SOLUSDT",
-      "BNBUSDT",
-      "DOGEUSDT",
-      "ADAUSDT",
-      "XRPUSDT",
-      "DOTUSDT"
-    ];
-
+    this.tracked = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "DOGEUSDT", "ADAUSDT", "XRPUSDT", "DOTUSDT"];
     this.mapName = {
-      BTCUSDT: "bitcoin",
-      ETHUSDT: "ethereum",
-      SOLUSDT: "solana",
-      BNBUSDT: "binancecoin",
-      DOGEUSDT: "dogecoin",
-      ADAUSDT: "cardano",
-      XRPUSDT: "ripple",
-      DOTUSDT: "polkadot"
+      BTCUSDT: "bitcoin", ETHUSDT: "ethereum", SOLUSDT: "solana",
+      BNBUSDT: "binancecoin", DOGEUSDT: "dogecoin", ADAUSDT: "cardano",
+      XRPUSDT: "ripple", DOTUSDT: "polkadot"
     };
 
-    // Initialize WebSocket connection
     this.connectToBinance();
   }
 
   connectToBinance() {
-    const BINANCE_STREAM = "wss://stream.binance.com:9443/ws/!ticker@arr";
-    
-    console.log("Connecting to Binance WebSocket...");
-    
+    // Clean up existing resources before starting a new one
+    this.cleanup();
+
+    const streams = this.tracked.map(s => `${s.toLowerCase()}@ticker`).join("/");
+    const BINANCE_STREAM = `wss://stream.binance.com:9443/stream?streams=${streams}`;
+
+    console.log("📡 Attempting connection to Binance...");
+
     this.binanceWS = new WebSocket(BINANCE_STREAM);
 
     this.binanceWS.on("open", () => {
-      console.log("✅ Connected to Binance WebSocket");
+      console.log("✅ [Binance] Connected. Logs throttled to 10s to save CPU.");
       this.isConnected = true;
       this.retryCount = 0;
+      
+      // Start ping only AFTER successful open
+      this.pingInterval = setInterval(() => {
+        if (this.binanceWS?.readyState === WebSocket.OPEN) {
+          this.binanceWS.ping();
+        }
+      }, 30000); // Ping every 30s instead of 3 mins
     });
 
-    this.binanceWS.on("message", (data) => {
-      this.handlePriceUpdate(data);
+    this.binanceWS.on("message", (rawData) => {
+      this.handlePriceUpdate(rawData);
     });
 
     this.binanceWS.on("error", (err) => {
-      console.error("❌ Binance WebSocket error:", err.message);
-      this.isConnected = false;
+      console.error("❌ [Binance] Error:", err.message);
     });
 
-    this.binanceWS.on("close", (code, reason) => {
-      console.log(`🔌 Binance WebSocket closed: ${code} - ${reason}`);
+    this.binanceWS.on("close", () => {
       this.isConnected = false;
       this.scheduleReconnect();
     });
   }
 
-  handlePriceUpdate(data) {
+  handlePriceUpdate(rawData) {
     try {
-      const updates = JSON.parse(data);
-      const timestamp = Date.now();
+      const parsed = JSON.parse(rawData);
+      const coin = parsed.data;
+      if (!coin) return;
 
-      updates.forEach((coin) => {
-        if (!this.tracked.includes(coin.s)) return;
+      const symbolKey = this.mapName[coin.s];
+      if (!symbolKey) return;
 
-        const current = Number(coin.c);
-        const open = Number(coin.o);
-        const high = Number(coin.h);
-        const low = Number(coin.l);
-        const volume = Number(coin.v);
-        const changePercent = ((current - open) / open) * 100;
+      const current = parseFloat(coin.c);
+      const open = parseFloat(coin.o);
 
-        const symbol = this.mapName[coin.s];
+      this.formatted[symbolKey] = {
+        symbol: coin.s,
+        name: symbolKey,
+        usd: current,
+        usd_24h_high: parseFloat(coin.h),
+        usd_24h_low: parseFloat(coin.l),
+        usd_24h_volume: parseFloat(coin.v),
+        usd_24h_change: Number((((current - open) / open) * 100).toFixed(2)),
+        last_updated: Date.now()
+      };
+
+      // THROTTLE LOGGING: Only log once every 10 seconds so your terminal doesn't crash
+      const now = Date.now();
+      {/*
+        if (now - this.lastLogTime > 10000) {
+        console.log(`📊 Heartbeat: BTC is at $${this.formatted['bitcoin']?.usd}`);
+        this.lastLogTime = now;
+      }
         
-        this.formatted[symbol] = {
-          symbol: coin.s,
-          name: symbol,
-          usd: current,
-          usd_24h_high: high,
-          usd_24h_low: low,
-          usd_24h_volume: volume,
-          usd_24h_change: Number(changePercent.toFixed(2)),
-          last_updated: timestamp
-        };
-      });
+       */}
 
-      // Emit to all connected Socket.IO clients
       if (this.io) {
         this.io.emit("priceUpdate", this.formatted);
       }
-
     } catch (error) {
-      console.error("Error processing price update:", error);
+      // Quietly handle errors to avoid terminal spam
     }
   }
 
   scheduleReconnect() {
+    this.cleanup(); // Stop intervals and kill socket
     if (this.retryCount >= this.maxRetries) {
-      console.error(`Max retries (${this.maxRetries}) reached. Stopping reconnection attempts.`);
+      console.log("🛑 Max retries reached. Stopping.");
       return;
     }
-
     this.retryCount++;
-    const delay = this.retryDelay * this.retryCount;
-    
-    console.log(`Retrying connection in ${delay / 1000} seconds... (Attempt ${this.retryCount}/${this.maxRetries})`);
-    
-    setTimeout(() => {
-      this.connectToBinance();
-    }, delay);
+    console.log(`🔄 Reconnecting in ${this.retryDelay / 1000}s...`);
+    setTimeout(() => this.connectToBinance(), this.retryDelay);
   }
 
-  getPrices() {
-    return this.formatted;
-  }
-
-  getPrice(symbol) {
-    const key = symbol.toLowerCase();
-    return this.formatted[key];
-  }
-
-  getStatus() {
-    return {
-      connected: this.isConnected,
-      trackedSymbols: this.tracked,
-      retryCount: this.retryCount,
-      lastUpdate: Object.keys(this.formatted).length > 0 
-        ? Math.max(...Object.values(this.formatted).map(p => p.last_updated))
-        : null
-    };
-  }
-
-  addSymbol(symbol) {
-    if (!this.tracked.includes(symbol)) {
-      this.tracked.push(symbol);
-      console.log(`Added ${symbol} to tracked symbols`);
-    }
-  }
-
-  removeSymbol(symbol) {
-    const index = this.tracked.indexOf(symbol);
-    if (index > -1) {
-      this.tracked.splice(index, 1);
-      
-      // Remove from formatted data
-      const nameKey = Object.keys(this.mapName).find(key => key === symbol);
-      if (nameKey && this.mapName[nameKey]) {
-        delete this.formatted[this.mapName[nameKey]];
-      }
-      
-      console.log(`Removed ${symbol} from tracked symbols`);
+  cleanup() {
+    if (this.pingInterval) clearInterval(this.pingInterval);
+    if (this.binanceWS) {
+      this.binanceWS.removeAllListeners();
+      this.binanceWS.terminate();
+      this.binanceWS = null;
     }
   }
 
   disconnect() {
-    if (this.binanceWS) {
-      this.binanceWS.close();
-      this.binanceWS = null;
-      this.isConnected = false;
-      console.log("Disconnected from Binance WebSocket");
-    }
+    this.cleanup();
+    console.log("🔌 Manually disconnected.");
   }
 
-  reconnect() {
-    this.disconnect();
-    this.retryCount = 0;
-    this.connectToBinance();
-  }
+  getPrices() { return this.formatted; }
 }
 
 export default PriceFeedService;

@@ -77,7 +77,7 @@ const KYCVerificationPopup = () => {
         return {
           title: 'KYC Requires Attention',
           message: 'Your KYC needs additional verification. Please check your application.',
-          icon: <AlertCircle className="h-6 w-6 text-blue-500" />,
+          icon: <AlertCircle className="h-6 w-6 text-green-500" />,
           buttonText: 'Review Application'
         };
       case 'rejected':
@@ -91,7 +91,7 @@ const KYCVerificationPopup = () => {
         return {
           title: 'Verify Your Identity',
           message: 'Complete KYC verification to access all features and higher limits.',
-          icon: <User className="h-6 w-6 text-blue-500" />,
+          icon: <User className="h-6 w-6 text-green-500" />,
           buttonText: 'Verify Now'
         };
     }
@@ -147,7 +147,7 @@ const KYCVerificationPopup = () => {
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleVerifyNow}
-              className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 font-medium flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-gradient-to-r from-green-600 to-green-600 text-white rounded-xl hover:from-green-700 hover:to-green-700 transition-all duration-300 font-medium flex items-center justify-center gap-2"
             >
               <FileText className="h-5 w-5" />
 

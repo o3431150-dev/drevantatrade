@@ -68,19 +68,19 @@ const StepOne = ({ setEmail, email, verificationStatus, setVerificationStatus, s
                 </AnimatePresence>
 
                 <div>
-                    <label htmlFor="email" className="block text-blue-200 text-sm mb-2 font-medium">
+                    <label htmlFor="email" className="block text-blgreene-200 text-sm mb-2 font-medium">
                         Email Address
                     </label>
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Mail className="h-5 w-5 text-blue-400" />
+                            <Mail className="h-5 w-5 text-green-400" />
                         </div>
                         <input
                             type="email"
                             id="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full pl-10 pr-3 py-3 bg-gray-800/50 border border-blue-500/30 rounded-xl text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition placeholder:text-blue-200/40"
+                            className="w-full pl-10 pr-3 py-3 bg-gray-800/50 border border-green-500/30 rounded-xl text-white focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none transition placeholder:text-green-200/40"
                             placeholder="your@email.com"
                             disabled={isLoading}
                         />
@@ -90,7 +90,7 @@ const StepOne = ({ setEmail, email, verificationStatus, setVerificationStatus, s
                 <button
                     onClick={handleSendOTP}
                     disabled={isLoading}
-                    className="w-full py-4 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full py-4 px-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all bg-gradient-to-r from-green-600 to-green-700 hover:from-green-500 hover:to-green-600 text-white shadow-lg shadow-green-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {isLoading ? (
                         <>

@@ -15,7 +15,7 @@ export default function N404() {
 
       <Link
         to="/"
-        className="mt-8 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition-colors font-semibold shadow-md"
+        className="mt-8 px-6 py-3 rounded-xl bg-green-600 hover:bg-green-700 transition-colors font-semibold shadow-md"
       >
         Go Home
       </Link>

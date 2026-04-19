@@ -19,14 +19,14 @@ import DepositAddressManager from '../components/DepositAddressManager.jsx'
 
 
 export default function AdminHome() {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('users');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const renderAdminContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <AdminDashboard />;
+        return <UsersManagement />;
       case 'users':
         return <UsersManagement />;
       case 'kyc':
@@ -56,7 +56,7 @@ export default function AdminHome() {
       case 'loans':
         return <LoansPanel/>;
       default:
-        return <AdminDashboard />;
+        return <UsersManagement />;
     }
   };
 

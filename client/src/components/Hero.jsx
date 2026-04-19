@@ -47,8 +47,8 @@ export default function Hero() {
     <section className="relative min-h-screen flex flex-col items-center justify-center bg-gray-900 px-4 sm:px-6 md:px-8 overflow-hidden">
 
       {/* Subtle animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-900 to-blue-900/10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-900 to-green-900/10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/5 via-transparent to-transparent"></div>
       </div>
 
       <div className="relative z-10 max-w-6xl mx-auto w-full py-10 ">
@@ -124,7 +124,7 @@ export default function Hero() {
                 key={index}
                 onClick={() => setCurrentSlide(index)}
                 className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide
-                    ? "w-8 bg-blue-500 shadow-lg shadow-blue-500/30"
+                    ? "w-8 bg-green-500 shadow-lg shadow-green-500/30"
                     : "w-2 bg-gray-500/70 hover:bg-gray-400"
                   }`}
                 aria-label={`Go to slide ${index + 1}`}
@@ -140,7 +140,7 @@ export default function Hero() {
           transition={{ duration: 0.5 }}
           className="mb-6 md:mb-8 text-center"
         >
-          {/* <span className="inline-block px-4 py-2 rounded-full bg-blue-900/30 border border-blue-500/30 text-blue-300 text-sm font-mono tracking-wider">
+          {/* <span className="inline-block px-4 py-2 rounded-full bg-green-900/30 border border-green-500/30 text-green-300 text-sm font-mono tracking-wider">
             REAL-TIME DATA STREAM
           </span> */}
         </motion.div>
@@ -155,16 +155,16 @@ export default function Hero() {
           {/* <div className="text-2xl sm:text-3xl md:text-4xl mb-3 md:mb-4">
             Track & Trade the{" "}
             <span className="relative inline-block">
-              <span className="text-blue-400">Future</span>
+              <span className="text-green-400">Future</span>
               <svg className="absolute -bottom-1 left-0 w-full h-0.5" viewBox="0 0 100 2">
-                <path d="M0,1 Q50,3 100,1" stroke="currentColor" strokeWidth="1" fill="none" className="text-blue-400/50"/>
+                <path d="M0,1 Q50,3 100,1" stroke="currentColor" strokeWidth="1" fill="none" className="text-green-400/50"/>
               </svg>
             </span>{" "}
             of
           </div> */}
 
           {/* <div className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-6 md:mb-8">
-            <span className="bg-gradient-to-r from-blue-300 via-cyan-200 to-blue-400 bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-green-300 via-cyan-200 to-green-400 bg-clip-text text-transparent">
               Digital Assets
             </span>
           </div> */}
@@ -199,7 +199,7 @@ export default function Hero() {
         >
           <a
             href="#pd"
-            className="group relative px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-medium text-base sm:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/25 flex items-center gap-3 hover:scale-105"
+            className="group relative px-8 py-4 bg-green-600 hover:bg-green-700 text-white rounded-xl font-medium text-base sm:text-lg transition-all duration-300 hover:shadow-xl hover:shadow-green-500/25 flex items-center gap-3 hover:scale-105"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -225,7 +225,7 @@ export default function Hero() {
           ].map((stat, index) => (
             <div 
               key={index}
-              className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-5 sm:p-6 border border-gray-700/50 hover:border-gray-600/50 hover:shadow-lg hover:shadow-blue-900/10 transition-all duration-300 hover:scale-105"
+              className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-5 sm:p-6 border border-gray-700/50 hover:border-gray-600/50 hover:shadow-lg hover:shadow-green-900/10 transition-all duration-300 hover:scale-105"
             >
               <div className="flex items-center gap-3 mb-3">
                 <div className={`p-2 rounded-lg bg-gray-800/50 ${stat.color.replace('text-', 'bg-')}/10`}>

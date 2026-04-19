@@ -125,9 +125,9 @@ const DEFAULT_DEPOSIT_DATA = {
     },
     ETH: {
         icon: assets.ethereum,
-        color: "text-purple-500",
-        bgColor: "bg-purple-500/10",
-        borderColor: "border-purple-500/30",
+        color: "text-green-500",
+        bgColor: "bg-green-500/10",
+        borderColor: "border-green-500/30",
         networks: {
             Ethereum: "Loading...",
             Arbitrum: "Loading..."
@@ -513,7 +513,7 @@ export default function Deposit() {
                 {loading && (
                     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
                         <div className="bg-gray-800 p-6 rounded-xl flex flex-col items-center">
-                            <FaSpinner className="animate-spin text-3xl text-blue-500 mb-3" />
+                            <FaSpinner className="animate-spin text-3xl text-green-500 mb-3" />
                             <p className="text-white">Processing your deposit...</p>
                             <p className="text-gray-400 text-sm mt-2">Please don't close this window</p>
                         </div>
@@ -564,7 +564,7 @@ export default function Deposit() {
                         <select
                             value={network}
                             onChange={(e) => handleNetworkChange(e.target.value)}
-                            className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50"
+                            className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all disabled:opacity-50"
                             disabled={fetchingAddresses || loading || !currentCoin?.networks}
                         >
                             {currentCoin?.networks && Object.keys(currentCoin.networks).map((net) => (
@@ -584,7 +584,7 @@ export default function Deposit() {
                             <input
                                 type="number"
                                 placeholder="0.00"
-                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 pr-20 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50"
+                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 pr-20 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all disabled:opacity-50"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
                                 disabled={loading}
@@ -614,7 +614,7 @@ export default function Deposit() {
                         <input
                             type="text"
                             placeholder="Enter transaction hash from your wallet"
-                            className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50"
+                            className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all disabled:opacity-50"
                             value={transactionHash}
                             onChange={(e) => setTransactionHash(e.target.value)}
                             disabled={loading}
@@ -632,7 +632,7 @@ export default function Deposit() {
                         <input
                             type="text"
                             placeholder="Address you sent from (helps verification)"
-                            className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all disabled:opacity-50"
+                            className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all disabled:opacity-50"
                             value={fromAddress}
                             onChange={(e) => setFromAddress(e.target.value)}
                             disabled={loading}
@@ -651,7 +651,7 @@ export default function Deposit() {
                             <button
                                 onClick={generateQRCode}
                                 disabled={!address || address === "Loading..." || fetchingAddresses || loading}
-                                className="text-blue-400 hover:text-blue-300 transition-colors text-sm flex items-center gap-1 disabled:opacity-50"
+                                className="text-green-400 hover:text-green-300 transition-colors text-sm flex items-center gap-1 disabled:opacity-50"
                             >
                                 <FaQrcode />
                                 {showQR ? 'Hide QR' : 'Show QR'}
@@ -662,7 +662,7 @@ export default function Deposit() {
                             <div className="bg-gray-950 p-4 rounded-xl flex flex-col items-center justify-center">
                                 {generatingQR ? (
                                     <div className="w-40 h-40 flex items-center justify-center">
-                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500"></div>
                                     </div>
                                 ) : (
                                     <>
@@ -677,7 +677,7 @@ export default function Deposit() {
                                             <button
                                                 onClick={downloadQRCode}
                                                 disabled={loading}
-                                                className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors text-sm disabled:opacity-50"
+                                                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors text-sm disabled:opacity-50"
                                             >
                                                 <FaDownload className="text-sm" />
                                                 Download QR
@@ -720,7 +720,7 @@ export default function Deposit() {
                             Upload Deposit Proof (Screenshot/Receipt)
                             <span className="text-red-400 ml-1">*</span>
                         </label>
-                        <div className="border-2 border-dashed border-gray-600/50 rounded-xl p-4 text-center transition-all hover:border-blue-500/50 cursor-pointer group">
+                        <div className="border-2 border-dashed border-gray-600/50 rounded-xl p-4 text-center transition-all hover:border-green-500/50 cursor-pointer group">
                             <input
                                 type="file"
                                 className="hidden"
@@ -731,7 +731,7 @@ export default function Deposit() {
                             />
                             <label htmlFor="fileInput" className="cursor-pointer disabled:opacity-50">
                                 <div className="flex flex-col items-center">
-                                    <FaUpload className="text-gray-400 group-hover:text-blue-400 text-2xl mx-auto mb-3 transition-colors" />
+                                    <FaUpload className="text-gray-400 group-hover:text-green-400 text-2xl mx-auto mb-3 transition-colors" />
 
                                     {file ? (
                                         <div className="w-full">
@@ -781,7 +781,7 @@ export default function Deposit() {
                             onClick={handleSubmit}
                             disabled={loading || fetchingAddresses || !file || !amount || !transactionHash || kycStatus?.status !== 'approved' || !accountVerified}
                             className={`w-full py-3 rounded-xl font-semibold transition-all duration-300 ${!loading && !fetchingAddresses && file && amount && transactionHash && kycStatus?.status === 'approved' && accountVerified
-                                ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 text-white shadow-lg"
+                                ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transform hover:scale-105 text-white shadow-lg"
                                 : "bg-gray-600 text-gray-400 cursor-not-allowed"
                                 }`}
                         >
@@ -840,13 +840,13 @@ export default function Deposit() {
                     </div>
 
                     {/* Info Box */}
-                    {/* <div className="mt-4 p-3 bg-blue-500/5 border border-blue-500/20 rounded-lg">
+                    {/* <div className="mt-4 p-3 bg-green-500/5 border border-green-500/20 rounded-lg">
                         <div className="flex items-start gap-2">
-                            <div className="p-1 rounded bg-blue-500/10">
-                                <span className="text-blue-400 text-sm">ℹ️</span>
+                            <div className="p-1 rounded bg-green-500/10">
+                                <span className="text-green-400 text-sm">ℹ️</span>
                             </div>
                             <div>
-                                <p className="text-blue-300 text-xs">
+                                <p className="text-green-300 text-xs">
                                     Need help? Contact support if your deposit doesn't appear within 30 minutes of confirmation.
                                 </p>
                             </div>

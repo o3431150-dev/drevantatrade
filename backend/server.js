@@ -26,9 +26,12 @@ import profileRoutes from "./routes/profileRoutes.js";
 import depositAddressRouter from './routes/depositAddressRoutes.js'
 // Services
 import PriceFeedService from "./services/priceFeed.js";
-import './services/orderProcessor.js';
+//import './services/orderProcessor.js';
 
 dotenv.config();
+
+/* ---------- Database ---------- */
+connectToMongoDB();
 
 /* ---------- Path Fix (ESM) ---------- */
 const __filename = fileURLToPath(import.meta.url);
@@ -46,6 +49,7 @@ app.use((req, res, next) => {
 
 /* ---------- CORS ---------- */
 const allowedOrigins = [
+  "http://localhost:3000",
   "http://localhost:5173",
   "https://www.zaytrade.com",
   "https://zaytrade.com",
@@ -66,9 +70,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-/* ---------- Database ---------- */
-connectToMongoDB();
-startBot();
+
+//startBot();
 
 /* ---------- Server & Socket ---------- */
 const server = http.createServer(app);

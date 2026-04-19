@@ -36,60 +36,19 @@ export default function TransactionsPanel() {
     {
       id: "TX001",
       transactionId: "TXID123456789",
-      user: { email: "john.doe@example.com", userId: "USR001" },
+      user: { email: "example@example.com", userId: "USR001" },
       type: "Deposit",
       amount: 120,
       currency: "USDT",
       status: "Completed",
-      date: "12/10/2025, 14:33",
+      date: "12/10/2026, 14:33",
       fee: 0.5,
       network: "TRC20",
       hash: "0x1234567890abcdef1234567890abcdef1234567890abcdef",
       fromAddress: "TXYZ123456789",
       toAddress: "TABC456789012"
     },
-    {
-      id: "TX002",
-      transactionId: "TXID987654321",
-      user: { email: "jane.smith@example.com", userId: "USR002" },
-      type: "Withdrawal",
-      amount: 75.5,
-      currency: "BTC",
-      status: "Pending",
-      date: "12/10/2025, 12:15",
-      fee: 0.001,
-      network: "Bitcoin",
-      hash: "0xfedcba0987654321fedcba0987654321fedcba0987654321",
-      fromAddress: "BC1XYZ789012",
-      toAddress: "BC1ABC345678"
-    },
-    {
-      id: "TX003",
-      transactionId: "TXID456789123",
-      user: { email: "mike.wilson@example.com", userId: "USR003" },
-      type: "Trade",
-      amount: -500,
-      currency: "USDT",
-      status: "Completed",
-      date: "12/10/2025, 10:45",
-      fee: 2.5,
-      pair: "BTC/USDT",
-      price: 51234.56
-    },
-    {
-      id: "TX004",
-      transactionId: "TXID789123456",
-      user: { email: "sarah.jones@example.com", userId: "USR004" },
-      type: "Deposit",
-      amount: 2500,
-      currency: "USDT",
-      status: "Failed",
-      date: "11/10/2025, 16:20",
-      fee: 1.25,
-      network: "ERC20",
-      hash: "0x9876543210fedcba9876543210fedcba9876543210fedcba",
-      error: "Insufficient gas"
-    }
+   
   ];
 
   const filteredTransactions = transactions.filter(transaction => {

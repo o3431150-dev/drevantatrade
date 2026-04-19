@@ -44,7 +44,7 @@ export default function ResetPasswordPage() {
               <React.Fragment key={num}>
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step >= num
-                    ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
+                    ? "bg-gradient-to-r from-green-600 to-green-700 text-white"
                     : "bg-gray-800 text-gray-400"
                     }`}
                 >
@@ -52,7 +52,7 @@ export default function ResetPasswordPage() {
                 </div>
                 {num < 3 && (
                   <div
-                    className={`flex-1 h-1 ${step > num ? "bg-gradient-to-r from-blue-600 to-blue-700" : "bg-gray-800"
+                    className={`flex-1 h-1 ${step > num ? "bg-gradient-to-r from-green-600 to-green-700" : "bg-gray-800"
                       }`}
                   />
                 )}
@@ -100,13 +100,13 @@ export default function ResetPasswordPage() {
         )}
 
         {/* Navigation/Back Button */}
-        <div className="text-center text-sm text-blue-200/80 mt-6">
+        <div className="text-center text-sm text-green-200/80 mt-6">
           {step === 1 ? (
             <motion.a
               href="/login"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="text-blue-400 hover:text-blue-300 font-medium flex items-center justify-center gap-1"
+              className="text-green-400 hover:text-green-300 font-medium flex items-center justify-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" /> Back to Login
             </motion.a>
@@ -115,7 +115,7 @@ export default function ResetPasswordPage() {
               onClick={() => setStep(1)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="text-blue-400 hover:text-blue-300 font-medium flex items-center justify-center gap-1"
+              className="text-green-400 hover:text-green-300 font-medium flex items-center justify-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" /> Change Email
             </motion.button>
@@ -124,7 +124,7 @@ export default function ResetPasswordPage() {
               onClick={() => setStep(2)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="text-blue-400 hover:text-blue-300 font-medium flex items-center justify-center gap-1"
+              className="text-green-400 hover:text-green-300 font-medium flex items-center justify-center gap-1"
             >
               <ArrowLeft className="h-4 w-4" /> Back to Verification
             </motion.button>

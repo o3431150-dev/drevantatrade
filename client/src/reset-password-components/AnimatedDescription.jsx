@@ -12,7 +12,7 @@ const AnimatedDescription = ({ step, descriptions }) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.3 }}
-        className="text-blue-200/80 text-center mb-8 text-xs sm:text-md"
+        className="text-green-200/80 text-center mb-8 text-xs sm:text-md"
       >
         {content}
       </motion.p>

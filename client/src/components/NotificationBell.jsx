@@ -301,7 +301,7 @@ const NotificationBell = () => {
             case 'deposit':
                 return <DollarSign {...iconProps} className={`${iconProps.className} text-green-500`} />;
             case 'withdrawal':
-                return <CreditCard {...iconProps} className={`${iconProps.className} text-blue-500`} />;
+                return <CreditCard {...iconProps} className={`${iconProps.className} text-xblue-500`} />;
             case 'loan':
                 return <TrendingUp {...iconProps} className={`${iconProps.className} text-purple-500`} />;
             case 'kyc':
@@ -317,7 +317,7 @@ const NotificationBell = () => {
             case 'account':
                 return <User {...iconProps} className={`${iconProps.className} text-teal-500`} />;
             default:
-                return <Bell {...iconProps} className={`${iconProps.className} text-blue-500`} />;
+                return <Bell {...iconProps} className={`${iconProps.className} text-xblue-500`} />;
         }
     };
 
@@ -343,10 +343,10 @@ const NotificationBell = () => {
                 icon: 'text-yellow-600 dark:text-yellow-400'
             },
             info: {
-                bg: 'bg-blue-100 dark:bg-blue-900/20',
-                text: 'text-blue-800 dark:text-blue-300',
-                border: 'border-blue-200 dark:border-blue-800',
-                icon: 'text-blue-600 dark:text-blue-400'
+                bg: 'bg-xblue-100 dark:bg-xblue-900/20',
+                text: 'text-xblue-800 dark:text-xblue-300',
+                border: 'border-xblue-200 dark:border-xblue-800',
+                icon: 'text-xblue-600 dark:text-xblue-400'
             }
         };
 
@@ -371,7 +371,7 @@ const NotificationBell = () => {
     const getStatusIndicator = (status) => {
         if (status === 'unread') {
             return (
-                <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                <span className="absolute left-0 top-1/2 transform -translate-y-1/2 w-2 h-2 rounded-full bg-green-600 animate-pulse"></span>
             );
         }
         return null;
@@ -413,7 +413,7 @@ const NotificationBell = () => {
     // Loading state
     const renderLoadingState = () => (
         <div className="p-8 text-center">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin text-blue-500" />
+            <Loader2 className="mx-auto h-8 w-8 animate-spin text-green-500" />
             <p className="mt-2 text-sm text-gray-500">Loading notifications...</p>
         </div>
     );
@@ -444,7 +444,7 @@ const NotificationBell = () => {
                 <button
                     onClick={() => toast('Please log in to view notifications')}
                     className={`
-                        relative p-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+                        relative p-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50
                         ${isDarkMode
                             ? 'text-gray-300 hover:text-white hover:bg-gray-800'
                             : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -464,7 +464,7 @@ const NotificationBell = () => {
             <button
                 onClick={() => setIsOpen(!isOpen)}
                 className={`
-                    relative p-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50
+                    relative p-2 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50
                     ${isDarkMode
                         ? 'text-gray-300 hover:text-white hover:bg-gray-800'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
@@ -498,7 +498,7 @@ const NotificationBell = () => {
                     {/* Header */}
                     <div className={`
                         sticky top-0 p-4 border-b dark:border-gray-800
-                        bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-900 dark:to-blue-800
+                        bg-gradient-to-r from-green-600 to-green-700 dark:from-green-900 dark:to-green-800
                         z-10
                     `}>
                         <div className="flex items-center justify-between">
@@ -507,7 +507,7 @@ const NotificationBell = () => {
                                     <Bell size={20} />
                                     Notifications
                                 </h3>
-                                <p className="text-blue-100 text-sm mt-1">
+                                <p className="text-green-100 text-sm mt-1">
                                     {unreadCount} unread • {notifications.length} total
                                 </p>
                             </div>
@@ -518,8 +518,8 @@ const NotificationBell = () => {
                                     className={`
                                         p-2 rounded-lg transition-all disabled:opacity-50
                                         ${isDarkMode
-                                            ? 'hover:bg-blue-800 text-blue-200'
-                                            : 'hover:bg-blue-500 text-blue-100'
+                                            ? 'hover:bg-green-800 text-green-200'
+                                            : 'hover:bg-green-500 text-green-100'
                                         }
                                     `}
                                     title="Refresh notifications"
@@ -531,8 +531,8 @@ const NotificationBell = () => {
                                     className={`
                                         p-2 rounded-lg transition-all
                                         ${isDarkMode
-                                            ? 'hover:bg-blue-800 text-blue-200'
-                                            : 'hover:bg-blue-500 text-blue-100'
+                                            ? 'hover:bg-green-800 text-green-200'
+                                            : 'hover:bg-green-500 text-green-100'
                                         }
                                     `}
                                     title="Filter notifications"
@@ -544,8 +544,8 @@ const NotificationBell = () => {
                                     className={`
                                         p-2 rounded-lg transition-all
                                         ${isDarkMode
-                                            ? 'hover:bg-blue-800 text-blue-200'
-                                            : 'hover:bg-blue-500 text-blue-100'
+                                            ? 'hover:bg-green-800 text-green-200'
+                                            : 'hover:bg-green-500 text-green-100'
                                         }
                                     `}
                                     title="Close"
@@ -598,7 +598,7 @@ const NotificationBell = () => {
                                         className={`
                                             flex-shrink-0 px-3 py-1.5 rounded-full text-sm font-medium transition-all whitespace-nowrap flex items-center gap-1
                                             ${activeFilter === filter.value
-                                                ? 'bg-blue-600 text-white shadow-md'
+                                                ? 'bg-green-600 text-white shadow-md'
                                                 : isDarkMode
                                                     ? 'text-gray-300 hover:text-white hover:bg-gray-700'
                                                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-200'
@@ -611,7 +611,7 @@ const NotificationBell = () => {
                                             <span className={`
                                                 ml-1 px-1.5 py-0.5 rounded-full text-xs
                                                 ${activeFilter === filter.value
-                                                    ? 'bg-blue-700 text-blue-100'
+                                                    ? 'bg-green-700 text-green-100'
                                                     : isDarkMode
                                                         ? 'bg-gray-700 text-gray-300'
                                                         : 'bg-gray-200 text-gray-600'
@@ -645,8 +645,8 @@ const NotificationBell = () => {
                                                 group p-4 transition-all duration-200 cursor-pointer relative
                                                 ${notification.status === 'unread'
                                                     ? isDarkMode
-                                                        ? 'bg-blue-900/10 hover:bg-blue-900/20'
-                                                        : 'bg-blue-50 hover:bg-blue-100'
+                                                        ? 'bg-green-900/10 hover:bg-green-900/20'
+                                                        : 'bg-green-50 hover:bg-green-100'
                                                     : isDarkMode
                                                         ? 'hover:bg-gray-800/50'
                                                         : 'hover:bg-gray-50'
@@ -737,7 +737,7 @@ const NotificationBell = () => {
                                                                             ? 'bg-red-600 hover:bg-red-700 text-white'
                                                                             : action.style === 'success'
                                                                                 ? 'bg-green-600 hover:bg-green-700 text-white'
-                                                                                : 'bg-blue-600 hover:bg-blue-700 text-white'
+                                                                                : 'bg-green-600 hover:bg-green-700 text-white'
                                                                         }
                                                                     `}
                                                                 >
@@ -780,8 +780,8 @@ const NotificationBell = () => {
                                 className={`
                                     inline-flex items-center gap-2 text-sm font-medium transition-all
                                     ${isDarkMode
-                                        ? 'text-blue-400 hover:text-blue-300'
-                                        : 'text-blue-600 hover:text-blue-800'
+                                        ? 'text-green-400 hover:text-green-300'
+                                        : 'text-green-600 hover:text-green-800'
                                     }
                                 `}
                             >

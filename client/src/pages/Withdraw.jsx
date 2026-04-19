@@ -254,9 +254,9 @@ export default function WithdrawPage() {
                         return address.length > 10; // Basic validation
                 }
             case 'BTC':
-                return address.length >= 26 && address.length <= 35;
+               // return address.length >= 26 && address.length <= 35;
             case 'ETH':
-                return address.length === 42 && address.startsWith('0x');
+                //return address.length === 42 && address.startsWith('0x');
             default:
                 return address.length > 10;
         }
@@ -318,7 +318,7 @@ export default function WithdrawPage() {
                 </div>
 
                 {/* Balance Card */}
-                <div className="bg-gradient-to-r from-blue-500/20 to-blue-600/20 rounded-2xl border border-blue-500/30 p-4 mb-6">
+                <div className="bg-gradient-to-r from-green-500/20 to-green-600/20 rounded-2xl border border-green-500/30 p-4 mb-6">
                     <div className="text-center">
                         <p className="text-gray-300 text-sm mb-1">Available Balance</p>
                         <p className="text-2xl font-bold text-white">
@@ -389,7 +389,7 @@ export default function WithdrawPage() {
                                 setNetwork(e.target.value);
                                 setWithdrawAddress("");
                             }}
-                            className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                         >
                             {Object.keys(currentCoin.networks).map((net) => (
                                 <option key={net} value={net} className="bg-gray-800">
@@ -412,7 +412,7 @@ export default function WithdrawPage() {
                                 <button
                                     onClick={handleMaxAmount}
                                     disabled={userBalances[coin] <= 0}
-                                    className="text-blue-400 hover:text-blue-300 text-xs px-2 py-1 border border-blue-400/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="text-green-400 hover:text-green-300 text-xs px-2 py-1 border border-green-400/50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     MAX
                                 </button>
@@ -428,7 +428,7 @@ export default function WithdrawPage() {
                             <input
                                 type="number"
                                 placeholder="0.00"
-                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 pr-20 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 pr-20 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
 
@@ -444,7 +444,7 @@ export default function WithdrawPage() {
                             <span>Available: {formatBalance(userBalances[coin])} {coin}</span>
                         </div>
                         {amount && parseFloat(amount) > 0 && (
-                            <p className="text-xs text-blue-400 mt-1">
+                            <p className="text-xs text-green-400 mt-1">
                                 You will receive: {getReceiveAmount()} {coin} (after {networkFee} fee)
                             </p>
                         )}
@@ -513,7 +513,7 @@ export default function WithdrawPage() {
                                     parseFloat(amount) <= userBalances[coin] &&
                                     isValidAddress() &&
                                     !isSubmitting
-                                    ? "bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 transform hover:scale-105 text-white shadow-lg"
+                                    ? "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 transform hover:scale-105 text-white shadow-lg"
                                     : "bg-gray-600 text-gray-400 cursor-not-allowed"
                                 }`}
                         >
@@ -536,14 +536,14 @@ export default function WithdrawPage() {
                     </div>
 
                     {/* Important Information */}
-                    <div className="bg-blue-500/10 rounded-xl p-3 mt-6 border border-blue-500/20">
+                    <div className="bg-green-500/10 rounded-xl p-3 mt-6 border border-green-500/20">
                         <div className="flex items-start gap-3">
-                            <div className="text-blue-400 mt-0.5">
+                            <div className="text-green-400 mt-0.5">
                                 ℹ️
                             </div>
                             <div>
-                                <h3 className="font-semibold text-blue-400 mb-1">Important Information</h3>
-                                <ul className="text-xs text-blue-300 space-y-1">
+                                <h3 className="font-semibold text-green-400 mb-1">Important Information</h3>
+                                <ul className="text-xs text-green-300 space-y-1">
                                     <li>• Only withdraw {coin} to {network} addresses</li>
                                     <li>• Minimum withdrawal: {getMinimumWithdrawal()} {coin}</li>
                                     <li>• Network fee: {networkFee}</li>

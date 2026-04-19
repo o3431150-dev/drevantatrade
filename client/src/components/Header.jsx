@@ -16,6 +16,7 @@ import {
   Sparkles,
   PiggyBank,
   LogIn,
+  
 
 
 } from 'lucide-react';
@@ -43,10 +44,10 @@ const Header = () => {
 
   const navigation = [
 
-    { name: 'News', href: '#live', featured: true, icon: <TrendingUp className="w-4 h-4" /> },
-    { name: 'wallet', href: '#wallet', icon: <Wallet className="w-4 h-4" /> },
-    { name: 'loan', href: '#loan', icon: <PiggyBank className="w-4 h-4" /> },
-    { name: 'Profile', href: '#profile', icon: <User className="w-4 h-4" /> },
+    { name: 'News', href: 'News', featured: true, icon: <TrendingUp className="w-4 h-4" /> },
+    { name: 'Wallet', href: 'wallet', icon: <Wallet className="w-4 h-4" /> },
+    { name: 'History', href: 'history', icon: <History className="w-4 h-4" /> },
+    { name: 'profile', href: 'profile', icon: <User className="w-4 h-4" /> },
   ];
 
 
@@ -57,7 +58,7 @@ const Header = () => {
 
   const walletOptions = [
     { name: 'Profile', action: () => navigate('/profile'), icon: <User className="w-4 h-4" /> },
-    { name: 'Loans', action: () => navigate('/loan'), icon: <PiggyBank className="w-4 h-4" /> },
+   // { name: 'Loans', action: () => navigate('/loan'), icon: <PiggyBank className="w-4 h-4" /> },
     { name: 'Deposit', action: () => navigate('/deposit'), icon: <Coins className="w-4 h-4" /> },
     { name: 'Withdraw', action: () => navigate('/Withdraw'), icon: <Coins className="w-4 h-4" /> },
     { name: 'Wallet', action: () => navigate('/wallet'), icon: <Wallet className="w-4 h-4" /> },
@@ -90,10 +91,10 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             <div className=" space-x-2 flex items-center cursor-pointer" onClick={() => navigate('/')}>
-              <img src={assets.logo} alt="Loading..." className="w-16 h-16 sm:w-20 md:h-20  " />
-              {/* <span className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                Logo
-              </span> */}
+              {/* <img src={assets.logo} alt="Loading..." className="w-16 h-16 sm:w-20 md:h-20  " /> */}
+              <span className="text-md font-bold bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">
+                Uphold trading
+              </span>
             </div>
 
             {/* Desktop Navigation */}
@@ -102,9 +103,9 @@ const Header = () => {
                 <div key={item.name} className="relative group">
                   <p
                     // href={item.href}
-                    onClick={() => navigate(`/${item.name}`)}
+                    onClick={() => navigate(`/${item.href}`)}
                     className={`flex cursor-pointer items-center space-x-1 px-4 py-2 rounded-lg text-sm font-medium transition-all ${item.featured
-                      ? 'text-cyan-400 hover:text-cyan-300'
+                      ? 'text-white hover:text-white'
                       : 'text-gray-300 hover:text-white'
                       }`}
                   >
@@ -136,7 +137,7 @@ const Header = () => {
                   <div className="relative">
                     <button
                       onClick={() => setIsWalletDropdownOpen(!isWalletDropdownOpen)}
-                      className="flex items-center space-x-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 px-4 py-2 rounded-lg transition-all duration-200"
+                      className="flex items-center space-x-2 bg-gradient-to-r from-green-500 to-green-500 hover:from-green-600 hover:to-green-600 px-4 py-2 rounded-lg transition-all duration-200"
                     >
                       <Menu className="w-5 h-5" />
 
@@ -175,7 +176,7 @@ const Header = () => {
 
               (
                 <button
-                  className=' text-white w-[110px] bg-blue-500 p-2 font-bold rounded-full cursor-pointer hidden md:block'
+                  className=' text-white w-[110px] bg-green-500 p-2 font-bold rounded-full cursor-pointer hidden md:block'
                   onClick={() => navigate('/signup')}>
                   Get start
                 </button>
@@ -192,7 +193,7 @@ const Header = () => {
           {!isLogin && (
             <button
               onClick={() => navigate('/login')}
-              className="sm:hidden px-3 py-2 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 active:scale-95 transition-all"
+              className="sm:hidden px-3 py-2 rounded-lg bg-green-500 text-white text-sm font-medium hover:bg-green-600 active:scale-95 transition-all"
             >
               Get Started
             </button>
@@ -217,12 +218,12 @@ const Header = () => {
                 >
                   <div className="flex items-center space-x-2">
                     {item.icon}
-                    <span className={item.featured ? 'text-cyan-400' : ''}>
+                    <span className={item.featured ? 'text-green-400' : ''}>
                       {item.name}
                     </span>
                   </div>
                   {item.featured && (
-                    <span className="px-2 py-1 text-xs bg-cyan-500/20 text-cyan-400 rounded">
+                    <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded">
                       HOT
                     </span>
                   )}
@@ -240,7 +241,7 @@ const Header = () => {
               <div className="grid grid-cols-2 gap-2  z-10">
                 <button
 
-                  className="flex z-50 items-center justify-center space-x-2 px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-lg transition-colors text-white font-sm"
+                  className="flex z-50 items-center justify-center space-x-2 px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg transition-colors text-white font-sm"
                   onClick={() => {
                     navigate('/deposit')
 
@@ -255,7 +256,7 @@ const Header = () => {
 
                   }}
 
-                  className="flex items-center justify-center space-x-2 px-4 py-2 border border-gray-600 hover:border-cyan-400 rounded-lg transition-colors text-white font-sm z-50">
+                  className="flex items-center justify-center space-x-2 px-4 py-2 border border-gray-600 hover:border-green-400 rounded-lg transition-colors text-white font-sm z-50">
                   <Wallet className="w-4 h-4" />
                   <span>Withdraw</span>
                 </button>

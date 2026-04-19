@@ -241,7 +241,7 @@ export default function ConvertModal({
                                         setErrorMessage("");
                                     }}
                                     className={`p-3 sm:p-4 rounded-lg border-1 transition-all duration-200 ${convertFrom === symbol
-                                        ? `border-blue-500 ${config.bgColor} ring-2 ring-blue-500/20`
+                                        ? `border-green-500 ${config.bgColor} ring-2 ring-green-500/20`
                                         : "border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
                                         }`}
                                 >
@@ -298,7 +298,7 @@ export default function ConvertModal({
                                 onChange={handleAmountChange}
                                 className="w-full p-3 sm:p-4 pl-4 pr-28 text-base sm:text-lg rounded-lg border bg-white dark:bg-gray-800
                                          border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white
-                                         focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors
+                                         focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors
                                          disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={currentBalance <= 0}
                             />
@@ -311,8 +311,8 @@ export default function ConvertModal({
                                         type="button"
                                         onClick={handleMaxAmount}
                                         disabled={currentBalance <= 0}
-                                        className="px-2 sm:px-3 py-1 text-xs bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 
-                                                 rounded-md hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors
+                                        className="px-2 sm:px-3 py-1 text-xs bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 
+                                                 rounded-md hover:bg-green-200 dark:hover:bg-green-800 transition-colors
                                                  disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         MAX
@@ -330,7 +330,7 @@ export default function ConvertModal({
                                 </div>
                                 <div className="h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-blue-500 rounded-full transition-all duration-300"
+                                        className="h-full bg-green-500 rounded-full transition-all duration-300"
                                         style={{ width: `${Math.min(balancePercentage, 100)}%` }}
                                     />
                                 </div>
@@ -397,7 +397,7 @@ export default function ConvertModal({
                             <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-gray-600 dark:text-gray-400">Estimated USDT</span>
-                                    <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                                    <span className="text-sm font-bold text-green-600 dark:text-green-400">
                                         ${estimatedUSDT.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                                     </span>
                                 </div>
@@ -440,8 +440,8 @@ export default function ConvertModal({
                             onClick={handleConvert}
                             disabled={!convertAmount || parseFloat(convertAmount) <= 0 || isConverting || !!errorMessage || currentBalance <= 0}
                             className="order-1 sm:order-2 flex-1 py-3 text-sm font-semibold
-                                     bg-gradient-to-r from-blue-600 to-blue-700 text-white 
-                                     hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 
+                                     bg-gradient-to-r from-green-600 to-green-700 text-white 
+                                     hover:from-green-700 hover:to-green-800 disabled:opacity-50 
                                      disabled:cursor-not-allowed rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                         >
                             {currentBalance <= 0 ? (
