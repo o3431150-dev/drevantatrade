@@ -130,8 +130,25 @@ app.use(history({
 }));
 
 /* ---------- Serve Frontend ---------- */
-const clientDistPath = path.join(__dirname, "../client/dist");
+//const clientDistPath = path.join(__dirname, "../client/dist");
+///app.use(express.static(clientDistPath));
+
+
+/* ---------- Serve Frontend ---------- */
+// This ensures we get the absolute path to the root, then into client/dist
+const clientDistPath = path.resolve(__dirname, "..", "client", "dist");
+
 app.use(express.static(clientDistPath));
+
+// Add this RIGHT AFTER app.use(express.static...):
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientDistPath, "index.html"), (err) => {
+    if (err) {
+      res.status(500).send("index.html not found in " + clientDistPath);
+    }
+  });
+});
+
 
 /* ---------- Socket.IO ---------- */
 io.on("connection", socket => {
