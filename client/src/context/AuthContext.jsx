@@ -13,8 +13,10 @@ export const AuthProvider = ({ children }) => {
     const [isOtpSend, setIsOtpSend] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
 
-    const backendUrl = "https://trading-app-fdzj.onrender.com/"
+    //const backendUrl = "https://trading-app-fdzj.onrender.com/"
     //const backendUrl = 'http://localhost:3000/'
+
+    const backendUrl = "https://tradingappv1-production.up.railway.app/"
 
 
     // Admin state
