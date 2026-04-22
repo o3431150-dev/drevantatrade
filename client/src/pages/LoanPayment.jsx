@@ -21,7 +21,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // API configuration
 //const API_URL = 'https://trading-app-fdzj.onrender.com/api';
-const API_URL = "https://tradingappv1-production.up.railway.app/api";
+const API_URL = "https://trading-appv1.onrender.com//api";
 //const API_URL = 'http://localhost:3000/api';
 
 // Create axios instance

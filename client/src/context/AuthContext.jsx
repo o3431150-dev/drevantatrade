@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     //const backendUrl = "https://trading-app-fdzj.onrender.com/"
     //const backendUrl = 'http://localhost:3000/'
 
-    const backendUrl = "https://tradingappv1-production.up.railway.app/"
+    const backendUrl = "https://trading-appv1.onrender.com/"
 
 
     // Admin state

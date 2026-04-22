@@ -49,6 +49,7 @@ app.use((req, res, next) => {
 
 /* ---------- CORS ---------- */
 const allowedOrigins = [
+  "https://trading-appv1.onrender.com",
   "http://localhost:3000",
   "http://localhost:5173",
   "https://www.zaytrade.com",

@@ -41,7 +41,7 @@ export const OrderWebSocketProvider = ({ children }) => {
 
   useEffect(() => {
     // Initialize socket connection
-    const backendUrl = "https://tradingappv1-production.up.railway.app";
+    const backendUrl = "https://trading-appv1.onrender.com"
     socketRef.current = io(backendUrl, { 
       transports: ["websocket"],
       path: '/socket.io', // or your custom path
