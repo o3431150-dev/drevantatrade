@@ -1,9 +1,9 @@
 {
   "name": "trading-app-root",
   "version": "1.0.0",
-  "type": "module", 
+  "type": "module",
   "scripts": {
-    "build": "cd client && npm install && npm run build",
+    "build": "cd client && npm install && npm run build && cd ../backend && npm install",
     "start": "cd backend && node server.js"
   }
 }
