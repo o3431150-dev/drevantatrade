@@ -52,11 +52,10 @@ const allowedOrigins = [
   "https://trading-appv1.onrender.com"
   "http://localhost:3000",
   "http://localhost:5173",
-  "https://www.zaytrade.com",
-  "https://zaytrade.com",
   "https://trading-app-fdzj.onrender.com",
   "https://tradingappv1-production.up.railway.app",
-  "https://upholdtrading.netlify.app"
+  "https://tradingappv1-production-71a7.up.railway.app"
+
 ];
 
 app.use(cors({
@@ -125,15 +124,22 @@ app.get("/api/prices/:symbol", (req, res) => {
 });
 
 /* ---------- SPA History Fallback ---------- */
+// This middleware redirects non-API requests to index.html
 app.use(history({
+  verbose: false,
   rewrites: [
-    { from: /^\/api\/.*$/, to: ctx => ctx.parsedUrl.pathname }
+    { from: /^\/api\/.*$/, to: (ctx) => ctx.parsedUrl.pathname }
   ]
 }));
 
 /* ---------- Serve Frontend ---------- */
 const clientDistPath = path.join(__dirname, "../client/dist");
 app.use(express.static(clientDistPath));
+
+// Final Catch-all (Optional but recommended for deep-linking reliability)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientDistPath, "index.html"));
+});
 
 /* ---------- Socket.IO ---------- */
 io.on("connection", socket => {
