@@ -37,6 +37,10 @@ connectToMongoDB();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Construct the path and log it once to the console to verify on Railway
+const clientDistPath = path.resolve(__dirname, "..", "client", "dist");
+console.log("Serving static files from:", clientDistPath);
+
 /* ---------- App ---------- */
 const app = express();
 
