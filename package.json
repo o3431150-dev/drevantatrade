@@ -4,6 +4,6 @@
   "type": "module", 
   "scripts": {
     "build": "cd client && npm install && npm run build",
-    "start": "cd backend && node index.js"
+    "start": "cd backend && node server.js"
   }
 }
