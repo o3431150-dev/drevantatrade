@@ -1,11 +1,9 @@
 {
-  "name": "my-fullstack-app",
+  "name": "trading-app-root",
   "version": "1.0.0",
+  "type": "module", 
   "scripts": {
-    "install-client": "cd client && npm install",
-    "install-backend": "cd backend && npm install",
-    "build-client": "cd client && npm run build",
-    "start": "cd backend && node server.js",
-    "deploy": "npm run install-client && npm run build-client && npm run install-backend && npm run start"
+    "build": "cd client && npm install && npm run build",
+    "start": "cd backend && node index.js"
   }
 }
