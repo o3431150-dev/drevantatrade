@@ -123,22 +123,29 @@ app.get("/api/prices/:symbol", (req, res) => {
   res.json(price);
 });
 
-/* ---------- SPA History Fallback ---------- */
-// This middleware redirects non-API requests to index.html
+/* ---------- SPA / Static Handling ---------- */
+
+// 1. Serve static files first
+app.use(express.static(clientDistPath));
+
+// 2. SPA History Fallback
+// This handles the "refresh" issue by redirecting 404s to index.html
 app.use(history({
   verbose: false,
+  index: '/index.html',
   rewrites: [
     { from: /^\/api\/.*$/, to: (ctx) => ctx.parsedUrl.pathname }
   ]
 }));
 
-/* ---------- Serve Frontend ---------- */
-const clientDistPath = path.join(__dirname, "../client/dist");
-app.use(express.static(clientDistPath));
-
-// Final Catch-all (Optional but recommended for deep-linking reliability
-app.get("*path", (req, res) => {
-  res.sendFile(path.join(clientDistPath, "index.html"));
+// 3. Final Catch-all (Redundant but keeps things bulletproof)
+// If the history middleware misses something, this serves index.html
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientDistPath, "index.html"), (err) => {
+    if (err) {
+      res.status(500).send("Error: The build files are missing. Check if 'npm run build' ran successfully.");
+    }
+  });
 });
 
 /* ---------- Socket.IO ---------- */
