@@ -54,7 +54,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://trading-app-fdzj.onrender.com",
   "https://tradingappv1-production.up.railway.app",
-  "https://tradingappv1-production-71a7.up.railway.app"
+  "https://tradingappv1-production-71a7.up.railway.app",
 
 ];
 
@@ -137,7 +137,7 @@ const clientDistPath = path.join(__dirname, "../client/dist");
 app.use(express.static(clientDistPath));
 
 // Final Catch-all (Optional but recommended for deep-linking reliability
-app.get("(.*)", (req, res) => {
+app.get("*path", (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"));
 });
 
