@@ -37,9 +37,11 @@ connectToMongoDB();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Construct the path and log it once to the console to verify on Railway
-const clientDistPath = path.resolve(__dirname, "..", "client", "dist");
-console.log("Serving static files from:", clientDistPath);
+// Ensure we use path.join to create a relative lookup from the current folder
+// This will result in something like /app/client/dist on Railway
+const clientDistPath = path.join(__dirname, "..", "client", "dist");
+
+console.log("✅ Serving static files from:", clientDistPath);
 
 /* ---------- App ---------- */
 const app = express();
@@ -144,10 +146,12 @@ app.use(history({
 
 // 3. Final Catch-all (Redundant but keeps things bulletproof)
 // If the history middleware misses something, this serves index.html
-app.get("*", (req, res) => {
+
+app.get("/:path*", (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"), (err) => {
     if (err) {
-      res.status(500).send("Error: The build files are missing. Check if 'npm run build' ran successfully.");
+      console.error("Error sending index.html:", err);
+      res.status(500).send("Build files not found. Ensure 'npm run build' is successful.");
     }
   });
 });
