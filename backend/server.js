@@ -140,7 +140,7 @@ app.use(history({
 app.get(/^((?!\/api).)*$/, (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"), (err) => {
     if (err) {
-      console.error("❌ SendFile Error:", err.message);
+      console.error("SendFile Error:", err.message);
       res.status(500).send("Build files not found in /app/client/dist");
     }
   });
@@ -161,6 +161,6 @@ process.on("SIGTERM", shutdown);
 
 /* ---------- Listen ---------- */
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`🚀 Server running on ${PORT}`);
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is live and listening on port ${PORT}`);
 });
