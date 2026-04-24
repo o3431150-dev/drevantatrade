@@ -122,10 +122,12 @@ app.get("/api/prices/:symbol", (req, res) => {
 
 /* ---------- SPA / Static Handling ---------- */
 
+/* ---------- SPA / Static Handling ---------- */
+
 // 1. Static files (images, js, css)
 app.use(express.static(clientDistPath));
 
-// 2. SPA History Fallback (handles client-side routing refreshes)
+// 2. SPA History Fallback
 app.use(history({
   verbose: false,
   rewrites: [
@@ -134,16 +136,15 @@ app.use(history({
 }));
 
 // 3. Final Catch-all
-// Fixed syntax for Express 5: Using (.*) to avoid PathError
-app.get("(.*)", (req, res) => {
+// Use a REGEX LITERAL (no quotes) to bypass the path-to-regexp string parser
+app.get(/^((?!\/api).)*$/, (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"), (err) => {
     if (err) {
       console.error("❌ SendFile Error:", err.message);
-      res.status(500).send("Build files not found. Check Railway build logs.");
+      res.status(500).send("Build files not found in /app/client/dist");
     }
   });
 });
-
 /* ---------- Socket.IO ---------- */
 io.on("connection", socket => {
   console.log("Socket connected:", socket.id);
