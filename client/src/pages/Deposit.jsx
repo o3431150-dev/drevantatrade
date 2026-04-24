@@ -20,7 +20,7 @@ import { Helmet } from "react-helmet-async";
 
 // API configuration
 ///const API_URL = 'https://trading-app-fdzj.onrender.com/api';
-const API_URL = 'https://trading-appv1.onrender.com/api'
+const API_URL = 'https://tradingappv1-production-71a7.up.railway.app/api';
 
 // Create axios instance
 const api = axios.create({
