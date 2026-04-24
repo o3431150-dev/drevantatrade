@@ -24,9 +24,9 @@ import notificationRouter from "./routes/notificationRoutes.js";
 import expiredLoanRouter from "./routes/expiredLoanRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import depositAddressRouter from './routes/depositAddressRoutes.js'
+
 // Services
 import PriceFeedService from "./services/priceFeed.js";
-//import './services/orderProcessor.js';
 
 dotenv.config();
 
@@ -37,10 +37,8 @@ connectToMongoDB();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Ensure we use path.join to create a relative lookup from the current folder
-// This will result in something like /app/client/dist on Railway
-const clientDistPath = path.join(__dirname, "..", "client", "dist");
-
+// Construct absolute path to the frontend build
+const clientDistPath = path.resolve(__dirname, "..", "client", "dist");
 console.log("✅ Serving static files from:", clientDistPath);
 
 /* ---------- App ---------- */
@@ -61,7 +59,6 @@ const allowedOrigins = [
   "https://trading-app-fdzj.onrender.com",
   "https://tradingappv1-production.up.railway.app",
   "https://tradingappv1-production-71a7.up.railway.app",
-
 ];
 
 app.use(cors({
@@ -71,15 +68,10 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 }));
 
-
-
 /* ---------- Middleware ---------- */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-
-//startBot();
 
 /* ---------- Server & Socket ---------- */
 const server = http.createServer(app);
@@ -114,7 +106,6 @@ app.use("/api/deposit-addresses", depositAddressRouter);
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", timestamp: new Date() });
-  console.log("Health check ping received");
 });
 
 /* ---------- Price APIs ---------- */
@@ -131,27 +122,24 @@ app.get("/api/prices/:symbol", (req, res) => {
 
 /* ---------- SPA / Static Handling ---------- */
 
-// 1. Serve static files first
+// 1. Static files (images, js, css)
 app.use(express.static(clientDistPath));
 
-// 2. SPA History Fallback
-// This handles the "refresh" issue by redirecting 404s to index.html
+// 2. SPA History Fallback (handles client-side routing refreshes)
 app.use(history({
   verbose: false,
-  index: '/index.html',
   rewrites: [
     { from: /^\/api\/.*$/, to: (ctx) => ctx.parsedUrl.pathname }
   ]
 }));
 
-// 3. Final Catch-all (Redundant but keeps things bulletproof)
-// If the history middleware misses something, this serves index.html
-
-app.get("/:path*", (req, res) => {
+// 3. Final Catch-all
+// Fixed syntax for Express 5: Using (.*) to avoid PathError
+app.get("(.*)", (req, res) => {
   res.sendFile(path.join(clientDistPath, "index.html"), (err) => {
     if (err) {
-      console.error("Error sending index.html:", err);
-      res.status(500).send("Build files not found. Ensure 'npm run build' is successful.");
+      console.error("❌ SendFile Error:", err.message);
+      res.status(500).send("Build files not found. Check Railway build logs.");
     }
   });
 });
@@ -173,5 +161,5 @@ process.on("SIGTERM", shutdown);
 /* ---------- Listen ---------- */
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
+  console.log(`🚀 Server running on ${PORT}`);
 });
