@@ -8,7 +8,7 @@ export default function MobileNav() {
 
   const tabs = [
     { icon: <Home size={18} />, label: "Home", path: "/" },
-    { icon: <Wallet size={18} />, label: "Wallet", path: "/wallet" },
+    { icon: <ChartNoAxesCombined size={18} />, label: "Markets", path: "/markets" },
     { 
       icon: <Megaphone size={22} />, 
       label: "News", 
@@ -72,12 +72,12 @@ function Tab({ icon, label, active, onClick, isCenter }) {
         </span>
 
         {/* Active indicator */}
-        {active && (
+        {/* {active && (
           <div
             className="absolute -top-1.5 w-2.5 h-2.5 bg-white rounded-full animate-pulse ring-1 ring-green-400"
             aria-hidden="true"
           />
-        )}
+        )} */}
 
         {/* Glow effect */}
         <div
@@ -118,12 +118,12 @@ function Tab({ icon, label, active, onClick, isCenter }) {
       </span>
 
       {/* Active indicator */}
-      {active && (
+      {/* {active && (
         <div
           className="absolute -top-1 w-1.5 h-1.5 bg-green-400 rounded-full"
           aria-hidden="true"
         />
-      )}
+      )} */}
 
       {/* Subtle hover effect */}
       {!active && (

@@ -93,7 +93,7 @@ const Header = () => {
             <div className=" space-x-2 flex items-center cursor-pointer" onClick={() => navigate('/')}>
               {/* <img src={assets.logo} alt="Loading..." className="w-16 h-16 sm:w-20 md:h-20  " /> */}
               <span className="text-md font-bold bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">
-                Uphold trading
+               UPH
               </span>
             </div>
 

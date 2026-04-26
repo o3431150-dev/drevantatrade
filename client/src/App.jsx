@@ -13,7 +13,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Deposit = lazy(() => import("./pages/Deposit"));
 const Withdraw = lazy(() => import("./pages/Withdraw"));
 const SignUp = lazy(() => import("./pages/SignUp"));
-
+const Markets = lazy(() => import("./pages/Markets.jsx"));
 const Verify = lazy(() => import("./pages/EmailVerificationPage.jsx"));
 const Reset = lazy(() => import("./pages/ResetPasswordPage.jsx"));
 const KYC = lazy(() => import("./pages/kyc"));
@@ -48,6 +48,7 @@ const App = () => {
           <Route path="/verify" element={<Verify />} />
           <Route path="/reset" element={<Reset />} />
           <Route path="/kyc" element={<KYC />} />
+          <Route path="/markets" element={token ? <Markets /> : <Markets />} />
           <Route path="/loan" element={token ? <Loan /> : <SignUp />} />
           <Route path="/news" element={<News />} />
           <Route path="/profile" element={token ? <Profile /> : <SignUp />} />

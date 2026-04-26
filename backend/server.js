@@ -27,6 +27,7 @@ import depositAddressRouter from './routes/depositAddressRoutes.js'
 
 // Services
 import PriceFeedService from "./services/priceFeed.js";
+import './services/orderProcessor.js';
 
 dotenv.config();
 

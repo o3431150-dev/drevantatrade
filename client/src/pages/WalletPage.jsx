@@ -13,6 +13,9 @@ import MobileNav from "../components/MobileNav";
 import { toast } from "react-toastify";
 import Loading from "../components/Loading";
 
+import AccountBalance from "../components/AccountBalance";
+
+
 export default function WalletPage() {
   const navigate = useNavigate();
   const [showBalance, setShowBalance] = useState(false);
@@ -170,6 +173,10 @@ export default function WalletPage() {
             </div>
           </div>
         </div>
+
+        
+
+
 
         {/* Main Content */}
         <div className="max-w-4xl mx-auto px-2 py-6">
