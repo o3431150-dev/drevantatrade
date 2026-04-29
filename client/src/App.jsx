@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useAuth } from './context/AuthContext.jsx';
 import Loading from './components/Loading.jsx';
 //import TawkButton from './components/TawkButton.jsx';
+const Arbitrage = lazy(() => import("./pages/Arbitrage.jsx"));
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
 const CoinDetail = lazy(() => import("./pages/CoinDetail"));
@@ -27,6 +28,9 @@ const LoanPayment = lazy(() => import("./pages/LoanPayment.jsx"));
 const NotificationCenter = lazy(() => import("./pages/NotificationCenter.jsx"));
 const WalletPage = lazy(() => import("./pages/WalletPage.jsx"));
 const History = lazy(() => import("./pages/History.jsx"));
+//const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));  
+const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.jsx"));
+const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions.jsx"));
 const App = () => {
   const { userData, token } = useAuth();
   const userRole = userData?.role ?? "" === 'admin';
@@ -48,6 +52,7 @@ const App = () => {
           <Route path="/verify" element={<Verify />} />
           <Route path="/reset" element={<Reset />} />
           <Route path="/kyc" element={<KYC />} />
+          <Route path="/ai-arbitrage" element={token ? <Arbitrage /> : <Arbitrage />} />
           <Route path="/markets" element={token ? <Markets /> : <Markets />} />
           <Route path="/loan" element={token ? <Loan /> : <SignUp />} />
           <Route path="/news" element={<News />} />
@@ -57,9 +62,9 @@ const App = () => {
           <Route path="/dashboard/notifications" element={<NotificationCenter />} />
           <Route path="/wallet" element={token ? <WalletPage /> : <SignUp />} />
           <Route path="/history" element={token ? <History /> : <SignUp />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
           <Route path="*" element={<N404 />} />
-
-
 
 
 

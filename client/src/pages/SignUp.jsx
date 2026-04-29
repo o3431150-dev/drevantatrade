@@ -55,6 +55,11 @@ const SignUp = () => {
         e.preventDefault();
         setLoading(true)
 
+        if(acceptedTerms){
+            
+
+        }
+
         try {
             const fullName = (formData.firstName + ' ' + formData.lastName)
             let res = await axios.post(`${backendUrl}api/auth/register`, {
@@ -246,6 +251,28 @@ const SignUp = () => {
                             </div>
 
                             {/* 
+
+                            <P>By signing in, you agree to our Terms of Service and Privacy Policy.</P> */}
+
+                             <div className="flex items-center my-3">
+                                <input
+                                    id="terms"
+                                    type="checkbox"
+                                    checked={acceptedTerms}
+                                    onChange={() => setAcceptedTerms(!acceptedTerms)}
+                                    className="w-4 h-4 text-green-500 bg-gray-900 border-gray-800 rounded focus:ring-green-500/50"
+                                />
+                                <label htmlFor="terms" className="ml-2 text-xs text-gray-400">
+                                    I agree to the{" "}
+                                    <Link to="/terms-and-conditions" className="text-green-500 hover:text-green-400">
+                                        Terms and Conditions 
+                                    </Link>
+                                       {" "} and{" "}
+                                    <Link to="/privacy-policy" className="text-green-500 hover:text-green-400">
+                                        Privacy Policy
+                                    </Link>
+                                </label>
+                            </div>
                             
 
                             {/* Submit */}

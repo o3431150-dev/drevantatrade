@@ -12,12 +12,38 @@ class PriceFeedService {
     this.pingInterval = null; 
     this.lastLogTime = 0; // To throttle logs
 
-    this.tracked = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "DOGEUSDT", "ADAUSDT", "XRPUSDT", "DOTUSDT"];
-    this.mapName = {
-      BTCUSDT: "bitcoin", ETHUSDT: "ethereum", SOLUSDT: "solana",
-      BNBUSDT: "binancecoin", DOGEUSDT: "dogecoin", ADAUSDT: "cardano",
-      XRPUSDT: "ripple", DOTUSDT: "polkadot"
-    };
+    this.tracked = [
+  // Original 8
+  "BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "DOGEUSDT", "ADAUSDT", "XRPUSDT", "DOTUSDT",
+  // Layer 1s & 2s
+  "MATICUSDT", "AVAXUSDT", "TRXUSDT", "LINKUSDT", "NEARUSDT", "ATOMUSDT", "APTUSDT", "OPUSDT", "ARBUSDT", "STXUSDT", "SUIUSDT", "FTMUSDT",
+  // DeFi & Exchange
+  "UNIUSDT", "AAVEUSDT", "LDOUSDT", "MKRUSDT", "RUNEUSDT", "CAKEUSDT",
+  // High Volume / Trending
+  "LTCUSDT", "BCHUSDT", "SHIBUSDT", "PEPEUSDT", "WIFUSDT", "FETUSDT", "RNDRUSDT", "TIAUSDT", "FILUSDT", "HBARUSDT", "VETUSDT", "ICPUSDT", "KASUSDT",
+  // Others
+  "ETCUSDT", "XLMUSDT", "ALGOUSDT"
+];
+
+this.mapName = {
+  // Originals
+  BTCUSDT: "bitcoin", ETHUSDT: "ethereum", SOLUSDT: "solana", BNBUSDT: "binancecoin", 
+  DOGEUSDT: "dogecoin", ADAUSDT: "cardano", XRPUSDT: "ripple", DOTUSDT: "polkadot",
+  // Layer 1s & 2s
+  MATICUSDT: "polygon", AVAXUSDT: "avalanche", TRXUSDT: "tron", LINKUSDT: "chainlink", 
+  NEARUSDT: "near", ATOMUSDT: "cosmos", APTUSDT: "aptos", OPUSDT: "optimism", 
+  ARBUSDT: "arbitrum", STXUSDT: "stacks", SUIUSDT: "sui", FTMUSDT: "fantom",
+  // DeFi & Exchange
+  UNIUSDT: "uniswap", AAVEUSDT: "aave", LDOUSDT: "lido-dao", MKRUSDT: "maker", 
+  RUNEUSDT: "thorchain", CAKEUSDT: "pancakeswap",
+  // High Volume / Trending
+  LTCUSDT: "litecoin", BCHUSDT: "bitcoin-cash", SHIBUSDT: "shiba-inu", PEPEUSDT: "pepe", 
+  WIFUSDT: "dogwifhat", FETUSDT: "fetch-ai", RNDRUSDT: "render-token", TIAUSDT: "celestia", 
+  FILUSDT: "filecoin", HBARUSDT: "hedera-hashgraph", VETUSDT: "vechain", 
+  ICPUSDT: "internet-computer", KASUSDT: "kaspa",
+  // Others
+  ETCUSDT: "ethereum-classic", XLMUSDT: "stellar", ALGOUSDT: "algorand"
+};
 
     this.connectToBinance();
   }

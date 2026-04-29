@@ -1,6 +1,6 @@
 @import "tailwindcss";
 body {
-  @apply bg-gray-900 text-white;
+  @apply bg-gray-950 text-white;
 }
 
 /* Enable smooth in-page anchor scrolling globally */

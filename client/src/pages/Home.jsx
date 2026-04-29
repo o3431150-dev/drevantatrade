@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { useState } from 'react'
 import VerifyAccountModal from '../components/VerifyAccountModal'
 import TawkButton from '../components/TawkButton.jsx' 
+import Loading from '../components/Loading.jsx'
 
 
 const Home = () => {
@@ -18,12 +19,13 @@ const Home = () => {
   const verifyOpen = isLogin && userData && !userData.isAccountVerified;
 
   return (
-    <div className="bg-gray-900 mb-20">
+    <div className="bg-gray-950 mb-20">
       <Header />
       <Hero />
       <CoinList />
       <MobileNav />
       {/* <TawkButton/> */}
+      
 
 
       {!isLogin && <GetStart />}

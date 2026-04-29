@@ -1,67 +1,46 @@
-// src/components/MarketList.jsx
 import React, { useState, useEffect, useMemo } from 'react';
 import MarketCard from './MarketCard';
 import { useNavigate } from 'react-router-dom';
 import { usePriceFeed } from '../context/PriceFeedContext';
-import {
-    BarChart3,
-    Bitcoin,
-    Gem,
-    CircleDollarSign,
-    Search,
-    Activity,
-    Lock
+import { 
+    BarChart3, 
+    Bitcoin, 
+    Gem, 
+    CircleDollarSign, 
+    Search, 
+    Lock,
+    TrendingUp,
+    LayoutGrid
 } from 'lucide-react';
 
 const marketDataConfig = {
-    stocks: {
-        title: "Global Equities",
-        icon: BarChart3,
-        color: "from-indigo-500 to-purple-500",
-        data: [
-            { id: 1, name: "apple", symbol: "AAPL", price: 0, change: 0, volume: "" },
-            { id: 2, name: "microsoft", symbol: "MSFT", price: 0, change: 0, volume: "" },
-            { id: 3, name: "google", symbol: "GOOGL", price: 0, change: 0, volume: "" },
-            { id: 4, name: "amazon", symbol: "AMZN", price: 0, change: 0, volume: "" },
-            { id: 5, name: "tesla", symbol: "TSLA", price: 0, change: 0, volume: "" },
-            { id: 6, name: "nvidia", symbol: "NVDA", price: 0, change: 0, volume: "" },
-            { id: 7, name: "meta", symbol: "META", price: 0, change: 0, volume: "" },
-            { id: 8, name: "jpmorgan", symbol: "JPM", price: 0, change: 0, volume: "" }
-        ]
-    },
+    stocks: { title: "Global Equities", color: "indigo", data: [] },
     crypto: {
         title: "Digital Assets",
-        icon: Bitcoin,
-        color: "from-orange-500 to-yellow-500",
+        color: "orange",
         data: [
-            { name: "bitcoin", symbol: "BTC" },
-            { name: "ethereum", symbol: "ETH" },
-            { name: "solana", symbol: "SOL" },
-            { name: "binancecoin", symbol: "BNB" },
-            { name: "ripple", symbol: "XRP" },
-            { name: "cardano", symbol: "ADA" },
-            { name: "dogecoin", symbol: "DOGE" }
+            { name: "bitcoin", symbol: "BTC" }, { name: "ethereum", symbol: "ETH" },
+            { name: "solana", symbol: "SOL" }, { name: "binancecoin", symbol: "BNB" },
+            { name: "ripple", symbol: "XRP" }, { name: "cardano", symbol: "ADA" },
+            { name: "dogecoin", symbol: "DOGE" }, { name: "polkadot", symbol: "DOT" },
+            { name: "tron", symbol: "TRX" }, { name: "chainlink", symbol: "LINK" },
+            { name: "polygon", symbol: "MATIC" }, { name: "avalanche", symbol: "AVAX" },
+            { name: "shiba-inu", symbol: "SHIB" }, { name: "pepe", symbol: "PEPE" },
+            { name: "near", symbol: "NEAR" }, { name: "uniswap", symbol: "UNI" },
+            { name: "aptos", symbol: "APT" }, { name: "sui", symbol: "SUI" },
+            { name: "optimism", symbol: "OP" }, { name: "arbitrum", symbol: "ARB" },
+            { name: "stellar", symbol: "XLM" }, { name: "cosmos", symbol: "ATOM" },
+            { name: "stacks", symbol: "STX" }, { name: "fetch-ai", symbol: "FET" },
+            { name: "pancakeswap", symbol: "CAKE" }, { name: "lido-dao", symbol: "LDO" },
+            { name: "thorchain", symbol: "RUNE" }, { name: "internet-computer", symbol: "ICP" },
+            { name: "filecoin", symbol: "FIL" }, { name: "hedera-hashgraph", symbol: "HBAR" },
+            { name: "vechain", symbol: "VET" }, { name: "litecoin", symbol: "LTC" },
+            { name: "bitcoin-cash", symbol: "BCH" }, { name: "ethereum-classic", symbol: "ETC" },
+            { name: "dogwifhat", symbol: "WIF" }
         ]
     },
-    metals: {
-        title: "Commodities",
-        icon: Gem,
-        color: "from-cyan-500 to-blue-500",
-        data: [
-            { name: "gold", symbol: "XAU", price: 0, change: 0, volume: "" },
-            { name: "silver", symbol: "XAG", price: 0, change: 0, volume: "" },
-            { name: "platinum", symbol: "XPT", price: 0, change: 0, volume: "" }
-        ]
-    },
-    forex: {
-        title: "Currencies",
-        icon: CircleDollarSign,
-        color: "from-emerald-500 to-teal-500",
-        data: [
-            { name: "eur/usd", symbol: "EUR/USD", price: 0, change: 0, volume: "" },
-            { name: "gbp/usd", symbol: "GBP/USD", price: 0, change: 0, volume: "" }
-        ]
-    },
+    metals: { title: "Commodities", color: "cyan", data: [] },
+    forex: { title: "Currencies", color: "emerald", data: [] },
 };
 
 const categories = [
@@ -74,149 +53,146 @@ const categories = [
 const MarketList = () => {
     const [activeCategory, setActiveCategory] = useState('crypto');
     const [searchTerm, setSearchTerm] = useState('');
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
     const { prices } = usePriceFeed();
-
-    useEffect(() => {
-        setLoading(true);
-        const timer = setTimeout(() => setLoading(false), 400);
-        return () => clearTimeout(timer);
-    }, [activeCategory]);
-
-    const currentMarket = marketDataConfig[activeCategory];
+    const navigate = useNavigate();
 
     const filteredData = useMemo(() => {
-        let baseData = [...(currentMarket?.data || [])];
+        let baseData = [...(marketDataConfig[activeCategory]?.data || [])];
 
-        if (activeCategory === 'crypto' && prices && Object.keys(prices).length > 0) {
+        if (activeCategory === 'crypto' && prices) {
             baseData = baseData.map(asset => {
-                const liveInfo = prices[asset.name];
+                const live = prices[asset.name];
                 return {
                     ...asset,
-                    price: liveInfo?.usd ?? 0,
-                    change: liveInfo?.usd_24h_change ?? 0,
-                    volume: liveInfo?.usd_24h_vol ? `$${(liveInfo.usd_24h_vol / 1e9).toFixed(2)}B` : "0"
+                    price: live?.usd || 0,
+                    change: live?.usd_24h_change || 0
                 };
-            });
+            }).sort((a, b) => b.price - a.price);
         }
-
-        if (!searchTerm) return baseData;
 
         return baseData.filter(item =>
             item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             item.symbol.toLowerCase().includes(searchTerm.toLowerCase())
         );
-    }, [currentMarket, searchTerm, prices, activeCategory]);
-
-    const handleMarketClick = (market, category) => {
-        // Prevent navigation if not crypto
-        if (category !== 'crypto') return;
-        
-        navigate(`/coin/${market.name}`, {
-            state: { market, category }
-        });
-    };
+    }, [activeCategory, prices, searchTerm]);
 
     return (
-        <div className="bg-gray-950 min-h-screen text-gray-100 font-sans selection:bg-green-500/30 relative">
-            
-            {/* COMING SOON OVERLAY - Only shows when not in Crypto */}
+        <div className="bg-[#030712] min-h-screen text-slate-100 font-sans selection:bg-green-500/30">
+            {/* --- Coming Soon Overlay --- */}
             {activeCategory !== 'crypto' && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-gray-950/60 backdrop-blur-sm">
-                    <div className="max-w-sm w-full bg-gray-900 border border-gray-800 rounded-3xl p-8 text-center shadow-2xl shadow-green-500/10">
-                        <div className="w-10 h-10 bg-green-500/10 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-2 bg-black/60 backdrop-blur-md transition-all duration-300">
+                    <div className="bg-[#111827] border border-slate-800 p-10 rounded-[2.5rem] text-center max-w-sm shadow-2xl shadow-green-500/10">
+                        {/* <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Lock className="w-5 h-5 text-green-500" />
-                        </div>
-                        <h2 className="text-xl font-bold mb-2 capitalize">{activeCategory} Coming Soon</h2>
-                        <p className="text-gray-400 mb-8">This market is currently in development. Stick with Crypto for now!</p>
+                        </div> */}
+                        <h2 className="text-xl font-bold mb-3 tracking-tight">Market Locked</h2>
+                        <p className="text-md mb-8 leading-relaxed">
+                            We're currently calibrating the {activeCategory} price feeds. Please stick with Crypto for now!
+                        </p>
                         <button 
-                            onClick={() => setActiveCategory('crypto')}
-                            className="w-full py-4 bg-green-500 text-gray-950 font-bold rounded-2xl hover:bg-green-400 transition-colors shadow-lg shadow-green-500/20"
+                            onClick={() => setActiveCategory('crypto')} 
+                            className="w-full py-4 bg-green-500 hover:bg-green-400 text-black font-black rounded-2xl transition-all active:scale-95 shadow-lg shadow-green-500/20 text-sm"
                         >
-                            Return to Trading
+                            Back to Active Assets
                         </button>
                     </div>
                 </div>
             )}
 
-            {/* Navigation Tabs */}
-            <div className="sticky top-0 z-20 bg-gray-950/80 backdrop-blur-md border-b border-gray-800/50">
-                <div className="max-w-2xl mx-auto px-4 py-4 overflow-x-auto hide-scrollbar">
-                    <div className="flex gap-2 min-w-max">
-                        {categories.map((cat) => {
+            {/* --- Global Header --- */}
+            <header className="sticky top-0 z-30 bg-[#030712]/70 backdrop-blur-2xl border-b border-slate-800/50">
+                <div className="max-w-2xl mx-auto px-6 py-5">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 className="text-2xl font-black tracking-tighter text-white flex items-center gap-2">
+                                <LayoutGrid className="w-6 h-6 text-green-500" />
+                                MARKETS
+                            </h1>
+                            <p className="text-[10px] uppercase tracking-widest font-bold text-slate-500 mt-0.5">Real-time Data</p>
+                        </div>
+                        <div className="flex items-center gap-1.5 bg-green-500/10 px-3 py-1.5 rounded-full border border-green-500/20">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                            <span className="text-[10px] font-black text-green-500 uppercase tracking-wider">Live</span>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-2 overflow-x-auto hide-scrollbar pb-1">
+                        {categories.map(cat => {
                             const isActive = activeCategory === cat.id;
-                            const Icon = cat.icon;
                             return (
-                                <button
-                                    key={cat.id}
+                                <button 
+                                    key={cat.id} 
                                     onClick={() => setActiveCategory(cat.id)}
-                                    className={`flex items-center gap-2.5 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all duration-300 ${isActive
-                                        ? `bg-green-500 text-gray-950 shadow-lg shadow-green-500/20`
-                                        : 'bg-gray-900 text-gray-400 border border-gray-800 hover:border-gray-600'
+                                    className={`flex items-center gap-2.5 px-5 py-2.5 rounded-full text-xs font-black whitespace-nowrap transition-all duration-200 border ${
+                                        isActive 
+                                        ? 'bg-white text-black border-white shadow-xl shadow-white/5 scale-105' 
+                                        : 'bg-slate-900 text-slate-400 border-slate-800 hover:border-slate-600'
                                     }`}
                                 >
-                                    <Icon className={`w-4 h-4 ${isActive ? 'text-gray-950' : 'text-gray-500'}`} />
-                                    {cat.label}
+                                    <cat.icon className={`w-3.5 h-3.5 ${isActive ? 'text-black' : 'text-slate-500'}`} />
+                                    {cat.label.toUpperCase()}
                                 </button>
                             );
                         })}
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div className={`max-w-2xl mx-auto px-4 transition-all duration-500 ${activeCategory !== 'crypto' ? 'blur-md grayscale pointer-events-none' : ''}`}>
-                <div className="mt-6 mb-2">
-                    <div className="relative group">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-green-500 transition-colors" />
-                        <input
-                            type="text"
-                            placeholder={`Find an asset in ${activeCategory}...`}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-11 pr-4 py-3 bg-gray-900 border border-gray-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-green-500/20 focus:border-green-500/50 text-gray-300 placeholder:text-gray-500 transition-all text-sm"
-                        />
+            <main className="max-w-2xl mx-auto px-6 pt-8 pb-32">
+                {/* --- Search Interface --- */}
+                <div className="relative mb-8 group">
+                    <div className="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+                        <Search className="w-4 h-4 text-slate-500 group-focus-within:text-green-500 transition-colors" />
                     </div>
+                    <input 
+                        className="w-full bg-[#111827] border border-slate-800 rounded-[1.25rem] py-4 pl-14 pr-6 text-sm font-medium placeholder:text-slate-600 focus:border-green-500/50 focus:ring-4 focus:ring-green-500/5 outline-none transition-all" 
+                        placeholder={`Search ${activeCategory} assets by name or ticker...`} 
+                        value={searchTerm}
+                        onChange={e => setSearchTerm(e.target.value)}
+                    />
                 </div>
 
-                <div className="flex items-center justify-between py-6">
+                {/* --- Market Stats Header --- */}
+                <div className="flex items-center justify-between mb-6 px-1">
                     <div className="flex items-center gap-3">
-                        <div className={`w-2 h-8 rounded-full bg-gradient-to-b ${currentMarket.color}`} />
-                        <h2 className="text-xl font-bold text-white tracking-tight">
-                            {currentMarket.title}
-                        </h2>
+                        <div className={`w-1 h-5 rounded-full bg-green-500 shadow-[0_0_12px_rgba(34,197,94,0.4)]`} />
+                        <h3 className="font-black text-xs uppercase tracking-[0.2em] text-slate-400">
+                            {activeCategory} Overview
+                        </h3>
                     </div>
+                    <p className="text-[10px] font-bold text-slate-500">{filteredData.length} Assets</p>
                 </div>
 
-                <div className="pb-32">
-                    {loading ? (
-                        <div className="space-y-3">
-                            {[1, 2, 3, 4, 5].map((i) => (
-                                <div key={i} className="h-20 bg-gray-900/50 border border-gray-800 rounded-2xl animate-pulse" />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="space-y-3">
-                            {filteredData.map((item, idx) => (
-                                <MarketCard
-                                    key={item.symbol || idx}
-                                    {...item}
-                                    category={activeCategory}
-                                    onClick={() => handleMarketClick(item, activeCategory)}
+                {/* --- Asset List --- */}
+                <div className="space-y-3">
+                    {filteredData.length > 0 ? (
+                        filteredData.map(item => (
+                            <div key={item.name} className="transition-transform active:scale-[0.98]">
+                                <MarketCard 
+                                    {...item} 
+                                    onClick={() => navigate(`/coin/${item.name}`)} 
                                 />
-                            ))}
+                            </div>
+                        ))
+                    ) : (
+                        <div className="py-20 text-center">
+                            <div className="inline-flex p-5 rounded-3xl bg-slate-900 mb-4 border border-slate-800">
+                                <Search className="w-8 h-8 text-slate-700" />
+                            </div>
+                            <h4 className="text-lg font-bold text-slate-300">No assets found</h4>
+                            <p className="text-sm text-slate-500 mt-1">Try adjusting your search terms</p>
                         </div>
                     )}
                 </div>
-            </div>
+            </main>
 
             <style jsx global>{`
                 .hide-scrollbar::-webkit-scrollbar { display: none; }
                 .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-                body { background-color: #030712; }
+                body { overflow-x: hidden; }
             `}</style>
         </div>
     );
-}
+};
 
 export default MarketList;

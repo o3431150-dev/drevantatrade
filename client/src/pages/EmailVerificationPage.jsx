@@ -153,18 +153,18 @@ export default function EmailOtpVerificationPage() {
                             damping: 10
                         }}
                         className={`p-2 rounded-full ${verificationStatus === 'success'
-                            ? 'bg-blue-900/30'
+                            ? 'bg-green-900/30'
                             : verificationStatus === 'error'
                                 ? 'bg-rose-900/30'
-                                : 'bg-blue-600/20'
+                                : 'bg-green-600/20'
                             }`}
                     >
                         {verificationStatus === 'success' ? (
-                            <CheckCircle className="h-5 w-5 text-blue-500" />
+                            <CheckCircle className="h-5 w-5 text-green-500" />
                         ) : verificationStatus === 'error' ? (
                             <XCircle className="h-5 w-5 text-rose-500" />
                         ) : (
-                            <MailCheck className="h-5 w-5 text-blue-400" />
+                            <MailCheck className="h-5 w-5 text-green-400" />
                         )}
                     </motion.div>
 
@@ -269,7 +269,7 @@ export default function EmailOtpVerificationPage() {
                                     className={` w-10 h-10 text-xl text-white text-center  border-2 ${verificationStatus === 'error'
                                         ? 'border-rose-500 shake'
                                         : 'border-gray-700'
-                                        } rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 outline-none transition-all duration-200`}
+                                        } rounded-lg focus:border-green-500 focus:ring-2 focus:ring-green-500/30 outline-none transition-all duration-200`}
                                 />
 
                             </motion.div>
@@ -283,10 +283,10 @@ export default function EmailOtpVerificationPage() {
                         type="submit"
                         disabled={isLoading || otp.includes("") || verificationStatus === 'success'}
                         className={`w-full py-3 px-4 rounded-xl font-medium flex items-center justify-center gap-2 transition-all ${verificationStatus === 'success'
-                            ? 'bg-blue-600/30 text-blue-400'
+                            ? 'bg-green-600/30 text-green-400'
                             : verificationStatus === 'error'
                                 ? 'bg-rose-600 hover:bg-rose-500 text-white'
-                                : 'bg-blue-600 hover:bg-blue-500 text-white'
+                                : 'bg-green-600 hover:bg-green-500 text-white'
                             } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                         {isLoading ? (
@@ -319,7 +319,7 @@ export default function EmailOtpVerificationPage() {
                             onClick={handleResend}
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
-                            className="text-blue-500 hover:text-blue-400 font-medium hover:underline"
+                            className="text-green-500 hover:text-green-400 font-medium hover:underline"
                         >
                             Resend OTP
                         </motion.button>
@@ -330,7 +330,7 @@ export default function EmailOtpVerificationPage() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="text-blue-300 text-center text-xs  mt-2"
+                            className="text-green-300 text-center text-xs  mt-2"
                         >
                             Verification code sent to {email || 'undefined'}
                         </motion.p>

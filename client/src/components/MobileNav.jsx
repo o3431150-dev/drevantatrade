@@ -24,7 +24,7 @@ export default function MobileNav() {
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 bg-gray-900/95 backdrop-blur-xl supports-[backdrop-filter]:bg-gray-900/80 border-t border-gray-700 shadow-[0_-4px_20px_rgba(0,0,0,0.3)] flex justify-between items-center py-3 px-4 md:hidden z-50 safe-bottom"
+      className="fixed inset-x-0 bottom-0 bg-gray-950/95 backdrop-blur-xl supports-[backdrop-filter]:bg-gray-950/80  shadow-[0_-4px_20px_rgba(0,0,0,0.3)] flex justify-between items-center py-3 px-4 md:hidden z-50 safe-bottom"
       aria-label="Main navigation"
     >
       {tabs.map((tab) => (
@@ -46,7 +46,7 @@ function Tab({ icon, label, active, onClick, isCenter }) {
     return (
       <button
         onClick={onClick}
-        className={`relative flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-[20px] transition-all duration-300 ease-out flex-1 min-w-0 mx-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
+        className={`relative flex flex-col items-center justify-center gap-1 px-4 py-3 rounded-[20px] transition-all duration-300 ease-out flex-1 min-w-0 mx-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-950 ${
           active
             ? "text-white bg-green-500 shadow-xl shadow-green-500/30 border-2 border-green-400"
             : "text-white bg-green-600 hover:bg-green-500 shadow-lg border-2 border-green-500/50"
@@ -92,10 +92,10 @@ function Tab({ icon, label, active, onClick, isCenter }) {
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 ease-out flex-1 min-w-0 mx-0.5 focus:outline-none focus-visible:ring-1 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-900 ${
+      className={`relative flex flex-col items-center justify-center gap-0.5 px-2 py-1.5 rounded-lg transition-all duration-200 ease-out flex-1 min-w-0 mx-0.5 focus:outline-none focus-visible:ring-1 focus-visible:ring-green-500 focus-visible:ring-offset-1 focus-visible:ring-offset-gray-950 ${
         active
           ? "text-green-400 bg-green-500/10"
-          : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/20"
+          : "text-gray-450 hover:text-gray-350 hover:bg-gray-850/20"
       }`}
       aria-current={active ? "page" : undefined}
       aria-label={label}
@@ -128,7 +128,7 @@ function Tab({ icon, label, active, onClick, isCenter }) {
       {/* Subtle hover effect */}
       {!active && (
         <div
-          className="absolute inset-0 rounded-lg bg-gradient-to-t from-gray-700/0 to-gray-700/0 hover:from-gray-700/10 hover:to-gray-700/0 transition-all duration-200"
+          className="absolute inset-0 rounded-lg bg-gradient-to-t from-gray-750/0 to-gray-750/0 hover:from-gray-750/10 hover:to-gray-750/0 transition-all duration-200"
           aria-hidden="true"
         />
       )}

@@ -240,7 +240,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <img 
-                              src={assets[order.coinId] || assets.bitcoin} 
+                              src={assets[order.coinId]} 
                               alt={order.coinId}
                               className="w-10 h-10 rounded-lg"
                             />
@@ -309,7 +309,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
                             <div className="flex items-center gap-3">
                               <div className="relative">
                                 <img 
-                                  src={assets[order.coinId] || assets.bitcoin} 
+                                  src={assets[order.coinId] } 
                                   alt={order.coinId}
                                   className="w-10 h-10 rounded-lg"
                                 />
@@ -420,7 +420,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
                             <img 
-                              src={assets[order.coinId] || assets.bitcoin} 
+                              src={assets[order.coinId]} 
                               alt={order.coinId}
                               className="w-10 h-10 rounded-lg"
                             />
@@ -489,7 +489,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
                           <div className="col-span-3">
                             <div className="flex items-center gap-3">
                               <img 
-                                src={assets[order.coinId] || assets.bitcoin} 
+                                src={assets[order.coinId]} 
                                 alt={order.coinId}
                                 className="w-10 h-10 rounded-lg"
                               />

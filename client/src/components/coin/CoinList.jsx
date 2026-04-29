@@ -1,108 +1,122 @@
-// src/components/CoinList.jsx
+import React from 'react';
 import CoinCard from "./CoinCard";
-//import usePriceFeed from "../hooks/usePriceFeed";
-//import usePriceFeed from "../../hooks/usePriceFeed";
 import { ClipLoader } from "react-spinners";
-import { usePriceFeed } from "../../context/PriceFeedContext";
-
+import { usePriceFeed } from "../../context/PriceFeedContext"
 import { useNavigate } from 'react-router-dom';
+import { motion } from "framer-motion";
+import { LayoutGrid, TrendingUp } from "lucide-react";
+
+// The whitelist of IDs as they appear in your PriceFeedContext
+const SELECTED_COINS = [
+  "bitcoin", 
+  "ethereum", 
+  "solana", 
+  "binancecoin", 
+  "dogecoin", 
+  "cardano", 
+  "ripple", 
+  "polkadot"
+];
+
+// Helper to map IDs to USDT symbols for the UI
+const symbolMap = {
+  bitcoin: "BTC", ethereum: "ETH", solana: "SOL", binancecoin: "BNB",
+  dogecoin: "DOGE", cardano: "ADA", ripple: "XRP", polkadot: "DOT"
+};
+
 export default function CoinList() {
   const { prices } = usePriceFeed();
   const navigate = useNavigate();
 
-  let mok = [1, 2, 3, 4, 5, 6, 7];
+  // Skeleton placeholders
+  const mok = [1, 2, 3, 4, 5, 6, 7, 8];
 
- // console.log("CoinList prices test:", prices===null ? "null" : Object.keys(prices).length === 0 ? "empty" : "has data");
-
-
-
-  if (false)
-    return (
-      <div id="pd" className="flex flex-col items-center justify-center mt-16 space-y-4 bg-gray-900 p-6">
-        <ClipLoader color="#00ff99" size={50} />
-        <p className="text-center text-gray-400 text-lg font-medium animate-pulse">
-          Fetching latest crypto prices...
-        </p>
-        <p className="text-sm text-gray-500">
-          Please wait while the blockchain gods do their thing.
-        </p>
-      </div>
-    );
-
+  // 1. LOADING / EMPTY STATE
   if (!prices || Object.keys(prices).length === 0) {
     return (
-      <>
-
-        <div id="pd" className="text-2xl font-bold text-white text-center my-8">
-          Live Crypto Prices
+      <div className="bg-[#030712] min-h-screen p-4">
+        <div className="max-w-2xl mx-auto py-8">
+            <h2 className="text-2xl font-black text-white text-center mb-2 tracking-tighter uppercase">
+                Market Pulse
+            </h2>
+            <div className="flex justify-center items-center gap-2 mb-8">
+                <div className="w-2 h-2 rounded-full bg-slate-700 animate-pulse" />
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Connecting to Feed</span>
+            </div>
+            
+            <div className="space-y-3 opacity-50">
+                {mok.map((item) => (
+                    <CoinCard
+                        key={item}
+                        name="Loading..."
+                        symbol="---"
+                        price={0}
+                        change={0}
+                    />
+                ))}
+            </div>
         </div>
-
-         <div className="max-w-2xl m-auto " >
-        {/* <div className="">
-          <button
-            className=" p-1 bg-blue-500 m-2 rounded-md text-white  w-[100px] cursor-pointer "
-            onClick={() => alert("future clicked")}>Future</button>
-          <button
-            className=" p-1 bg-gray-900 m-2 rounded-md border text-white  w-[100px] cursor-pointer"
-            onClick={() => alert("stock clicked")}>Stock</button>
-        </div> */}
       </div>
-
-        
-        <div className="p-2 bg-gray-900 min-h-screen pb-10 m-auto">
-          {mok.map((item) => (
-            <CoinCard
-              onClick={() => navigate(`/coin/bitcoin`)}
-              key={item}
-              name={"Loading..."}
-              symbol={"---"}
-              price={0}
-              change={0}
-            />
-          ))}
-
-        </div>
-      </>
     );
   }
 
-
-
+  // 2. FILTERED DATA LOGIC
+  // We filter the prices object entries to only include keys found in SELECTED_COINS
+  const filteredPrices = Object.entries(prices).filter(([id]) => 
+    SELECTED_COINS.includes(id)
+  );
 
   return (
-    <>
+    <div className="bg-[#030712] min-h-screen p-4 pb-24">
+      <div className="max-w-2xl mx-auto">
+        {/* Header Section */}
+        <div className="py-10 text-center">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
+                <TrendingUp className="w-3 h-3 text-green-500" />
+                <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Top Movers</span>
+            </div>
+            <h2 className="text-3xl font-black text-white tracking-tighter uppercase">
+                Featured Assets
+            </h2>
+            <p className="text-slate-500 text-sm mt-2 font-medium">Real-time valuation from global exchanges</p>
+        </div>
 
+        {/* Coin Grid/List */}
+        <div className="space-y-1">
+          {filteredPrices.map(([id, info]) => (
+            <CoinCard
+              onClick={() => navigate(`/coin/${id}`)}
+              key={id}
+              name={id}
+              symbol={symbolMap[id] || id.toUpperCase()}
+              price={info.usd}
+              change={info.usd_24h_change}
+            />
+          ))}
+        </div>
 
-      <div id="pd" className="text-2xl font-bold text-white text-center my-8">
-        Live Crypto Prices
-      </div>
-      <div className="max-w-2xl m-auto " >
-        {/* <div className="">
+        {/* Footer Navigation */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-12 text-center"
+        >
           <button
-            className=" p-1 bg-blue-500 m-2 rounded-md text-white  w-[100px] cursor-pointer "
-            onClick={() => alert("future clicked")}>Future</button>
-          <button
-            className=" p-1 bg-gray-900 m-2 rounded-md border text-white w-[100px] cursor-pointer"
-            onClick={() => alert("stock clicked")}>Stock</button>
-        </div> */}
+            onClick={() => navigate('/markets')}
+            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/10"
+          >
+            <LayoutGrid className="w-5 h-5 text-green-500 group-hover:rotate-90 transition-transform duration-500" />
+            <span>Explore All Markets</span>
+            <svg 
+              className="w-4 h-4 transform group-hover:translate-x-1 transition-transform text-slate-500" 
+              fill="none" stroke="currentColor" viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </button>
+        </motion.div>
       </div>
-
-      {
-      //console.log("Rendering CoinList with data:", prices)
-      }
-
-      <div className="p-2 bg-gray-900 min-h-screen pb-10 m-auto">
-        {Object.entries(prices).map(([coin, info]) => (
-          <CoinCard
-            onClick={() => navigate(`/coin/${coin}`)}
-            key={coin}
-            name={coin}
-            symbol={coin.slice(0, 3)}
-            price={info.usd}
-            change={info.usd_24h_change}
-          />
-        ))}
-      </div>
-    </>
+    </div>
   );
 }

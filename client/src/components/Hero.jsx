@@ -44,10 +44,10 @@ export default function Hero() {
   };
 
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center bg-gray-900 px-4 sm:px-6 md:px-8 overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-center bg-gray-950 px-4 sm:px-6 md:px-8 overflow-hidden">
 
       {/* Subtle animated background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-900 to-green-900/10">
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-950 via-gray-950 to-green-900/10">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-500/5 via-transparent to-transparent"></div>
       </div>
 
@@ -74,7 +74,7 @@ export default function Hero() {
                   className="w-full h-full object-cover"
                 />
                 {/* Overlay gradient */}
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-gray-900/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-gray-950/90 via-gray-950/40 to-transparent" />
 
                 {/* Slide text */}
                 <div className="absolute bottom-10 left-0 right-0 p-3 md:p-8 lg:p-10">
@@ -87,7 +87,7 @@ export default function Hero() {
                     <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 md:mb-3">
                       {slide.title}
                     </h3>
-                    <p className="text-gray-200 text-sm sm:text-base md:text-lg opacity-90">
+                    <p className="text-gray-250 text-sm sm:text-base md:text-lg opacity-90">
                       {slide.subtitle}
                     </p>
                   </motion.div>
@@ -99,7 +99,7 @@ export default function Hero() {
           {/* Navigation buttons */}
           {/* <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-900/90 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white hover:bg-gray-800/90 hover:border-gray-600/50 transition-all duration-300 z-20 hover:scale-105"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-950/90 backdrop-blur-sm border border-gray-750/50 flex items-center justify-center text-white hover:bg-gray-850/90 hover:border-gray-650/50 transition-all duration-300 z-20 hover:scale-105"
             aria-label="Previous slide"
           >
             <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@ export default function Hero() {
 
           {/* <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-900/90 backdrop-blur-sm border border-gray-700/50 flex items-center justify-center text-white hover:bg-gray-800/90 hover:border-gray-600/50 transition-all duration-300 z-20 hover:scale-105"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 rounded-full bg-gray-950/90 backdrop-blur-sm border border-gray-750/50 flex items-center justify-center text-white hover:bg-gray-850/90 hover:border-gray-650/50 transition-all duration-300 z-20 hover:scale-105"
             aria-label="Next slide"
           >
             <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +125,7 @@ export default function Hero() {
                 onClick={() => setCurrentSlide(index)}
                 className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide
                     ? "w-8 bg-green-500 shadow-lg shadow-green-500/30"
-                    : "w-2 bg-gray-500/70 hover:bg-gray-400"
+                    : "w-2 bg-gray-550/70 hover:bg-gray-450"
                   }`}
                 aria-label={`Go to slide ${index + 1}`}
               />
@@ -150,7 +150,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="font-semibold text-gray-100 mb-6 md:mb-8 leading-snug text-center"
+          className="font-semibold text-gray-150 mb-6 md:mb-8 leading-snug text-center"
         >
           {/* <div className="text-2xl sm:text-3xl md:text-4xl mb-3 md:mb-4">
             Track & Trade the{" "}
@@ -177,14 +177,14 @@ export default function Hero() {
           transition={{ delay: 0.2, duration: 0.7 }}
           className="mb-8 md:mb-12"
         >
-          <div className="flex items-center justify-center gap-3 text-gray-400 mb-4 md:mb-6">
-            <div className="w-16 sm:w-20 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+          <div className="flex items-center justify-center gap-3 text-gray-450 mb-4 md:mb-6">
+            <div className="w-16 sm:w-20 h-px bg-gradient-to-r from-transparent via-gray-650 to-transparent"></div>
             {/* <span className="text-xs sm:text-sm tracking-widest font-mono">REAL-TIME ANALYTICS</span> */}
             <span className="text-xs sm:text-sm tracking-widest font-mono">REAL-TIME DATA STREAM</span>
-            <div className="w-16 sm:w-20 h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent"></div>
+            <div className="w-16 sm:w-20 h-px bg-gradient-to-r from-transparent via-gray-650 to-transparent"></div>
           </div>
 
-          <p className="text-xs sm:text-lg md:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed font-light tracking-wide text-center px-4">
+          <p className="text-xs sm:text-lg md:text-xl text-gray-350 max-w-3xl mx-auto leading-relaxed font-light tracking-wide text-center px-4">
             Advanced market intelligence and lightning-fast tracking for global cryptocurrency markets.
             Professional-grade tools for modern traders.
           </p>
@@ -225,10 +225,10 @@ export default function Hero() {
           ].map((stat, index) => (
             <div 
               key={index}
-              className="bg-gray-800/40 backdrop-blur-sm rounded-xl p-5 sm:p-6 border border-gray-700/50 hover:border-gray-600/50 hover:shadow-lg hover:shadow-green-900/10 transition-all duration-300 hover:scale-105"
+              className="bg-gray-850/40 backdrop-blur-sm rounded-xl p-5 sm:p-6 border border-gray-750/50 hover:border-gray-650/50 hover:shadow-lg hover:shadow-green-900/10 transition-all duration-300 hover:scale-105"
             >
               <div className="flex items-center gap-3 mb-3">
-                <div className={`p-2 rounded-lg bg-gray-800/50 ${stat.color.replace('text-', 'bg-')}/10`}>
+                <div className={`p-2 rounded-lg bg-gray-850/50 ${stat.color.replace('text-', 'bg-')}/10`}>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={stat.icon} />
                   </svg>
@@ -237,7 +237,7 @@ export default function Hero() {
                   {stat.value}
                 </div>
               </div>
-              <div className="text-sm text-gray-400 font-medium tracking-wider">
+              <div className="text-sm text-gray-450 font-medium tracking-wider">
                 {stat.label}
               </div>
             </div>

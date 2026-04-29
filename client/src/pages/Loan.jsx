@@ -179,7 +179,7 @@ export default function LoanPackages() {
   const repaymentAmount = calculateRepayment();
 
   return (
-    <div className="min-h-screen bg-gray-900 sm:py-8 px-3 sm:px-4 mb-25">
+    <div className="min-h-screen bg-gray-950 sm:py-8 px-3 sm:px-4 mb-25">
       <MobileNav />
       <div className="max-w-6xl mx-auto">
         {/* Back to Home Button */}
@@ -220,7 +220,7 @@ export default function LoanPackages() {
                         <input
                           type="text"
                           placeholder="Search loan packages by name or description..."
-                          className="w-full pl-12 pr-4 py-4 bg-gray-900 border border-gray-600 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 transition-all duration-200"
+                          className="w-full pl-12 pr-4 py-4 bg-gray-950 border border-gray-600 rounded-full focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-400 transition-all duration-200"
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -238,7 +238,7 @@ export default function LoanPackages() {
                 <div
                   key={pack.id}
                   onClick={() => handleSelect(pack)}
-                  className="bg-gray-900 rounded-2xl border border-gray-700 hover:border-blue-600 hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:scale-101"
+                  className="bg-gray-950 rounded-2xl border border-gray-700 hover:border-blue-600 hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:scale-101"
                 >
                   <div className="p-6">
                     {/* Package Header */}
@@ -279,7 +279,7 @@ export default function LoanPackages() {
                     </div>
 
                     {/* CTA */}
-                    <button className="w-full py-3 px-4 bg-gray-700 hover:bg-blue-600 hover:text-white text-gray-200 rounded-2xl font-medium transition-all duration-300 group-hover:shadow-lg border border-gray-600 hover:border-blue-500 transform group-hover:scale-105">
+                    <button className="w-full py-3 px-4 bg-gray-700 hover:bg-blue-600 hover:text-white text-gray-200 rounded-2xl font-medium transition-all duration-300 group-hover:shadow-lg border border-gray-600 hover:border-green-500 transform group-hover:scale-105">
                       Select Package
                     </button>
                   </div>
@@ -296,7 +296,7 @@ export default function LoanPackages() {
                 <div className="text-gray-400 text-sm mb-6">No loan packages found</div>
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium transition-colors border border-blue-500 hover:border-blue-400 transform hover:scale-105"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium transition-colors border border-green-500 hover:border-blue-400 transform hover:scale-105"
                 >
                   View All Packages
                 </button>
@@ -316,7 +316,7 @@ export default function LoanPackages() {
                     onClick={handleBack}
                     className="flex gap-2 text-gray-400 hover:text-white transition-colors group"
                   >
-                    <div className="w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:bg-blue-500/20 border border-gray-600">
+                    <div className="w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:bg-green-500/20 border border-gray-600">
                       <svg className="w-5 h-5 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                       </svg>
@@ -389,7 +389,7 @@ export default function LoanPackages() {
                               min="1"
                               max={selected.maxAmount}
                               //  step="0.01"
-                              className="w-full p-4 bg-gray-700 border border-gray-600 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white placeholder-gray-400 text-lg font-semibold pr-20 transition-all duration-200"
+                              className="w-full p-4 bg-gray-700 border border-gray-600 rounded-2xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-white placeholder-gray-400 text-lg font-semibold pr-20 transition-all duration-200"
                               value={amount}
                               onChange={e => setAmount(e.target.value)}
                               placeholder="0.00"
@@ -413,7 +413,7 @@ export default function LoanPackages() {
                             //  step="100"
                             value={amount || 0}
                             onChange={e => setAmount(e.target.value)}
-                            className="w-full h-2 bg-gray-600 rounded-2xl appearance-none cursor-pointer accent-blue-500"
+                            className="w-full h-2 bg-gray-600 rounded-2xl appearance-none cursor-pointer accent-green-500"
                           />
                           <div className="flex justify-between text-xs text-gray-400 mt-2">
                             <span>1 USDT</span>
@@ -458,7 +458,7 @@ export default function LoanPackages() {
                         <button
                           onClick={requestLoan}
                           disabled={isLoading || !amount || amount <= 0}
-                          className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 border border-blue-500 disabled:border-gray-500 shadow-lg"
+                          className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 border border-green-500 disabled:border-gray-500 shadow-lg"
                         >
                           {isLoading ? (
                             <div className="flex items-center justify-center gap-3">

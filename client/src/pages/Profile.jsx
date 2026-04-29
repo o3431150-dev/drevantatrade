@@ -357,7 +357,7 @@ export default function ProfilePage() {
 
   if (!userdata) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
         <div className="text-center px-4">
           <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
           <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">Failed to load profile</h2>
@@ -376,11 +376,11 @@ export default function ProfilePage() {
   const kycStatus = getKYCStatusBadge(userdata.kycStatus);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 pb-20">
+    <div className="min-h-screen bg-gray-950 text-gray-100 pb-20">
       <MobileNav />
 
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-800">
+      <header className="sticky top-0 z-50 bg-gray-950  backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-4xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <div className="flex items-center justify-between">
             <button
@@ -409,12 +409,12 @@ export default function ProfilePage() {
         <div className="space-y-4 sm:space-y-6">
 
           {/* Profile Header Card */}
-          <div className="bg-gradient-to-br from-gray-900 to-gray-900 rounded-xl sm:rounded-2xl sm:border sm:border-gray-700 p-4 sm:p-4 shadow-xl">
+          <div className="bg-gray-900 rounded-xl sm:rounded-2xl sm:border sm:border-gray-700 p-4 sm:p-4 shadow-xl">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
               {/* Avatar */}
               <div className="relative group">
                 <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-0.5">
-                  <div className="w-full h-full rounded-full bg-gray-900 flex items-center justify-center">
+                  <div className="w-full h-full rounded-full bg-gray-950 flex items-center justify-center">
                     {userdata.avatar ? (
                       <img
                         src={userdata.avatar}
@@ -497,7 +497,7 @@ export default function ProfilePage() {
               {/* Edit Profile Button */}
               <button
                 onClick={() => setShowProfileEdit(true)}
-                className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg border border-gray-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+                className="w-full sm:w-auto px-3 sm:px-4 py-1.5 sm:py-2 bg-green-800 hover:bg-gray-700 text-gray-300 rounded-lg border border-gray-700 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
               >
                 <User size={14} className="sm:w-4 sm:h-4" />
                 <span>Edit Profile</span>
@@ -622,7 +622,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Quick Actions */}
-          <div className="bg-gray-900 rounded-xl sm:rounded-2xl sm:border sm:border-gray-700 p-4 sm:p-6">
+          <div className="bg-gray-950 rounded-xl sm:rounded-2xl sm:border sm:border-gray-700 p-4 sm:p-6">
             <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {quickActions.map((action, index) => (
@@ -638,7 +638,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Security & Settings */}
-          <div className="bg-gray-900 rounded-xl sm:rounded-2xl sm:border sm:border-gray-700 p-4 sm:p-6">
+          <div className="bg-gray-950 rounded-xl sm:rounded-2xl sm:border sm:border-gray-700 p-4 sm:p-6">
             <h2 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4">Security & Settings</h2>
             <div className="space-y-1 sm:space-y-2">
               <SettingItem
@@ -682,7 +682,7 @@ export default function ProfilePage() {
           </div>
 
           {/* Account Info */}
-          <div className="bg-gray-800/30 rounded-xl sm:rounded-2xl border border-gray-700 p-4 sm:p-6">
+          <div className="bg-gray-950 rounded-xl sm:rounded-2xl border border-gray-700 p-4 sm:p-6">
             <div className="flex items-center justify-between flex-wrap gap-2">
               <div>
                 <h3 className="text-xs sm:text-sm font-medium text-gray-400">Account ID</h3>

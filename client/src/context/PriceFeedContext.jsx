@@ -9,7 +9,7 @@ export const PriceFeedProvider = ({ children }) => {
   useEffect(() => {
     // FIX: Point to port 5000 (your backend port)
    const backendUrl = "https://tradingappv1-production-71a7.up.railway.app"
-   // const backendUrl = "http://localhost:3000";
+   ///const backendUrl = "http://localhost:3000";
     const socket = io(backendUrl, { 
       transports: ["websocket", "polling"], // Allow fallback
       withCredentials: true 
@@ -20,8 +20,10 @@ export const PriceFeedProvider = ({ children }) => {
     });
 
     socket.on("priceUpdate", (data) => {
-      // console.log("Received update:", data);
+      ///console.log("Received update:", data);
+      
       setPrices(data); 
+  
     });
 
     socket.on("connect_error", (err) => {

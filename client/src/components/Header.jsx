@@ -16,7 +16,10 @@ import {
   Sparkles,
   PiggyBank,
   LogIn,
-  
+  MessageCircle,
+  Cpu,
+  CircleX
+
 
 
 } from 'lucide-react';
@@ -26,7 +29,8 @@ import NotificationBell from './NotificationBell';
 import { assets } from '../assets/assets';
 
 const Header = () => {
-  const { isLogin, token } = useAuth();
+  let { isLogin, token } = useAuth();
+ ''
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isWalletDropdownOpen, setIsWalletDropdownOpen] = useState(false);
@@ -51,6 +55,14 @@ const Header = () => {
   ];
 
 
+  const MobileNav = [
+    { name: 'Arbitrage', href: 'ai-arbitrage', featured: true, icon: <Cpu className="w-4 h-4" /> },
+    { name: 'Assets', href: 'wallet', icon: <Wallet className="w-4 h-4" /> },
+    { name: 'Support', href: 'support', icon: <MessageCircle className="w-4 h-4" /> },
+    { name: 'Loan', href: 'loan', icon: <PiggyBank className="w-4 h-4" /> },
+  ];
+
+
 
   const gamesDropdown = [
 
@@ -58,7 +70,7 @@ const Header = () => {
 
   const walletOptions = [
     { name: 'Profile', action: () => navigate('/profile'), icon: <User className="w-4 h-4" /> },
-   // { name: 'Loans', action: () => navigate('/loan'), icon: <PiggyBank className="w-4 h-4" /> },
+    // { name: 'Loans', action: () => navigate('/loan'), icon: <PiggyBank className="w-4 h-4" /> },
     { name: 'Deposit', action: () => navigate('/deposit'), icon: <Coins className="w-4 h-4" /> },
     { name: 'Withdraw', action: () => navigate('/Withdraw'), icon: <Coins className="w-4 h-4" /> },
     { name: 'Wallet', action: () => navigate('/wallet'), icon: <Wallet className="w-4 h-4" /> },
@@ -89,15 +101,18 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
+
           <div className="flex items-center space-x-3">
             <div className=" space-x-2 flex items-center cursor-pointer" onClick={() => navigate('/')}>
-              {/* <img src={assets.logo} alt="Loading..." className="w-16 h-16 sm:w-20 md:h-20  " /> */}
-              <span className="text-md font-bold bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">
+              <img src={assets.logo} alt="Loading..." className="w-12 h-12 " />
+
+              {/* <span className="text-md font-bold bg-gradient-to-r from-green-400 to-green-500 bg-clip-text text-transparent">
                UPH
-              </span>
+              </span> */}
             </div>
 
             {/* Desktop Navigation */}
+
             <nav className="hidden lg:flex items-center space-x-1 ml-8">
               {navigation.map((item) => (
                 <div key={item.name} className="relative group">
@@ -110,14 +125,16 @@ const Header = () => {
                       }`}
                   >
                     {item.icon}
+
                     <span>{item.name}</span>
+
                     {item.dropdown && (
                       <ChevronDown className="w-4 h-4 ml-1" />
                     )}
 
                   </p>
 
-                  {/* Dropdown Menu for Games */}
+
 
                 </div>
               ))}
@@ -134,6 +151,7 @@ const Header = () => {
 
 
                   {/* Wallet Button with Dropdown */}
+
                   <div className="relative">
                     <button
                       onClick={() => setIsWalletDropdownOpen(!isWalletDropdownOpen)}
@@ -141,12 +159,15 @@ const Header = () => {
                     >
                       <Menu className="w-5 h-5" />
 
+
                     </button>
 
                     {/* Wallet Dropdown */}
+
                     {true && (
                       <div className={`${isWalletDropdownOpen ? '' : 'invisible'} z-50  absolute top-full right-0 mt-2 w-64 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl`}>
                         {/* // <div className="p-4 border-b  border-gray-700"> */}
+
                         <div className="">
 
                         </div>
@@ -162,6 +183,7 @@ const Header = () => {
                               className="w-full flex items-center space-x-3 px-3 py-3 rounded-lg hover:bg-gray-700/50 transition-colors text-gray-300 hover:text-white"
                             >
                               {option.icon}
+
                               <span>{option.name}</span>
                             </button>
                           ))}
@@ -184,9 +206,19 @@ const Header = () => {
 
           }
 
-          <div className='sm:hidden '>
+          <div className='sm:hidden  flex gap-2'>
             {token && <NotificationBell />}
+
+            {token && <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className={`"flex items-center space-x-2 ${isMenuOpen? '':'bg-green-500 rounded-lg'}  hover:to-green-600 px-4 py-2  transition-all duration-200"`}
+            >
+             {
+                isMenuOpen ? <CircleX className="w-6 h-6 text-red-500" /> : <Menu className="w-5 h-5" />}
+            </button>}
+
           </div>
+
 
 
 
@@ -203,35 +235,45 @@ const Header = () => {
         </div>
 
         {/* Mobile Menu */}
+
         {true && (
           <div className={`${isMenuOpen ? 'max-h-screen' : 'hidden'} overflow-hidden transition-all duration-300 lg:hidden bg-gray-900 border-t border-gray-800 bg-amber-200`}>
             {/* Mobile Navigation */}
+
             <nav className="py-4"
 
 
             >
-              {navigation.map((item) => (
-                <a
+              {MobileNav.map((item) => (
+                <div
+                  // onClick={() => navigate(`/${item.href}`)}
                   key={item.name}
-                  href={item.href}
-                  className="flex items-center justify-between px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors"
+                  className="flex items-center justify-between px-4 py-3 text-gray-300 hover:text-white hover:bg-gray-800/50 transition-colors w-full mt-1"
                 >
-                  <div className="flex items-center space-x-2">
+                  <div
+                    onClick={(e) => {
+                      navigate(`/${item.href}`)
+                      setIsMenuOpen(false)
+                    }}
+                    className="flex items-center space-x-2 bo z-100 w-full">
                     {item.icon}
+
                     <span className={item.featured ? 'text-green-400' : ''}>
                       {item.name}
                     </span>
                   </div>
+
                   {item.featured && (
                     <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded">
-                      HOT
+                      AI
                     </span>
                   )}
-                </a>
+                </div>
               ))}
             </nav>
 
             {/* Mobile Wallet Section */}
+
             <div className="p-4 border-t border-gray-800">
               <div className="flex items-center justify-between mb-4">
 
@@ -248,8 +290,10 @@ const Header = () => {
                   }}
                 >
                   <Coins className="w-4 h-4" />
+
                   <span>Deposit</span>
                 </button>
+
                 <button
                   onClick={() => {
                     navigate('/withdraw')
@@ -258,6 +302,7 @@ const Header = () => {
 
                   className="flex items-center justify-center space-x-2 px-4 py-2 border border-gray-600 hover:border-green-400 rounded-lg transition-colors text-white font-sm z-50">
                   <Wallet className="w-4 h-4" />
+
                   <span>Withdraw</span>
                 </button>
               </div>
@@ -267,6 +312,7 @@ const Header = () => {
       </div>
 
       {/* Overlay for dropdowns */}
+
       {(isWalletDropdownOpen || isMenuOpen) && (
         <div
           className="fixed inset-0 z-40"

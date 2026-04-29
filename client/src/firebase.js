@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import {getAuth,GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCczKM25d43wjsAbrJs20UdpMYisbxK2VM",
-  authDomain: "crypto-9b989.firebaseapp.com",
-  projectId: "crypto-9b989",
-  storageBucket: "crypto-9b989.firebasestorage.app",
-  messagingSenderId: "694839636754",
-  appId: "1:694839636754:web:2d56436f42560b24c139cb",
-  measurementId: "G-Z54DH26QSK"
+   apiKey: "AIzaSyD3husBYrq1tY-K3I87PL7Vjnq9iVkPyWk",
+  authDomain: "drevantatrade.firebaseapp.com",
+  projectId: "drevantatrade",
+  storageBucket: "drevantatrade.firebasestorage.app",
+  messagingSenderId: "443069466176",
+  appId: "1:443069466176:web:793c8acb38fccf86aa41a5",
+  measurementId: "G-QTLQJKLVP4"
 
   
 };

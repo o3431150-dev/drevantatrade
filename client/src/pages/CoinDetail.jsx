@@ -24,16 +24,56 @@ import { tradeAPI } from "../services/api";
 import { conversionAPI } from "../services/api";
 
 const symbol = {
-  bitcoin: "BTC",
-  ethereum: "ETH",
-  tether: "USDT",
-  ripple: "XRP",
-  binancecoin: "BNB",
-  solana: "SOL",
-  usdc: "USDC",
-  dogecoin: "DOGE",
-  cardano: "ADA",
-  polkadot: "DOT",
+    // Top 10 & Stable
+    bitcoin: "BTC",
+    ethereum: "ETH",
+    solana: "SOL",
+    binancecoin: "BNB",
+    ripple: "XRP",
+    cardano: "ADA",
+    dogecoin: "DOGE",
+    polkadot: "DOT",
+    usdc: "USDC",
+    tether: "USDT",
+
+    // Ecosystem & Layer 1/2
+    tron: "TRX",
+    chainlink: "LINK",
+    polygon: "MATIC",
+    avalanche: "AVAX",
+    near: "NEAR",
+    uniswap: "UNI",
+    aptos: "APT",
+    sui: "SUI",
+    optimism: "OP",
+    arbitrum: "ARB",
+    stellar: "XLM",
+    cosmos: "ATOM",
+    stacks: "STX",
+    fantom: "FTM",
+    celestia: "TIA",
+
+    // DeFi & AI
+    "fetch-ai": "FET",
+    "lido-dao": "LDO",
+    thorchain: "RUNE",
+    pancakeswap: "CAKE",
+    aave: "AAVE",
+    "internet-computer": "ICP",
+
+    // Storage & Infrastructure
+    filecoin: "FIL",
+    "hedera-hashgraph": "HBAR",
+    vechain: "VET",
+    algorand: "ALGO",
+
+    // Memecoins & Legacy
+    pepe: "PEPE",
+    "shiba-inu": "SHIB",
+    dogwifhat: "WIF",
+    litecoin: "LTC",
+    "bitcoin-cash": "BCH",
+    "ethereum-classic": "ETC",
 };
 
 const CoinDetail = () => {

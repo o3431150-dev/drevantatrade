@@ -13,7 +13,6 @@ import MobileNav from "../components/MobileNav";
 import { toast } from "react-toastify";
 import Loading from "../components/Loading";
 
-import AccountBalance from "../components/AccountBalance";
 
 
 export default function WalletPage() {
@@ -154,11 +153,11 @@ export default function WalletPage() {
     loading ? (
       <Loading text="Loading your wallet..." />
     ) : (
-      <div className="min-h-screen bg-gray-900 text-gray-100 mb-20">
+      <div className="min-h-screen bg-gray-950 text-gray-100 mb-20">
         <MobileNav />
 
         {/* Header */}
-        <div className="hidden sm:block bg-gray-900 sticky top-0 z-50">
+        <div className="hidden sm:block bg-gray-950 sticky top-0 z-50">
           <div className="max-w-4xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <button
@@ -183,7 +182,7 @@ export default function WalletPage() {
           <div className="space-y-6">
 
             {/* Balance Overview */}
-            <div className="bg-gray-900 rounded-lg sm:border border-gray-700 p-3 sm:p-6">
+            <div className="bg-gray-950 rounded-lg sm:border border-gray-700 p-3 sm:p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h2 className="text-md font-bold text-white">Wallet Balance</h2>
@@ -325,7 +324,7 @@ export default function WalletPage() {
             </div>
 
             {/* Quick Actions */}
-            <div className="bg-gray-900 rounded-lg sm:border border-gray-700 p-3 sm:p-6">
+            <div className="bg-gray-950 rounded-lg sm:border border-gray-700 p-3 sm:p-6">
               <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {quickActions.map((action, index) => (
