@@ -2,7 +2,7 @@
 import axios from 'axios';
 
 //const API_BASE_URL = 'https://trading-app-fdzj.onrender.com/api';
-const API_BASE_URL = "https://tradingappv1-production-71a7.up.railway.app/api";
+const API_BASE_URL = "https://drevantatrade-production-e27d.up.railway.app/api";
 
 //const API_BASE_URL = 'http://localhost:3000/api'
 // Create axios instance
