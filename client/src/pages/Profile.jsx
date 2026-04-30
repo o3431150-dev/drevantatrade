@@ -45,28 +45,28 @@ export default function ProfilePage() {
   const [userdata, setUserdata] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  
+
   // Balance State
   const [showBalance, setShowBalance] = useState(false);
   const [marketPrices, setMarketPrices] = useState(null);
   const [priceLoading, setPriceLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
-  
+
   // Modal states
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
-  
+
   // Form states
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
     newPassword: "",
     confirmPassword: ""
   });
-  
+
   const [isPasswordSet, setIsPasswordSet] = useState(true);
   const [passwordErrors, setPasswordErrors] = useState({});
   const [updatingPassword, setUpdatingPassword] = useState(false);
-  
+
   const [profileForm, setProfileForm] = useState({
     name: "",
     userName: "",
@@ -131,19 +131,19 @@ export default function ProfilePage() {
 
   useEffect(() => {
     fetchAllData();
-    
+
     // Refresh prices every 30 seconds
     const intervalId = setInterval(() => {
       getMarketPrices();
     }, 30000);
-    
+
     return () => clearInterval(intervalId);
   }, []);
 
   // Calculate total balance with market prices
   const calculateTotalBalance = () => {
     if (!userdata?.wallet) return 0;
-    
+
     const usdtValue = userdata.wallet.usdt || 0;
     const btcPrice = marketPrices?.BTC?.price || 45000;
     const btcValue = (userdata.wallet.btc || 0) * btcPrice;
@@ -157,13 +157,13 @@ export default function ProfilePage() {
   // Calculate 24h change for total balance
   const calculateTotalChange = () => {
     if (!userdata?.wallet) return 0;
-    
+
     const btcChange = marketPrices?.BTC?.change24h || 0;
     const ethChange = marketPrices?.ETH?.change24h || 0;
     const totalBalance = calculateTotalBalance();
-    
+
     if (totalBalance === 0) return 0;
-    
+
     const btcBalance = (userdata.wallet.btc || 0) * (marketPrices?.BTC?.price || 45000);
     const ethBalance = (userdata.wallet.eth || 0) * (marketPrices?.ETH?.price || 3000);
     const usdtBalance = userdata.wallet.usdt || 0;
@@ -186,7 +186,7 @@ export default function ProfilePage() {
     const now = new Date();
     const updated = new Date(timestamp);
     const diffInSeconds = Math.floor((now - updated) / 1000);
-    
+
     if (diffInSeconds < 60) return "Just now";
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
     if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
@@ -200,14 +200,14 @@ export default function ProfilePage() {
       toast.success('Logged out successfully');
       navigate('/');
     } catch (error) {
-      toast.error('Failed to logout');
+      //toast.error('Failed to logout');
     }
   };
 
   // Password validation
   const validatePassword = () => {
     const errors = {};
-    
+
     if (passwordData.newPassword.length < 8) {
       errors.newPassword = "Password must be at least 8 characters";
     }
@@ -220,7 +220,7 @@ export default function ProfilePage() {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
     }
-    
+
     setPasswordErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -228,9 +228,9 @@ export default function ProfilePage() {
   // Change password handler
   const handlePasswordChange = async (e) => {
     e.preventDefault();
-    
+
     if (!validatePassword()) return;
-    
+
     try {
       setUpdatingPassword(true);
       const response = await axios.post(
@@ -243,7 +243,7 @@ export default function ProfilePage() {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      
+
       if (response.data.success) {
         toast.success("Password changed successfully");
         setShowChangePassword(false);
@@ -265,7 +265,7 @@ export default function ProfilePage() {
   // Profile update handler
   const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    
+
     try {
       setLoading(true);
       const response = await axios.put(
@@ -275,7 +275,7 @@ export default function ProfilePage() {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
-      
+
       if (response.data.success) {
         toast.success("Profile updated successfully");
         setShowProfileEdit(false);
@@ -362,12 +362,22 @@ export default function ProfilePage() {
           <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
           <h2 className="text-lg sm:text-xl font-semibold text-white mb-2">Failed to load profile</h2>
           <p className="text-gray-400 text-sm sm:text-base mb-4">Please try again</p>
-          <button
-            onClick={() => fetchProfile()}
-            className="px-4 sm:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm sm:text-base"
-          >
-            Retry
-          </button>
+          <div className="flex items-center justify-center gap-4">
+            <button
+              onClick={() => fetchProfile()}
+              className="px-5 sm:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors text-sm sm:text-base"
+            >
+              Retry 
+            </button>
+
+            <button
+              onClick={() => handleLogout()}
+              className="px-4 sm:px-6 py-2 bg-red-500 hover:bg-red-700 text-white rounded-lg transition-colors text-sm sm:text-base"
+            >
+              Logout
+            </button>
+          </div>
+
         </div>
       </div>
     );

@@ -683,7 +683,7 @@ export default function LoanPayment() {
                 {loading && (
                     <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
                         <div className="bg-gray-800 p-6 rounded-xl flex flex-col items-center">
-                            <FaSpinner className="animate-spin text-3xl text-blue-500 mb-3" />
+                            <FaSpinner className="animate-spin text-3xl text-green-500 mb-3" />
                             <p className="text-white">Processing...</p>
                         </div>
                     </div>
@@ -706,12 +706,12 @@ export default function LoanPayment() {
                                 onClick={() => handlePaymentMethodChange(PAYMENT_METHODS.EXTERNAL_WALLET)}
                                 disabled={loading}
                                 className={`p-3 rounded-xl border-2 transition-all ${paymentMethod === PAYMENT_METHODS.EXTERNAL_WALLET
-                                        ? "bg-blue-500/10 border-blue-500"
+                                        ? "bg-green-500/10 border-green-500"
                                         : "border-gray-600/50 hover:border-gray-500"
                                     }`}
                             >
                                 <div className="flex flex-col items-center">
-                                    <Wallet className={`w-5 h-5 mb-2 ${paymentMethod === PAYMENT_METHODS.EXTERNAL_WALLET ? "text-blue-400" : "text-gray-400"}`} />
+                                    <Wallet className={`w-5 h-5 mb-2 ${paymentMethod === PAYMENT_METHODS.EXTERNAL_WALLET ? "text-green-400" : "text-gray-400"}`} />
                                     <span className={`font-medium text-sm ${paymentMethod === PAYMENT_METHODS.EXTERNAL_WALLET ? "text-white" : "text-gray-400"}`}>
                                         External
                                     </span>
@@ -743,7 +743,7 @@ export default function LoanPayment() {
                         </label>
                         {fetchingData ? (
                             <div className="bg-gray-800/50 rounded-xl p-4 text-center">
-                                <FaSpinner className="animate-spin h-6 w-6 text-blue-400 mx-auto" />
+                                <FaSpinner className="animate-spin h-6 w-6 text-green-400 mx-auto" />
                             </div>
                         ) : !loan ? (
                             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-center">
@@ -751,7 +751,7 @@ export default function LoanPayment() {
                                 <p className="text-red-300 text-sm">No active loan</p>
                                 <button
                                     onClick={() => navigate('/loan')}
-                                    className="mt-2 text-blue-400 hover:text-blue-300 underline text-xs"
+                                    className="mt-2 text-green-400 hover:text-green-300 underline text-xs"
                                 >
                                     Apply for loan
                                 </button>
@@ -782,7 +782,7 @@ export default function LoanPayment() {
                                 <button
                                     onClick={fetchWalletBalance}
                                     disabled={isCheckingBalance || loading}
-                                    className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1"
+                                    className="text-green-400 hover:text-green-300 text-sm flex items-center gap-1"
                                 >
                                     <FaSync className={`w-3 h-3 ${isCheckingBalance ? 'animate-spin' : ''}`} />
                                     Refresh
@@ -877,7 +877,7 @@ export default function LoanPayment() {
                             <select
                                 value={network}
                                 onChange={(e) => setNetwork(e.target.value)}
-                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 disabled={loading}
                             >
                                 {Object.keys(paymentAddresses[coin]?.networks || {}).map((net) => (
@@ -903,7 +903,7 @@ export default function LoanPayment() {
                             <input
                                 type="number"
                                 placeholder="0.00"
-                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 pr-20 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 pr-20 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 value={amount}
                                 onChange={(e) => setAmount(e.target.value)}
                                 disabled={loading || !loan}
@@ -949,7 +949,7 @@ export default function LoanPayment() {
                             <input
                                 type="text"
                                 placeholder="Enter 64-character hash"
-                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full bg-gray-900 border border-gray-600/50 rounded-xl p-3 text-white focus:ring-2 focus:ring-green-500 focus:border-transparent"
                                 value={transactionHash}
                                 onChange={(e) => setTransactionHash(e.target.value)}
                                 disabled={loading || !loan}
@@ -967,7 +967,7 @@ export default function LoanPayment() {
                                 <button
                                     onClick={generateQRCode}
                                     disabled={!address || address === "Address not available" || address === "Loading..." || loading || !loan}
-                                    className="text-blue-400 hover:text-blue-300 text-sm flex items-center gap-1"
+                                    className="text-green-400 hover:text-green-300 text-sm flex items-center gap-1"
                                 >
                                     <FaQrcode />
                                     {showQR ? 'Hide QR' : 'Show QR'}
@@ -978,7 +978,7 @@ export default function LoanPayment() {
                                 <div className="bg-gray-950 p-4 rounded-xl flex flex-col items-center">
                                     {generatingQR ? (
                                         <div className="w-40 h-40 flex items-center justify-center">
-                                            <FaSpinner className="animate-spin text-xl text-blue-500" />
+                                            <FaSpinner className="animate-spin text-xl text-green-500" />
                                         </div>
                                     ) : (
                                         <>
@@ -992,7 +992,7 @@ export default function LoanPayment() {
                                             <div className="flex gap-2 mt-3">
                                                 <button
                                                     onClick={downloadQRCode}
-                                                    className="flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-xs"
+                                                    className="flex items-center gap-2 px-3 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs"
                                                 >
                                                     <FaDownload />
                                                     Download
@@ -1035,7 +1035,7 @@ export default function LoanPayment() {
                             <label className="block text-sm font-medium text-gray-300 mb-2">
                                 Payment Proof
                             </label>
-                            <div className="border-2 border-dashed border-gray-600/50 rounded-xl p-4 text-center hover:border-blue-500/50">
+                            <div className="border-2 border-dashed border-gray-600/50 rounded-xl p-4 text-center hover:border-green-500/50">
                                 <input
                                     type="file"
                                     className="hidden"

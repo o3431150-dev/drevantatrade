@@ -3,12 +3,12 @@ import mongoose from "mongoose";
 import userModel from "./usermodel.js";
 
 const durationRates = {
-  30: 10,  // 10% return for 30 seconds
-  60: 12,  // 12% return for 60 seconds  
-  120: 15, // 15% return for 120 seconds
-  180: 17, // 17% return for 180 seconds
-  240: 19, // 19% return for 240 seconds
-  365: 22   // 22% return for 365 seconds
+  30: 12,  // 12% return for 30 seconds
+  60: 18,  // 18% return for 60 seconds
+  120: 22, // 22% return for 120 seconds
+  180: 25, // 25% return for 180 seconds
+  240: 28, // 28% return for 240 seconds
+  365: 30   // 30% return for 365 seconds
 };
 
 const orderSchema = new mongoose.Schema(

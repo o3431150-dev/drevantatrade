@@ -7,6 +7,7 @@ import { useAuth } from './context/AuthContext.jsx';
 import Loading from './components/Loading.jsx';
 //import TawkButton from './components/TawkButton.jsx';
 const Arbitrage = lazy(() => import("./pages/Arbitrage.jsx"));
+const Support = lazy(() => import("./pages/Support.jsx"));
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
 const CoinDetail = lazy(() => import("./pages/CoinDetail"));
@@ -43,6 +44,7 @@ const App = () => {
       <Suspense fallback={<Loading text="Please wait..." />}>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/support" element={<Support />} />
           <Route path="/about" element={<About />} />
           <Route path="/coin/:id" element={token ? <CoinDetail /> : <SignUp />} />
           <Route path="/login" element={token ? <Home /> : <Login />} />

@@ -30,7 +30,7 @@ import { assets } from '../assets/assets';
 
 const Header = () => {
   let { isLogin, token } = useAuth();
- ''
+ 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isWalletDropdownOpen, setIsWalletDropdownOpen] = useState(false);
@@ -56,7 +56,7 @@ const Header = () => {
 
 
   const MobileNav = [
-    { name: 'Arbitrage', href: 'ai-arbitrage', featured: true, icon: <Cpu className="w-4 h-4" /> },
+  //  { name: 'Arbitrage', href: 'ai-arbitrage', featured: true, icon: <Cpu className="w-4 h-4" /> },
     { name: 'Assets', href: 'wallet', icon: <Wallet className="w-4 h-4" /> },
     { name: 'Support', href: 'support', icon: <MessageCircle className="w-4 h-4" /> },
     { name: 'Loan', href: 'loan', icon: <PiggyBank className="w-4 h-4" /> },
@@ -242,7 +242,6 @@ const Header = () => {
 
             <nav className="py-4"
 
-
             >
               {MobileNav.map((item) => (
                 <div
@@ -263,11 +262,12 @@ const Header = () => {
                     </span>
                   </div>
 
-                  {item.featured && (
+               {/*   
+                    {item.featured && (
                     <span className="px-2 py-1 text-xs bg-green-500/20 text-green-400 rounded">
                       AI
                     </span>
-                  )}
+                  )} */}
                 </div>
               ))}
             </nav>

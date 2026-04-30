@@ -238,15 +238,15 @@ export default function LoanPackages() {
                 <div
                   key={pack.id}
                   onClick={() => handleSelect(pack)}
-                  className="bg-gray-950 rounded-2xl border border-gray-700 hover:border-blue-600 hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:scale-101"
+                  className="bg-gray-950 rounded-2xl border border-gray-700 hover:border-green-600 hover:shadow-xl transition-all duration-300 cursor-pointer group transform hover:scale-101"
                 >
                   <div className="p-6">
                     {/* Package Header */}
                     <div className="flex justify-between items-start mb-4">
-                      <h3 className="text-xl font-semibold text-white group-hover:text-blue-300 transition-colors">
+                      <h3 className="text-xl font-semibold text-white group-hover:text-green-300 transition-colors">
                         {pack.title}
                       </h3>
-                      <div className="text-xl font-bold text-blue-400 bg-blue-900/30 px-3 py-1 rounded-2xl border border-blue-800/50">
+                      <div className="text-xl font-bold text-green-400 bg-green-900/30 px-3 py-1 rounded-2xl border border-green-800/50">
                         {pack.interest}%
                       </div>
                     </div>
@@ -271,7 +271,7 @@ export default function LoanPackages() {
                     <div className="mb-6">
                       <div className="flex flex-wrap gap-2">
                         {pack.features.map((feature, index) => (
-                          <span key={index} className="px-3 py-1 bg-blue-900/30 text-blue-300 text-xs rounded-2xl border border-blue-800/50">
+                          <span key={index} className="px-3 py-1 bg-green-900/30 text-green-300 text-xs rounded-2xl border border-green-800/50">
                             {feature}
                           </span>
                         ))}
@@ -279,7 +279,7 @@ export default function LoanPackages() {
                     </div>
 
                     {/* CTA */}
-                    <button className="w-full py-3 px-4 bg-gray-700 hover:bg-blue-600 hover:text-white text-gray-200 rounded-2xl font-medium transition-all duration-300 group-hover:shadow-lg border border-gray-600 hover:border-green-500 transform group-hover:scale-105">
+                    <button className="w-full py-3 px-4 bg-gray-700 hover:bg-green-600 hover:text-white text-gray-200 rounded-2xl font-medium transition-all duration-300 group-hover:shadow-lg border border-gray-600 hover:border-green-500 transform group-hover:scale-105">
                       Select Package
                     </button>
                   </div>
@@ -296,7 +296,7 @@ export default function LoanPackages() {
                 <div className="text-gray-400 text-sm mb-6">No loan packages found</div>
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-medium transition-colors border border-green-500 hover:border-blue-400 transform hover:scale-105"
+                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-medium transition-colors border border-green-500 hover:border-green-400 transform hover:scale-105"
                 >
                   View All Packages
                 </button>
@@ -329,7 +329,7 @@ export default function LoanPackages() {
                 </div>
 
                 <div className="flex justify-between items-center">
-                  <div className="text-sm sm:text-xl font-bold text-blue-400 bg-blue-900/30 px-4 py-2 rounded-2xl border border-blue-800/50">
+                  <div className="text-sm sm:text-xl font-bold text-green-400 bg-green-900/30 px-4 py-2 rounded-2xl border border-green-800/50">
                     {selected.interest}% Interest
                   </div>
                 </div>
@@ -425,7 +425,7 @@ export default function LoanPackages() {
                         {repaymentAmount && (
                           <div className=" p-1">
                             <h4 className="font-semibold text-white mb-4 text-lg flex items-center gap-2">
-                              {/* <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              {/* <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                               </svg> */}
                               Repayment Summary
@@ -448,7 +448,7 @@ export default function LoanPackages() {
                                 </div>
                               </div>
                             </div>
-                            <div className="mt-4 text-sm text-blue-300 text-center bg-blue-900/30 py-3 rounded-2xl border border-blue-800/30">
+                            <div className="mt-4 text-sm text-green-300 text-center bg-green-900/30 py-3 rounded-2xl border border-green-800/30">
                               Due in {selected.duration} days • {(parseFloat(repaymentAmount) / selected.duration).toFixed(2)} USDT per day
                             </div>
                           </div>
@@ -458,7 +458,7 @@ export default function LoanPackages() {
                         <button
                           onClick={requestLoan}
                           disabled={isLoading || !amount || amount <= 0}
-                          className="w-full py-4 px-6 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 border border-green-500 disabled:border-gray-500 shadow-lg"
+                          className="w-full py-4 px-6 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100 border border-green-500 disabled:border-gray-500 shadow-lg"
                         >
                           {isLoading ? (
                             <div className="flex items-center justify-center gap-3">
