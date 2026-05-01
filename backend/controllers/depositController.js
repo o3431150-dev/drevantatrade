@@ -7,15 +7,15 @@ import NotificationService from '../services/notificationService.js';
 // Get deposit addresses
 const DEPOSIT_ADDRESSES = {
   BTC: {
-    Bitcoin: "bc1qrw5hd0fy9a7z3d0t5vumry44dmnlpjxwaq8zk9",
+    Bitcoin: "bc1qd9gfcmn34rc2eyq8kdgpayr5e36f3qlw4akh2y",
     Lightning: ""
   },
   ETH: {
-    Ethereum: "0xa405e5F4297953fD9b7081AF10Ba5E718cDa22fD",
+    Ethereum: "0xF1B4E83f84B14D2E412Cc0cDDd146280d9884d70",
     Arbitrum: ""
   },
   USDT: {
-    TronTRC20: "TMPYc1bYVD3QrrcmmMmBsJEFkdzHpraYnG",
+    TronTRC20: "TMSAVQxj8pQEqK1k44doVqKq8UvJ1pUden",
     ERC20: ""
   },
  
