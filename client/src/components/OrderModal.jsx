@@ -32,11 +32,12 @@ export default function OrderModal({
 
     const durations = [
         { id: 30, rate: 12, min: 100, max: 5000 },
-        { id: 60, rate: 18, min: 500, max: 10000 },
-        { id: 120, rate: 22,min: 1000, max: 20000 },
-        { id: 180, rate: 25, min: 1500, max: 30000 },
-        { id: 240, rate: 28, min: 2000, max: 40000 },
-        { id: 365, rate: 30, min: 3000, max: 60000 }
+        { id: 60, rate: 18, min: 5000, max: 10000 },
+        {id: 90, rate: 20, min: 10000, max: 15000 },
+        { id: 120, rate: 22,min: 15000, max: 20000 },
+        { id: 180, rate: 25, min: 20000, max: 30000 },
+        { id: 240, rate: 28, min: 30000, max: 40000 },
+        { id: 365, rate: 30, min: 40000, max: 60000 }
 
     ];
 

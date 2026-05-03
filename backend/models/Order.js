@@ -5,6 +5,7 @@ import userModel from "./usermodel.js";
 const durationRates = {
   30: 12,  // 12% return for 30 seconds
   60: 18,  // 18% return for 60 seconds
+  90: 20, // 20% return for 90 seconds
   120: 22, // 22% return for 120 seconds
   180: 25, // 25% return for 180 seconds
   240: 28, // 28% return for 240 seconds
@@ -19,7 +20,7 @@ const orderSchema = new mongoose.Schema(
       required: true,
       index: true
     },
-    
+
     // Trade Details
     symbol: {
       type: String,
@@ -34,7 +35,7 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    
+
     // Position Details
     direction: {
       type: String,
@@ -52,7 +53,7 @@ const orderSchema = new mongoose.Schema(
       min: 1,
       max: 20
     },
-    
+
     // Price Details
     entryPrice: {
       type: Number,
@@ -61,11 +62,11 @@ const orderSchema = new mongoose.Schema(
     exitPrice: {
       type: Number
     },
-    
+
     // Time Management
     duration: {
       type: Number,
-      enum: [30, 60, 120, 180, 240, 365],
+      enum: [30, 50, 60, 90, 120, 180, 240, 365],
       required: true
     },
     startTime: {
@@ -79,7 +80,7 @@ const orderSchema = new mongoose.Schema(
     completedAt: {
       type: Date
     },
-    
+
     // Financial Details
     expectedReturn: {
       type: Number
@@ -95,7 +96,7 @@ const orderSchema = new mongoose.Schema(
     actualPayout: {
       type: Number
     },
-    
+
     // P&L
     profit: {
       type: Number,
@@ -105,7 +106,7 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
-    
+
     // Force Win/Lose Logic
     wasForceWin: {
       type: Boolean,
@@ -119,7 +120,7 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       default: 0
     },
-    
+
     // Status
     status: {
       type: String,
@@ -127,19 +128,19 @@ const orderSchema = new mongoose.Schema(
       default: 'pending',
       index: true
     },
-    
+
     result: {
       type: String,
       enum: ['win', 'loss', 'break_even', null],
       default: null
     },
-    
+
     // Additional Details
     description: {
       type: String,
       trim: true
     },
-    
+
     // System Info
     isLive: {
       type: Boolean,
@@ -150,7 +151,7 @@ const orderSchema = new mongoose.Schema(
       enum: ['time_based', 'manual'],
       default: 'time_based'
     },
-    
+
     // Audit
     cancelledAt: {
       type: Date
@@ -178,14 +179,14 @@ orderSchema.index({ coinId: 1, status: 1 });
 orderSchema.index({ createdAt: -1 });
 
 // Virtuals
-orderSchema.virtual('timeLeft').get(function() {
+orderSchema.virtual('timeLeft').get(function () {
   if (this.status !== 'active') return 0;
   const now = new Date();
   const timeLeftMs = this.endTime - now;
   return Math.max(0, Math.ceil(timeLeftMs / 1000));
 });
 
-orderSchema.virtual('progress').get(function() {
+orderSchema.virtual('progress').get(function () {
   if (this.status !== 'active') return 100;
   const now = new Date();
   const totalDuration = this.endTime - this.startTime;
@@ -193,16 +194,16 @@ orderSchema.virtual('progress').get(function() {
   return Math.min(100, (elapsed / totalDuration) * 100);
 });
 
-orderSchema.virtual('isProfitable').get(function() {
+orderSchema.virtual('isProfitable').get(function () {
   return this.profit > 0;
 });
 
-orderSchema.virtual('isLoss').get(function() {
+orderSchema.virtual('isLoss').get(function () {
   return this.profit < 0;
 });
 
 
-orderSchema.virtual('durationLabel').get(function() {
+orderSchema.virtual('durationLabel').get(function () {
   const labels = {
     30: '30 seconds',
     50: '50 seconds',
@@ -216,17 +217,17 @@ orderSchema.virtual('durationLabel').get(function() {
 });
 
 // Pre-save middleware - FIXED VERSION
-orderSchema.pre('save', async function(next) {
+orderSchema.pre('save', async function (next) {
   // Debug: Check if next is a function
   console.log('Order pre-save middleware called. Next is function?', typeof next === 'function');
-  
+
   // If next is not a function, this might be a direct save call
   if (typeof next !== 'function') {
     console.log('Direct save call detected, handling without next()');
     await this.preSaveLogic();
     return;
   }
-  
+
   try {
     await this.preSaveLogic();
     next();
@@ -237,9 +238,9 @@ orderSchema.pre('save', async function(next) {
 });
 
 // Extract pre-save logic to separate method
-orderSchema.methods.preSaveLogic = async function() {
+orderSchema.methods.preSaveLogic = async function () {
   console.log('Running preSaveLogic for order:', this.symbol, this.direction);
-  
+
   if (this.isNew) {
     console.log('New order detected, calculating fields...');
     const rate = durationRates[this.duration] || 12;
@@ -249,13 +250,13 @@ orderSchema.methods.preSaveLogic = async function() {
     if (!this.startTime) {
       this.startTime = new Date();
     }
-    
+
     if (!this.endTime) {
       const endTime = new Date(this.startTime);
       endTime.setSeconds(endTime.getSeconds() + this.duration);
       this.endTime = endTime;
     }
-    
+
     if (!this.description) {
       this.description = `${this.direction.toUpperCase()} ${this.symbol} for ${this.duration}s`;
       console.log('Description set:', this.description);
@@ -266,42 +267,42 @@ orderSchema.methods.preSaveLogic = async function() {
       console.log('Status set to active');
     }
   }
-  
+
   // Calculate profit when exit price is set
   if (this.exitPrice && this.isModified('exitPrice')) {
     //console.log('Exit price modified, calculating profit/loss...');
     await this.calculateProfitLoss();
   }
-  
+
   // Auto-complete if end time has passed and still active
   if (this.status === 'active' && this.endTime && this.endTime < new Date()) {
     //console.log('Order expired, marking as expired...');
     this.status = 'expired';
     this.isLive = false;
   }
-  
- // console.log('preSaveLogic completed');
+
+  // console.log('preSaveLogic completed');
 };
 
 // Method to calculate profit/loss with force win logic
-orderSchema.methods.calculateProfitLoss = async function() {
+orderSchema.methods.calculateProfitLoss = async function () {
   if (!this.exitPrice || !this.entryPrice) {
     console.log('Missing exitPrice or entryPrice, skipping profit calculation');
     return null;
   }
-  
+
   try {
-  //  console.log('Calculating profit/loss for order:', this._id);
+    //  console.log('Calculating profit/loss for order:', this._id);
     // Get user to check forceWin status
     const user = await userModel.findById(this.user);
     if (!user) {
       throw new Error('User not found');
     }
-    
+
     let percentage = 0;
     let isRandomLoss = false;
     let randomLossPercent = 0;
-    
+
     // Check if user has forceWin enabled
     if (user.forceWin) {
       //console.log('Force win enabled for user');
@@ -309,22 +310,22 @@ orderSchema.methods.calculateProfitLoss = async function() {
       this.wasForceWin = true;
       //percentage = Math.abs(this.expectedReturn / this.amount) * 100;
 
-     // randomLossPercent = 1 + Math.random() *  durationRates[this.duration] 
-     let  rateP = durationRates[this.duration] || 12;
-        percentage = rateP * this.leverage;
+      // randomLossPercent = 1 + Math.random() *  durationRates[this.duration] 
+      let rateP = durationRates[this.duration] || 12;
+      percentage = rateP * this.leverage;
     } else {
       // Generate random loss (1-20% loss) with 90% probability
       const shouldLose = Math.random() < 0.9; // 90% chance of losing
-      
+
       if (true) {
         // Generate random loss percentage between 1% and 50%
-       // randomLossPercent = 3 + Math.random() *  durationRates[this.duration]-3; 
-       let rateP = durationRates[this.duration] || 12;
+        // randomLossPercent = 3 + Math.random() *  durationRates[this.duration]-3; 
+        let rateP = durationRates[this.duration] || 12;
         percentage = -rateP * this.leverage; // Apply leverage to loss
         this.wasRandomLose = true;
         this.randomLossPercentage = rateP;
         isRandomLoss = true;
-       // console.log('Random loss applied:', randomLossPercent.toFixed(2), '%');
+        // console.log('Random loss applied:', randomLossPercent.toFixed(2), '%');
       } else {
         // Normal calculation based on price movement
         if (this.direction === 'buy') {
@@ -339,14 +340,14 @@ orderSchema.methods.calculateProfitLoss = async function() {
         console.log('Normal calculation, percentage:', percentage.toFixed(2));
       }
     }
-    
+
     this.profitPercentage = parseFloat(percentage.toFixed(2));
     this.profit = (this.amount * percentage) / 100;
     this.actualPayout = this.amount + this.profit
-    
+
     // Ensure actual payout is not negative
     if (this.actualPayout < 0) this.actualPayout = 0;
-    
+
     // Determine result
     if (this.profit > 0) {
       this.result = 'win';
@@ -355,7 +356,7 @@ orderSchema.methods.calculateProfitLoss = async function() {
     } else {
       this.result = 'break_even';
     }
-    
+
     /*console.log('Profit calculation complete:', {
       profit: this.profit,
       profitPercentage: this.profitPercentage,
@@ -363,7 +364,7 @@ orderSchema.methods.calculateProfitLoss = async function() {
       result: this.result
     });
     */
-    
+
     return {
       profit: this.profit,
       profitPercentage: this.profitPercentage,
@@ -371,7 +372,7 @@ orderSchema.methods.calculateProfitLoss = async function() {
       wasRandomLose: isRandomLoss,
       randomLossPercentage: randomLossPercent
     };
-    
+
   } catch (error) {
     console.error('Error calculating profit/loss:', error);
     throw error;
@@ -379,32 +380,32 @@ orderSchema.methods.calculateProfitLoss = async function() {
 };
 
 // Method to complete order with user balance update
-orderSchema.methods.completeOrder = async function(exitPrice) {
-  try { 
-   /// console.log('Completing order:', this._id);
-    
+orderSchema.methods.completeOrder = async function (exitPrice) {
+  try {
+    /// console.log('Completing order:', this._id);
+
     this.exitPrice = exitPrice;
     await this.calculateProfitLoss();
     this.status = 'completed';
     this.completedAt = new Date();
     this.isLive = false;
-    
+
     // Save order first
     await this.save();
-   // console.log('Order saved with completed status');
-    
+    // console.log('Order saved with completed status');
+
     // Update user balance and stats
     const user = await userModel.findById(this.user);
     if (!user) {
       throw new Error('User not found');
     }
-    
+
     // Add payout to user balance
     user.wallet.usdt += this.actualPayout;
-    
+
     // Update user stats
     user.totalTrades += 1;
-    
+
     if (this.profit > 0) {
       user.totalProfit += this.profit;
       user.winningTrades += 1;
@@ -412,25 +413,25 @@ orderSchema.methods.completeOrder = async function(exitPrice) {
       user.totalLoss += Math.abs(this.profit);
       user.losingTrades += 1;
     }
-    
+
     // Update win rate
     if (user.totalTrades > 0) {
       user.winRate = (user.winningTrades / user.totalTrades) * 100;
     }
-    
+
     await user.save();
-   // console.log('User balance updated to:', user.wallet.usdt);
-    
+    // console.log('User balance updated to:', user.wallet.usdt);
+
     // Create transaction record
     //await this.createTransaction();
-    
+
     return {
       order: this,
       userBalance: user.wallet.usdt,
       profit: this.profit,
       actualPayout: this.actualPayout
     };
-    
+
   } catch (error) {
     console.error('Error completing order:', error);
     throw error;
@@ -438,13 +439,13 @@ orderSchema.methods.completeOrder = async function(exitPrice) {
 };
 
 // Method to create transaction record
-orderSchema.methods.createTransaction = async function() {
+orderSchema.methods.createTransaction = async function () {
   try {
     console.log('Creating transaction for order:', this._id);
-    
+
     // Use mongoose.model to get Transaction model
     const Transaction = mongoose.model('Transaction');
-    
+
     const transaction = new Transaction({
       user: this.user,
       type: 'trade_payout',
@@ -467,11 +468,11 @@ orderSchema.methods.createTransaction = async function() {
         duration: this.duration
       }
     });
-    
+
     await transaction.save();
     console.log('Transaction created:', transaction._id);
     return transaction;
-    
+
   } catch (error) {
     console.error('Error creating transaction:', error);
     throw error;
@@ -479,20 +480,20 @@ orderSchema.methods.createTransaction = async function() {
 };
 
 // Method to cancel order
-orderSchema.methods.cancelOrder = async function(userId, reason = '') {
+orderSchema.methods.cancelOrder = async function (userId, reason = '') {
   try {
     console.log('Cancelling order:', this._id);
-    
+
     if (this.status !== 'pending' && this.status !== 'active') {
       throw new Error(`Cannot cancel order with status: ${this.status}`);
     }
-    
+
     this.status = 'cancelled';
     this.cancelledAt = new Date();
     this.cancelledBy = userId;
     this.cancellationReason = reason;
     this.isLive = false;
-    
+
     // Refund amount to user if order was active
     if (this.status === 'active') {
       const user = await userModel.findById(this.user);
@@ -502,15 +503,15 @@ orderSchema.methods.cancelOrder = async function(userId, reason = '') {
         console.log('Refunded amount to user:', this.amount);
       }
     }
-    
+
     await this.save();
-    
+
     return {
       order: this,
       message: 'Order cancelled successfully',
       refundAmount: this.status === 'active' ? this.amount : 0
     };
-    
+
   } catch (error) {
     console.error('Error cancelling order:', error);
     throw error;
@@ -518,7 +519,7 @@ orderSchema.methods.cancelOrder = async function(userId, reason = '') {
 };
 
 // Static method to get expired active orders
-orderSchema.statics.getExpiredOrders = function() {
+orderSchema.statics.getExpiredOrders = function () {
   return this.find({
     status: 'active',
     endTime: { $lte: new Date() }
@@ -526,17 +527,17 @@ orderSchema.statics.getExpiredOrders = function() {
 };
 
 // Static method to process expired orders automatically
-orderSchema.statics.processExpiredOrders = async function() {
+orderSchema.statics.processExpiredOrders = async function () {
   const expiredOrders = await this.getExpiredOrders();
   console.log('Processing', expiredOrders.length, 'expired orders');
-  
+
   const results = [];
-  
+
   for (const order of expiredOrders) {
     try {
       // Get current price (use entry price as fallback)
       const currentPrice = order.entryPrice;
-      
+
       const result = await order.completeOrder(currentPrice);
       results.push({
         orderId: order._id,
@@ -546,7 +547,7 @@ orderSchema.statics.processExpiredOrders = async function() {
         wasForceWin: order.wasForceWin,
         wasRandomLose: order.wasRandomLose
       });
-      
+
     } catch (error) {
       console.error('Error processing expired order', order._id, ':', error.message);
       results.push({
@@ -556,12 +557,12 @@ orderSchema.statics.processExpiredOrders = async function() {
       });
     }
   }
-  
+
   return results;
 };
 
 // Static method to get active orders
-orderSchema.statics.getActiveOrders = function(userId = null) {
+orderSchema.statics.getActiveOrders = function (userId = null) {
   const query = { status: 'active', isLive: true };
   if (userId) {
     query.user = userId;
