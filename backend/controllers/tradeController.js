@@ -12,7 +12,7 @@ export const tradeController = {
   placeOrder: async (req, res) => {
     try {
       const userId = req.user.id;
-      console.log('Place order request body:', req.body);
+      console.log('💵😉😉😉Place order request body:', req.body);
 
       const {
         symbol,
@@ -37,10 +37,10 @@ export const tradeController = {
           message: `Missing required fields: ${missingFields.join(', ')}`
         });
       }
-     
+
 
       // Check if duration is valid
-      const validDurations = [30, 50, 60, 120, 180, 240, 365];
+      const validDurations = [30, 50, 90, 60, 120, 180, 240, 365];
       if (!validDurations.includes(parseInt(duration))) {
         return res.status(400).json({
           success: false,
@@ -57,12 +57,13 @@ export const tradeController = {
         });
       }
 
-    
+
 
       // Check maximum amount based on duration
       const maxAmounts = {
         30: 5000,
         60: 10000,
+        90: 15000,
         120: 20000,
         180: 30000,
         240: 40000,
@@ -111,7 +112,21 @@ export const tradeController = {
           message: "Account is blocked"
         });
       }
+      const isOrder = await Order.findOne({
+        user: user._id,
+        status: 'active'
+      });
 
+      console.log('😉😉😉Active order check:', isOrder?.status);
+
+
+      if (isOrder?.status === 'active') {
+        console.log('😮 Active order found:', isOrder);
+        return res.json({
+          success: false,
+          message: "You already have an active order"
+        });
+      }
       // Calculate required balance (amount + fee)
       const feeRate = 0.02; // 2% fee
       const fee = parseFloat(amount) * feeRate;
@@ -147,18 +162,19 @@ export const tradeController = {
         }
       }
 
-       
 
-      
+
+
 
       // Calculate duration rate for expected return
       const durationRates = {
-        30: 10,
-        60: 12,
-        120: 15,
-        180: 17,
-        240: 19,
-        365: 22
+        30: 12,
+        60: 18,
+        90: 20,
+        120: 22,
+        180: 25,
+        240: 28,
+        365: 30
       };
 
       const rate = durationRates[duration] || 12;

@@ -208,6 +208,7 @@ orderSchema.virtual('durationLabel').get(function () {
     30: '30 seconds',
     50: '50 seconds',
     60: '1 minute',
+    90: '1.5 minutes',
     120: '2 minutes',
     180: '3 minutes',
     240: '4 minutes',
@@ -242,7 +243,7 @@ orderSchema.methods.preSaveLogic = async function () {
   console.log('Running preSaveLogic for order:', this.symbol, this.direction);
 
   if (this.isNew) {
-    console.log('New order detected, calculating fields...');
+    //console.log('New order detected, calculating fields...');
     const rate = durationRates[this.duration] || 12;
     this.expectedReturn = (this.amount * (rate / 100));
     this.fee = this.amount * 0.02;
@@ -287,7 +288,7 @@ orderSchema.methods.preSaveLogic = async function () {
 // Method to calculate profit/loss with force win logic
 orderSchema.methods.calculateProfitLoss = async function () {
   if (!this.exitPrice || !this.entryPrice) {
-    console.log('Missing exitPrice or entryPrice, skipping profit calculation');
+    //console.log('Missing exitPrice or entryPrice, skipping profit calculation');
     return null;
   }
 
