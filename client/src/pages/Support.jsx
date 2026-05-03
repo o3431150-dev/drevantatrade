@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { openTawkChat } from '../components/TawkButton';
 
-/**
- * 1. DESIGN SYSTEM
- */
+import TawkButton from '../components/TawkButton';
+
 const THEME = {
   bg: 'bg-[#05070A]',
   card: 'bg-[#0D111C]',
@@ -14,9 +14,6 @@ const THEME = {
   fontMain: 'font-sans antialiased tracking-tight',
 };
 
-/**
- * 2. SUPPORT COMPONENT
- */
 const Support = () => {
   const navigate = useNavigate();
 
@@ -66,7 +63,7 @@ const Support = () => {
                 </p>
               </div>
               <a 
-                href="mailto:drevantatrade@brand.com" 
+                href="mailto:support@drevantatrade.com" 
                 className="w-full md:w-auto px-10 py-5 bg-green-500 text-[#05070A] font-black rounded-2xl text-xs uppercase tracking-widest text-center shadow-[0_0_30px_rgba(16,185,129,0.2)] hover:shadow-green-500/40 hover:scale-[1.02] transition-all"
               >
                 Send Message
@@ -80,12 +77,14 @@ const Support = () => {
                   <h2 className="text-xl  sm:text-2xl font-black text-white tracking-tight">Live Escalation</h2>
                   <p className="text-slate-500 text-sm sm:text-base">Real-time intervention for critical terminal sessions.</p>
                 </div>
-                <button className="w-full md:w-auto px-10 py-5 bg-white text-black font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-slate-200 active:scale-[0.98] transition-all">
+                <button className="w-full md:w-auto px-10 py-5 bg-white text-black font-black rounded-2xl text-xs uppercase tracking-widest hover:bg-slate-200 active:scale-[0.98] transition-all" onClick={openTawkChat}>
                   Start Chat
                 </button>
               </div>
             </section>
           </div>
+
+          <TawkButton className="hidden" />
 
           {/* Footer Info */}
           {/* <footer className="pt-12 text-center">
