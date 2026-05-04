@@ -12,7 +12,7 @@ export const tradeController = {
   placeOrder: async (req, res) => {
     try {
       const userId = req.user.id;
-      console.log('💵😉😉😉Place order request body:', req.body);
+    /////  console.log('💵😉😉😉Place order request body:', req.body);
 
       const {
         symbol,
@@ -112,6 +112,7 @@ export const tradeController = {
           message: "Account is blocked"
         });
       }
+      /*
       const isOrder = await Order.findOne({
         user: user._id,
         status: 'active'
@@ -127,6 +128,8 @@ export const tradeController = {
           message: "You already have an active order"
         });
       }
+
+      */
       // Calculate required balance (amount + fee)
       const feeRate = 0.02; // 2% fee
       const fee = parseFloat(amount) * feeRate;
