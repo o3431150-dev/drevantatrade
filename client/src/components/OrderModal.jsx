@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import ConvertModal from "./ConvertModal";
 import { assets } from "../assets/assets"
 import { conversionAPI } from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import { ClipLoader } from "react-spinners";
 export default function OrderModal({
     open,
     onClose,
@@ -20,6 +22,7 @@ export default function OrderModal({
 }) {
 
     // console.log({  userBalance});
+    const { orderLoading, setOrderLoading } = useAuth();
     const [selected, setSelected] = useState(30);
     const [amount, setAmount] = useState("");
     const [leverage, setLeverage] = useState(1);
@@ -30,11 +33,13 @@ export default function OrderModal({
     const [convertAmount, setConvertAmount] = useState("");
     const [convertFrom, setConvertFrom] = useState("BTC");
 
+
+
     const durations = [
         { id: 30, rate: 12, min: 100, max: 5000 },
         { id: 60, rate: 18, min: 5000, max: 10000 },
-        {id: 90, rate: 20, min: 10000, max: 15000 },
-        { id: 120, rate: 22,min: 15000, max: 20000 },
+        { id: 90, rate: 20, min: 10000, max: 15000 },
+        { id: 120, rate: 22, min: 15000, max: 20000 },
         { id: 180, rate: 25, min: 20000, max: 30000 },
         { id: 240, rate: 28, min: 30000, max: 40000 },
         { id: 365, rate: 30, min: 40000, max: 60000 }
@@ -127,6 +132,10 @@ export default function OrderModal({
             };
             onConfirm(orderData);
         }
+
+        setOrderLoading(true);
+
+
     };
 
     // Handle convert confirmation
@@ -277,6 +286,8 @@ export default function OrderModal({
 
 
                         </div>
+                       
+                        
 
 
                         {/* Duration Selection */}
@@ -437,7 +448,7 @@ export default function OrderModal({
                         {/* Confirm Button */}
                         <button
                             onClick={handleConfirm}
-                            disabled={!!error || !amount || parseFloat(amount) === 0 || isCheckingEligibility}
+                            disabled={!!error || !amount || parseFloat(amount) === 0 || isCheckingEligibility || orderLoading}
                             className={`w-full py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg text-white transition-colors flex items-center justify-center gap-2 ${direction === 'buy'
                                 ? 'bg-green-500 hover:bg-green-600'
                                 : 'bg-red-500 hover:bg-red-600'
@@ -448,7 +459,12 @@ export default function OrderModal({
                                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                                     Checking Eligibility...
                                 </>
-                            ) : (
+                            ) : ( orderLoading ? (
+                                <>
+                                    <ClipLoader color="#ffffff" size={20} />
+                                    Placing Order...
+                                </>
+                            ) :
                                 `Confirm ${direction === 'buy' ? 'Buy' : 'Sell'} Order`
                             )}
                         </button>

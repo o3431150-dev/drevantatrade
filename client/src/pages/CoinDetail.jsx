@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 //import { conversionAPI } from "../services/api";
 import { Helmet } from "react-helmet-async";
+import { useAuth } from "../context/AuthContext";
 import {
   ArrowLeft,
   TrendingUp,
@@ -24,56 +25,56 @@ import { tradeAPI } from "../services/api";
 import { conversionAPI } from "../services/api";
 
 const symbol = {
-    // Top 10 & Stable
-    bitcoin: "BTC",
-    ethereum: "ETH",
-    solana: "SOL",
-    binancecoin: "BNB",
-    ripple: "XRP",
-    cardano: "ADA",
-    dogecoin: "DOGE",
-    polkadot: "DOT",
-    usdc: "USDC",
-    tether: "USDT",
+  // Top 10 & Stable
+  bitcoin: "BTC",
+  ethereum: "ETH",
+  solana: "SOL",
+  binancecoin: "BNB",
+  ripple: "XRP",
+  cardano: "ADA",
+  dogecoin: "DOGE",
+  polkadot: "DOT",
+  usdc: "USDC",
+  tether: "USDT",
 
-    // Ecosystem & Layer 1/2
-    tron: "TRX",
-    chainlink: "LINK",
-    polygon: "MATIC",
-    avalanche: "AVAX",
-    near: "NEAR",
-    uniswap: "UNI",
-    aptos: "APT",
-    sui: "SUI",
-    optimism: "OP",
-    arbitrum: "ARB",
-    stellar: "XLM",
-    cosmos: "ATOM",
-    stacks: "STX",
-    fantom: "FTM",
-    celestia: "TIA",
+  // Ecosystem & Layer 1/2
+  tron: "TRX",
+  chainlink: "LINK",
+  polygon: "MATIC",
+  avalanche: "AVAX",
+  near: "NEAR",
+  uniswap: "UNI",
+  aptos: "APT",
+  sui: "SUI",
+  optimism: "OP",
+  arbitrum: "ARB",
+  stellar: "XLM",
+  cosmos: "ATOM",
+  stacks: "STX",
+  fantom: "FTM",
+  celestia: "TIA",
 
-    // DeFi & AI
-    "fetch-ai": "FET",
-    "lido-dao": "LDO",
-    thorchain: "RUNE",
-    pancakeswap: "CAKE",
-    aave: "AAVE",
-    "internet-computer": "ICP",
+  // DeFi & AI
+  "fetch-ai": "FET",
+  "lido-dao": "LDO",
+  thorchain: "RUNE",
+  pancakeswap: "CAKE",
+  aave: "AAVE",
+  "internet-computer": "ICP",
 
-    // Storage & Infrastructure
-    filecoin: "FIL",
-    "hedera-hashgraph": "HBAR",
-    vechain: "VET",
-    algorand: "ALGO",
+  // Storage & Infrastructure
+  filecoin: "FIL",
+  "hedera-hashgraph": "HBAR",
+  vechain: "VET",
+  algorand: "ALGO",
 
-    // Memecoins & Legacy
-    pepe: "PEPE",
-    "shiba-inu": "SHIB",
-    dogwifhat: "WIF",
-    litecoin: "LTC",
-    "bitcoin-cash": "BCH",
-    "ethereum-classic": "ETC",
+  // Memecoins & Legacy
+  pepe: "PEPE",
+  "shiba-inu": "SHIB",
+  dogwifhat: "WIF",
+  litecoin: "LTC",
+  "bitcoin-cash": "BCH",
+  "ethereum-classic": "ETC",
 };
 
 const CoinDetail = () => {
@@ -81,7 +82,7 @@ const CoinDetail = () => {
   const { prices } = usePriceFeed();
   const { activeOrders, placeOrder } = useOrders();
   const navigate = useNavigate();
-
+  const { orderLoading, setOrderLoading } = useAuth();
   const [showOrderModal, setShowOrderModal] = useState(false);
   const [direction, setDirection] = useState('');
   const [isMobile, setIsMobile] = useState(false);
@@ -94,7 +95,7 @@ const CoinDetail = () => {
   useEffect(() => {
     fetchUserBalance();
     getMarketPrices();
-    
+
   }, [showOrderModal]);
 
   const fetchUserBalance = async () => {
@@ -119,16 +120,16 @@ const CoinDetail = () => {
     }
   };
 
-   const getMarketPrices = async () => {
-          try {
-              const response = await conversionAPI.getPrices();
-              setMarketPrices(response.data);
-          } catch (error) {
-              console.error('Error getting prices:', error);
-          }
-      };
-  
-    
+  const getMarketPrices = async () => {
+    try {
+      const response = await conversionAPI.getPrices();
+      setMarketPrices(response.data);
+    } catch (error) {
+      console.error('Error getting prices:', error);
+    }
+  };
+
+
 
   //new
   const isAuthenticated = localStorage.getItem('token') ? true : false;
@@ -208,6 +209,7 @@ const CoinDetail = () => {
       toast.error(error.message || 'Failed to place order');
     } finally {
       // setCheckingEligibility(false);
+      setOrderLoading(false);
       setShowOrderModal(false);
     }
   };

@@ -6,12 +6,14 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
+    
     const [userData, setUserData] = useState(() => {
         const saved = localStorage.getItem('userData');
         return saved ? JSON.parse(saved) : null;
     });
     const [isOtpSend, setIsOtpSend] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+    const [orderLoading, setOrderLoading] = useState(false);
 
     //const backendUrl = "https://trading-app-fdzj.onrender.com/"
     //const backendUrl = 'http://localhost:3000/'
@@ -138,7 +140,11 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         setToken,
-        setUserData
+        setUserData,
+
+        //order loading state
+        orderLoading,
+        setOrderLoading,
     };
 
     return (
