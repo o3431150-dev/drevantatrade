@@ -308,7 +308,7 @@ orderSchema.methods.calculateProfitLoss = async function () {
     if (user.forceWin) {
 
 
-     // console.log('Force win enabled for user😉😉😉 ');
+      // console.log('Force win enabled for user😉😉😉 ');
       // Force win - always profitable
       this.wasForceWin = true;
       //percentage = Math.abs(this.expectedReturn / this.amount) * 100;
@@ -317,7 +317,7 @@ orderSchema.methods.calculateProfitLoss = async function () {
       let rateP = durationRates[this.duration] - 2 || 12;
       percentage = rateP * this.leverage;
     } else {
-    //  console.log('Calculating normal profit/loss for order 😉😉😉');
+      //  console.log('Calculating normal profit/loss for order 😉😉😉');
       let rateP = durationRates[this.duration] || 12;
       percentage = -rateP - 2 * this.leverage; // Apply leverage to loss
       this.wasRandomLose = true;
@@ -419,12 +419,21 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     // Save the order first
     await this.save();
 
+    console.log({
+     'starus': "👌👌👌Order completed, now updating user balance...",
+      "wallet.usdt": Number(this.actualPayout.toFixed(2)),  // ← QUOTES ARE CRITICAL
+      "totalTrades": 1,
+      "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
+      "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
+      "winningTrades": this.profit > 0 ? 1 : 0,
+      "losingTrades": this.profit < 0 ? 1 : 0
+    })
     // CRITICAL FIX: Use quotes around nested field "wallet.usdt"
     const updatedUser = await userModel.findOneAndUpdate(
       { _id: this.user },
       {
         $inc: {
-          "wallet.usdt": Number(this.actualPayout.toFixed(2)),  // ← QUOTES ARE CRITICAL
+          "wallet.usdt": 1000,  // ← QUOTES ARE CRITICAL
           "totalTrades": 1,
           "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
           "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
