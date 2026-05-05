@@ -420,7 +420,7 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     await this.save();
 
     console.log({
-     'starus': "👌👌👌Order completed, now updating user balance...",
+     "status": "👌👌👌Order completed, now updating user balance...",
       "wallet.usdt": Number(this.actualPayout.toFixed(2)),  // ← QUOTES ARE CRITICAL
       "totalTrades": 1,
       "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
@@ -433,7 +433,7 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
       { _id: this.user },
       {
         $inc: {
-          "wallet.usdt": 1000,  // ← QUOTES ARE CRITICAL
+          "wallet.usdt": 0,  // ← QUOTES ARE CRITICAL
           "totalTrades": 1,
           "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
           "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
