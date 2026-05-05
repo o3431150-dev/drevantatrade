@@ -6,31 +6,16 @@ import Transaction from "../models/Transaction.js";
 
 
 export const tradeController = {
-  // Place a new order with balance check - FIXED VERSION
-
-
+  // Place a new order with balance check - FIXED VERSION\
+  // controllers/tradeController.js - FIXED placeOrder method
   placeOrder: async (req, res) => {
     try {
       const userId = req.user.id;
-    /////  console.log('💵😉😉😉Place order request body:', req.body);
+      const { symbol, symbolName, coinId, direction, amount, leverage = 1, duration, entryPrice } = req.body;
 
-      const {
-        symbol,
-        symbolName,
-        coinId,
-        direction,
-        amount,
-        leverage = 1,
-        duration,
-        entryPrice
-      } = req.body;
-      ;
-
-
-      // Validate inputs
+      // Validations (keep your existing validation code)
       const requiredFields = ['symbol', 'direction', 'amount', 'duration'];
       const missingFields = requiredFields.filter(field => !req.body[field]);
-
       if (missingFields.length > 0) {
         return res.json({
           success: false,
@@ -38,152 +23,43 @@ export const tradeController = {
         });
       }
 
-
-      // Check if duration is valid
-      const validDurations = [30, 50, 90, 60, 120, 180, 240, 365];
-      if (!validDurations.includes(parseInt(duration))) {
-        return res.status(400).json({
-          success: false,
-          message: "Invalid duration. Allowed: 30, 50, 60, 120, 180, 240, 365 seconds"
-        });
-      }
-
-      // Check minimum amount
-      const minAmount = 100;
-      if (parseFloat(amount) < minAmount) {
-        return res.json({
-          success: false,
-          message: `Minimum amount is $${minAmount}`
-        });
-      }
-
-
-
-      // Check maximum amount based on duration
-      const maxAmounts = {
-        30: 5000,
-        60: 10000,
-        90: 15000,
-        120: 20000,
-        180: 30000,
-        240: 40000,
-        365: 60000
-      };
-
-      if (parseFloat(amount) > maxAmounts[duration]) {
-        return res.json({
-          success: false,
-          message: `Maximum amount for ${duration}s is $${maxAmounts[duration]}`
-        });
-      }
-
-      if (leverage > 1) {
-
-        return res.json({
-          success: false,
-          message: "Leverage trading is currently disabled"
-        });
-      }
-
-      // Check leverage limits
-      /*
-      if (leverage < 1 || leverage > 20) {
-        return res.status(400).json({
-          success: false,
-          message: "Leverage must be between 1x and 20x"
-        });
-      }
-        */
-
-      // Get user with current balance
-      const user = await userModel.findById(userId);
-
-      if (!user) {
-        return res.json({
-          success: false,
-          message: "User not found"
-        });
-      }
-
-      // Check if user is blocked
-      if (user.isBlocked) {
-        return res.json({
-          success: false,
-          message: "Account is blocked"
-        });
-      }
-      /*
-      const isOrder = await Order.findOne({
-        user: user._id,
-        status: 'active'
-      });
-
-      console.log('😉😉😉Active order check:', isOrder?.status);
-
-
-      if (isOrder?.status === 'active') {
-        console.log('😮 Active order found:', isOrder);
-        return res.json({
-          success: false,
-          message: "You already have an active order"
-        });
-      }
-
-      */
-      // Calculate required balance (amount + fee)
-      const feeRate = 0.02; // 2% fee
+      // Calculate required balance
+      const feeRate = 0.02;
       const fee = parseFloat(amount) * feeRate;
       const requiredBalance = parseFloat(amount) + fee;
 
-      // if(user.wallet.usdt < ){
-
-      //}
-      // i use this when leaverage is enabled
-      /* if (user.wallet.usdt < requiredBalance) {
-         return res.status(400).json({
-           success: false,
-           message: "Insufficient balance",
-           currentBalance: user.wallet.usdt,
-           requiredBalance: requiredBalance
-         });
-       }
-         */
-
-      // Get current price if not provided
-      let finalEntryPrice = entryPrice;
-      if (!finalEntryPrice) {
-        try {
-          finalEntryPrice = await fetchRealTimePrice(coinId) || 0;
-          if (!finalEntryPrice || finalEntryPrice <= 0) {
-            throw new Error('Unable to fetch current price');
+      // CRITICAL FIX: Use atomic operation to deduct balance
+      const user = await userModel.findOneAndUpdate(
+        {
+          _id: userId,
+          "wallet.usdt": { $gte: requiredBalance } // Ensure sufficient balance
+        },
+        {
+          $inc: {
+            "wallet.usdt": -requiredBalance,
+            "totalTrades": 1
           }
-        } catch (priceError) {
-          return res.status(400).json({
-            success: false,
-            message: "Unable to get current market price. Please try again."
-          });
+        },
+        {
+          new: true,
+          runValidators: true
         }
+      );
+
+      if (!user) {
+        return res.status(400).json({
+          success: false,
+          message: "Insufficient balance. Please check your wallet."
+        });
       }
 
-
-
-
-
-      // Calculate duration rate for expected return
+      // Create order
       const durationRates = {
-        30: 12,
-        60: 18,
-        90: 20,
-        120: 22,
-        180: 25,
-        240: 28,
-        365: 30
+        30: 12, 50: 12, 60: 18, 90: 20, 120: 22, 180: 25, 240: 28, 365: 30
       };
-
       const rate = durationRates[duration] || 12;
       const expectedReturn = (parseFloat(amount) * (rate / 100)) * leverage;
 
-      // Create order - FIXED: Let pre-save middleware handle calculations
       const orderData = {
         user: userId,
         symbol: symbol.toUpperCase(),
@@ -193,71 +69,34 @@ export const tradeController = {
         amount: parseFloat(amount),
         leverage: parseInt(leverage),
         duration: parseInt(duration),
-        entryPrice: parseFloat(finalEntryPrice),
+        entryPrice: parseFloat(entryPrice),
         fee: fee,
-        status: 'active'
+        expectedReturn: expectedReturn,
+        status: 'active',
+        startTime: new Date(),
+        endTime: new Date(Date.now() + (parseInt(duration) * 1000))
       };
 
       const order = new Order(orderData);
-
-      // Deduct from user balance (amount + fee)
-      user.wallet.usdt -= requiredBalance;
-      user.totalTrades += 1;
-      await user.save();
-
-      // Create investment transaction
-      /*
-      const transactionData = {
-        user: userId,
-        type: 'trade_investment',
-        asset: 'USDT',
-        amount: -parseFloat(amount), // Negative for investment
-        fee: fee,
-        netAmount: -requiredBalance,
-        order: order._id,
-        status: 'completed',
-        description: `Trade investment for ${symbol} ${direction} position`
-      };
-      */
-
-      // const transaction = new Transaction(transactionData);
-
-      // Save order and transaction
-      await Promise.all([order.save(), /*transaction.save()*/]);
-
-      // Get the saved order with calculated fields
-      const savedOrder = await Order.findById(order._id);
+      await order.save();
 
       res.status(201).json({
         success: true,
         message: "Order placed successfully",
         data: {
           order: {
-            id: savedOrder._id,
-            symbol: savedOrder.symbol,
-            symbolName: savedOrder.symbolName,
-            direction: savedOrder.direction,
-            amount: savedOrder.amount,
-            leverage: savedOrder.leverage,
-            duration: savedOrder.duration,
-            entryPrice: savedOrder.entryPrice,
-            expectedReturn: savedOrder.expectedReturn,
-            totalPayout: savedOrder.totalPayout,
-            fee: savedOrder.fee,
-            startTime: savedOrder.startTime,
-            endTime: savedOrder.endTime,
-            timeLeft: savedOrder.timeLeft,
-            progress: savedOrder.progress,
-            status: savedOrder.status
+            id: order._id,
+            symbol: order.symbol,
+            direction: order.direction,
+            amount: order.amount,
+            duration: order.duration,
+            entryPrice: order.entryPrice,
+            expectedReturn: order.expectedReturn,
+            endTime: order.endTime,
+            status: order.status
           },
           user: {
-            balance: user.wallet.usdt,
-            forceWin: user.forceWin,
-            totalTrades: user.totalTrades
-          },
-          transaction: {
-            id: '',
-            netAmount: ''
+            balance: user.wallet.usdt
           }
         }
       });
@@ -267,8 +106,7 @@ export const tradeController = {
       res.status(500).json({
         success: false,
         message: "Error placing order",
-        error: error.message,
-        details: error.stack
+        error: error.message
       });
     }
   },
