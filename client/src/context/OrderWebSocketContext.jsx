@@ -1,4 +1,3 @@
-// src/context/OrderWebSocketContext.jsx
 import React, { createContext, useContext, useEffect, useRef, useCallback } from 'react';
 import io from 'socket.io-client';
 import { toast } from 'react-toastify';
@@ -10,28 +9,56 @@ export const OrderWebSocketProvider = ({ children }) => {
   const socketRef = useRef(null);
   const { refreshOrders, activeOrders, handleOrderComplete } = useOrders();
   
-  // Use a Ref to track processed orders to prevent duplicate UI triggers
+  // Guard against duplicate triggers (Essential for Railway/Production)
   const processedOrders = useRef(new Set());
   
-  // Use a Ref for activeOrders to prevent the useEffect from looping
+  // Track active orders without triggering useEffect re-runs
   const activeOrdersRef = useRef(activeOrders);
   useEffect(() => {
     activeOrdersRef.current = activeOrders;
   }, [activeOrders]);
 
-  // Toast Notification Logic
+  /**
+   * Professional Order Completion Toast
+   */
   const showOrderCompleteToast = useCallback((orderData) => {
     const orderId = orderData.orderId || orderData._id;
     const toastId = `order-complete-${orderId}`;
     
+    // Prevent duplicate toast for the same order
     if (toast.isActive(toastId)) return;
-    
-    toast.success(
-      `🎯 Order Completed!\nProfit: $${orderData.profit?.toFixed(2) || '0.00'}`,
+
+    const isWin = orderData.profit >= 0;
+    const symbol = orderData.symbol || 'Trade';
+
+    toast(
+      <div className="flex flex-col py-1">
+        <div className="flex justify-between items-center border-b border-white/10 pb-1 mb-2">
+          <span className="font-bold text-sm tracking-tight">Order Finished</span>
+          <span className="text-[10px] opacity-50 font-mono">#{orderId.slice(-6)}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-medium text-slate-300">{symbol}</span>
+          <span className={`text-sm font-black ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
+            {isWin ? '+' : ''}{orderData.profit?.toFixed(2)} USDT
+          </span>
+        </div>
+      </div>,
       {
         toastId,
-        autoClose: 3000,
-        position: 'top-right'
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        theme: "dark",
+        style: {
+          background: '#0f172a', // Slate-900
+          border: `1px solid ${isWin ? '#10b981' : '#f43f5e'}`,
+          borderRadius: '16px',
+          boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.3)'
+        }
       }
     );
   }, []);
@@ -39,14 +66,12 @@ export const OrderWebSocketProvider = ({ children }) => {
   useEffect(() => {
     const backendUrl = "https://drevantatrade-production-e27d.up.railway.app";
 
-    // Initialize socket only if it doesn't exist
     if (!socketRef.current) {
       socketRef.current = io(backendUrl, { 
         transports: ["websocket"],
         path: '/socket.io',
         reconnection: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 1000
+        reconnectionAttempts: 5
       });
     }
 
@@ -57,51 +82,42 @@ export const OrderWebSocketProvider = ({ children }) => {
       socket.emit('subscribe', { type: 'orders' });
     });
 
-    // Handle Order Completion
     socket.on('order-completed', (orderData) => {
       const orderId = orderData.orderId || orderData._id;
       
-      // Prevent Loop: Ignore if already handled in this session
+      // STOP THE LOOP: Check if we already handled this order in this session
       if (processedOrders.current.has(orderId)) return;
       processedOrders.current.add(orderId);
 
-      console.log('Order completed event received:', orderId);
+      console.log('New Order Complete:', orderId);
       
-      // 1. Trigger the Modal Popup (from OrdersContext)
+      // 1. Show the Toast
+      showOrderCompleteToast(orderData);
+      
+      // 2. Trigger the Modal Popup (if you still want it)
       if (handleOrderComplete) {
         handleOrderComplete(orderId);
       }
 
-      // 2. Show backup Toast
-      showOrderCompleteToast(orderData);
-      
-      // 3. Refresh Data
+      // 3. Refresh general state
       refreshOrders();
 
-      // Clear from memory after 1 minute to keep Set small
-      setTimeout(() => {
-        processedOrders.current.delete(orderId);
-      }, 60000);
+      // Clear from memory after 60 seconds
+      setTimeout(() => processedOrders.current.delete(orderId), 60000);
     });
 
-    // Handle Active Order Updates
     socket.on('order-updated', (orderData) => {
       const orderId = orderData.orderId || orderData._id;
-      // Use the Ref to check without re-triggering the socket useEffect
       if (activeOrdersRef.current.some(order => order._id === orderId)) {
         refreshOrders();
       }
     });
 
     return () => {
-      // We do NOT disconnect here to prevent Railway re-connection loops
-      // but we do remove listeners to prevent memory leaks
       socket.off('order-completed');
       socket.off('order-updated');
       socket.off('connect');
     };
-    // CRITICAL: Empty dependency array (or only stable functions) 
-    // prevents the socket from restarting and looping
   }, [refreshOrders, handleOrderComplete, showOrderCompleteToast]);
 
   const value = {
@@ -122,8 +138,6 @@ export const OrderWebSocketProvider = ({ children }) => {
 
 export const useOrderWebSocket = () => {
   const context = useContext(OrderWebSocketContext);
-  if (!context) {
-    throw new Error('useOrderWebSocket must be used within OrderWebSocketProvider');
-  }
+  if (!context) throw new Error('useOrderWebSocket must be used within OrderWebSocketProvider');
   return context;
 };

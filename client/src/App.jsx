@@ -43,12 +43,16 @@ const App = () => {
 
   return (
     <div>
-      <ToastContainer />
+      <ToastContainer
+        theme="dark"
+        position="top-right"
+        limit={3}
+      />
       {/* <Tawk />  */}
       {/* <TawkButton/> */}
 
       {/* Popup Trigger */}
-      {token && lastCompletedOrder && (
+      {/* {token && lastCompletedOrder && (
         <OrderCompleteModal
           order={lastCompletedOrder}
           onClose={() => {
@@ -56,7 +60,7 @@ const App = () => {
             setLastCompletedOrder(null);
           }}
         />
-      )}
+      )} */}
 
       <Suspense fallback={<Loading text="Please wait..." />}>
         <Routes>
