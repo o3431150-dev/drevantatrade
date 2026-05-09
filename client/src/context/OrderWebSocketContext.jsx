@@ -8,18 +8,23 @@ const OrderWebSocketContext = createContext();
 
 export const OrderWebSocketProvider = ({ children }) => {
   const socketRef = useRef(null);
-  const { refreshOrders, activeOrders } = useOrders();
+  const { refreshOrders, activeOrders, handleOrderComplete } = useOrders();
+  
+  // Use a Ref to track processed orders to prevent duplicate UI triggers
   const processedOrders = useRef(new Set());
+  
+  // Use a Ref for activeOrders to prevent the useEffect from looping
+  const activeOrdersRef = useRef(activeOrders);
+  useEffect(() => {
+    activeOrdersRef.current = activeOrders;
+  }, [activeOrders]);
 
-  // Custom toast for order completion
+  // Toast Notification Logic
   const showOrderCompleteToast = useCallback((orderData) => {
     const orderId = orderData.orderId || orderData._id;
     const toastId = `order-complete-${orderId}`;
     
-    // Check if toast already exists
-    if (toast.isActive(toastId)) {
-      return;
-    }
+    if (toast.isActive(toastId)) return;
     
     toast.success(
       `🎯 Order Completed!\nProfit: $${orderData.profit?.toFixed(2) || '0.00'}`,
@@ -29,75 +34,80 @@ export const OrderWebSocketProvider = ({ children }) => {
         position: 'top-right'
       }
     );
-    
-    // Mark as processed
-    processedOrders.current.add(orderId);
-    
-    // Clean up after 10 seconds
-    setTimeout(() => {
-      processedOrders.current.delete(orderId);
-    }, 10000);
   }, []);
 
   useEffect(() => {
-    // Initialize socket connection
-    const backendUrl = "https://drevantatrade-production-e27d.up.railway.app"
-    socketRef.current = io(backendUrl, { 
-      transports: ["websocket"],
-      path: '/socket.io', // or your custom path
-      reconnection: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 1000
-    });
+    const backendUrl = "https://drevantatrade-production-e27d.up.railway.app";
 
-    socketRef.current.on('connect', () => {
+    // Initialize socket only if it doesn't exist
+    if (!socketRef.current) {
+      socketRef.current = io(backendUrl, { 
+        transports: ["websocket"],
+        path: '/socket.io',
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
+      });
+    }
+
+    const socket = socketRef.current;
+
+    socket.on('connect', () => {
       console.log('Order WebSocket connected');
-      // Subscribe to user-specific channel if needed
-      socketRef.current.emit('subscribe', { type: 'orders' });
+      socket.emit('subscribe', { type: 'orders' });
     });
 
-    socketRef.current.on('disconnect', () => {
-      console.log('Order WebSocket disconnected');
-    });
-
-    // Order completed event
-    socketRef.current.on('order-completed', (orderData) => {
-      console.log('Order completed via WebSocket:', orderData);
-      
+    // Handle Order Completion
+    socket.on('order-completed', (orderData) => {
       const orderId = orderData.orderId || orderData._id;
       
-      // Skip if already processed
-      if (processedOrders.current.has(orderId)) {
-        return;
-      }
+      // Prevent Loop: Ignore if already handled in this session
+      if (processedOrders.current.has(orderId)) return;
+      processedOrders.current.add(orderId);
+
+      console.log('Order completed event received:', orderId);
       
-      // Show toast notification
+      // 1. Trigger the Modal Popup (from OrdersContext)
+      if (handleOrderComplete) {
+        handleOrderComplete(orderId);
+      }
+
+      // 2. Show backup Toast
       showOrderCompleteToast(orderData);
       
-      // Refresh order data
+      // 3. Refresh Data
       refreshOrders();
+
+      // Clear from memory after 1 minute to keep Set small
+      setTimeout(() => {
+        processedOrders.current.delete(orderId);
+      }, 60000);
     });
 
-    // Order status update event
-    socketRef.current.on('order-updated', (orderData) => {
-      console.log('Order updated:', orderData);
-      // Refresh orders if active order was updated
-      if (activeOrders.some(order => order._id === orderData._id)) {
+    // Handle Active Order Updates
+    socket.on('order-updated', (orderData) => {
+      const orderId = orderData.orderId || orderData._id;
+      // Use the Ref to check without re-triggering the socket useEffect
+      if (activeOrdersRef.current.some(order => order._id === orderId)) {
         refreshOrders();
       }
     });
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.disconnect();
-      }
+      // We do NOT disconnect here to prevent Railway re-connection loops
+      // but we do remove listeners to prevent memory leaks
+      socket.off('order-completed');
+      socket.off('order-updated');
+      socket.off('connect');
     };
-  }, [refreshOrders, activeOrders, showOrderCompleteToast]);
+    // CRITICAL: Empty dependency array (or only stable functions) 
+    // prevents the socket from restarting and looping
+  }, [refreshOrders, handleOrderComplete, showOrderCompleteToast]);
 
   const value = {
     socket: socketRef.current,
     emitEvent: (event, data) => {
-      if (socketRef.current && socketRef.current.connected) {
+      if (socketRef.current?.connected) {
         socketRef.current.emit(event, data);
       }
     }

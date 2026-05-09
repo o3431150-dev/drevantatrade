@@ -145,39 +145,21 @@ export const OrdersProvider = ({ children }) => {
 
 
 
-// 1. Add a "processedOrders" ref to track what we've already shown
-const processedOrders = React.useRef(new Set());
 
-const handleOrderComplete = useCallback(async (orderId) => {
-  // Prevent loop: If we already showed this ID, stop here
-  if (processedOrders.current.has(orderId)) return;
-  
-  try {
-    const response = await tradeAPI.getCompletedOrders({ limit: 10 });
-    const orders = response.data?.orders || [];
-    
-    // Find the specific order
-    const justFinished = orders.find(o => o._id === orderId);
-    
-    if (justFinished) {
-      // Mark as shown so it never loops again
-      processedOrders.current.add(orderId);
-      setLastCompletedOrder(justFinished);
-      
-      // Optional: Refresh the full list in the background
-      setCompletedOrders(orders);
+  // Inside OrdersContext.jsx
+  const handleOrderComplete = useCallback(async (orderId) => {
+    // Use a simple state or ref check here too
+    try {
+      const response = await tradeAPI.getCompletedOrders({ limit: 1 });
+      const latest = response.data?.orders?.[0];
+
+      if (latest && (latest._id === orderId || !orderId)) {
+        setLastCompletedOrder(latest);
+      }
+    } catch (e) {
+      console.error(e);
     }
-  } catch (error) {
-    console.error('Error in handleOrderComplete:', error);
-  }
-}, []); 
-
-// Clear the set when user logs out or changes
-useEffect(() => {
-  if (!userData) {
-    processedOrders.current.clear();
-  }
-}, [userData]);
+  }, []);
 
   const refreshOrders = useCallback(() => {
     loadOrders();
