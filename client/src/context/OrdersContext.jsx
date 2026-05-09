@@ -145,35 +145,39 @@ export const OrdersProvider = ({ children }) => {
 
 
 
-  const handleOrderComplete = useCallback(async (orderId) => {
-    try {
-      // 1. Fetch fresh data directly
-      const [activeRes, completedRes] = await Promise.all([
-        tradeAPI.getActiveOrders(),
-        tradeAPI.getCompletedOrders({ limit: 10 })
-      ]);
+// 1. Add a "processedOrders" ref to track what we've already shown
+const processedOrders = React.useRef(new Set());
 
-      const newCompletedList = completedRes.data?.orders || [];
-
-      // 2. Update states
-      setActiveOrders(activeRes.data?.orders || []);
-      setCompletedOrders(newCompletedList);
-      setLastUpdated(new Date());
-
-      // 3. Find the specific order from the NEW list we just fetched
-      const justFinished = newCompletedList.find(o => o._id === orderId);
-
-      if (justFinished) {
-        setLastCompletedOrder(justFinished);
-      } else if (newCompletedList.length > 0) {
-        // Fallback: if ID doesn't match for some reason, show the most recent one
-        setLastCompletedOrder(newCompletedList[0]);
-      }
-    } catch (error) {
-      console.error('Error in handleOrderComplete:', error);
+const handleOrderComplete = useCallback(async (orderId) => {
+  // Prevent loop: If we already showed this ID, stop here
+  if (processedOrders.current.has(orderId)) return;
+  
+  try {
+    const response = await tradeAPI.getCompletedOrders({ limit: 10 });
+    const orders = response.data?.orders || [];
+    
+    // Find the specific order
+    const justFinished = orders.find(o => o._id === orderId);
+    
+    if (justFinished) {
+      // Mark as shown so it never loops again
+      processedOrders.current.add(orderId);
+      setLastCompletedOrder(justFinished);
+      
+      // Optional: Refresh the full list in the background
+      setCompletedOrders(orders);
     }
-  }, []); // Remove dependencies that might cause loops
-  /////
+  } catch (error) {
+    console.error('Error in handleOrderComplete:', error);
+  }
+}, []); 
+
+// Clear the set when user logs out or changes
+useEffect(() => {
+  if (!userData) {
+    processedOrders.current.clear();
+  }
+}, [userData]);
 
   const refreshOrders = useCallback(() => {
     loadOrders();

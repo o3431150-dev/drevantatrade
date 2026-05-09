@@ -48,12 +48,15 @@ const App = () => {
       {/* <TawkButton/> */}
 
       {/* Popup Trigger */}
-      {/* {token && lastCompletedOrder && (
-        <OrderCompleteModal 
-          order={lastCompletedOrder} 
-          onClose={() => setLastCompletedOrder(null)} 
+      {token && lastCompletedOrder && (
+        <OrderCompleteModal
+          order={lastCompletedOrder}
+          onClose={() => {
+            // This MUST set the state to null to remove the modal from the DOM
+            setLastCompletedOrder(null);
+          }}
         />
-      )} */}
+      )}
 
       <Suspense fallback={<Loading text="Please wait..." />}>
         <Routes>
