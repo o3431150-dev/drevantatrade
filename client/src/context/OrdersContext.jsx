@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { tradeAPI } from '../services/api';
 import { useAuth } from './AuthContext';
+//import toast from 'react-hot-toast';
+import {toast} from 'react-toastify';
 
 const OrdersContext = createContext();
 
@@ -17,7 +19,15 @@ export const OrdersProvider = ({ children }) => {
   
   const [activeOrders, setActiveOrders] = useState([]);
   const [completedOrders, setCompletedOrders] = useState([]);
-  const [recentCompletion, setRecentCompletion] = useState(null); // Track the order for the popup
+  const [recentCompletion, setRecentCompletion] = useState(null); // For the Popup Modal
+  const [isLoading, setIsLoading] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  
+  // Refs to prevent re-render loops and race conditions
+  const refreshTimerRef = useRef(null);
+  const prevActiveIdsRef = useRef([]);
+  const isFetchingRef = useRef(false); 
+
   const [stats, setStats] = useState({
     totalTrades: 0,
     totalProfit: 0,
@@ -27,28 +37,21 @@ export const OrdersProvider = ({ children }) => {
     forceWin: false,
     availableBalance: 0
   });
-  
-  const [isLoading, setIsLoading] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState(null);
-  const [refreshInterval, setRefreshInterval] = useState(null);
-
-  // Use a ref to track IDs without triggering re-renders
-  const prevActiveIdsRef = useRef([]);
 
   const loadStats = useCallback(async () => {
     if (!userData) return;
     try {
-      // Logic for fetching stats can be re-enabled here
-      // const response = await tradeAPI.getTradingStats();
-      // setStats(...)
+      // tradeAPI.getTradingStats().then(res => setStats(res.data));
     } catch (error) {
       console.error('Error loading stats:', error);
     }
   }, [userData]);
 
   const loadOrders = useCallback(async () => {
-    if (!userData) return;
+    // Prevent overlapping requests that cause server strain/loops
+    if (!userData || isFetchingRef.current) return;
     
+    isFetchingRef.current = true;
     try {
       const [activeResponse, completedResponse] = await Promise.all([
         tradeAPI.getActiveOrders(),
@@ -58,112 +61,109 @@ export const OrdersProvider = ({ children }) => {
       const newActive = activeResponse.data?.orders || [];
       const newCompleted = completedResponse.data?.orders || [];
 
-      // DETECTION LOGIC: Check if an active order has moved to completed
+      // DETECTION LOGIC
       if (prevActiveIdsRef.current.length > 0) {
+        // Find IDs that were active but are now gone
         const finishedOrderId = prevActiveIdsRef.current.find(
-          id => !newActive.some(order => order._id === id)
+          oldId => !newActive.some(newOrder => newOrder._id === oldId)
         );
 
         if (finishedOrderId) {
-          const completedOrder = newCompleted.find(o => o._id === finishedOrderId);
-          if (completedOrder) {
-            setRecentCompletion(completedOrder);
-            await loadStats(); // Update balance/stats when an order finishes
+          const found = newCompleted.find(o => o._id === finishedOrderId);
+          if (found) {
+            // 1. Trigger the Modal
+            setRecentCompletion(found);
+            
+            // 2. Trigger the Toast Notification
+            const isWin = found.profit > 0;
+            if (isWin) {
+              toast.success(`Trade Won! +$${found.profit.toFixed(2)}`, {
+                duration: 5000,
+                icon: '🚀',
+              });
+            } else {
+              toast.error(`Trade Closed: -$${Math.abs(found.profit).toFixed(2)}`, {
+                duration: 5000,
+              });
+            }
+
+            loadStats(); // Refresh balance
           }
         }
       }
 
-      // Update refs and state
+      // Sync refs and state
       prevActiveIdsRef.current = newActive.map(o => o._id);
       setActiveOrders(newActive);
       setCompletedOrders(newCompleted);
       setLastUpdated(new Date());
     } catch (error) {
       console.error('Error loading orders:', error);
+    } finally {
+      isFetchingRef.current = false;
     }
   }, [userData, loadStats]);
 
-  const startAutoRefresh = useCallback(() => {
-    if (refreshInterval) clearInterval(refreshInterval);
-    const interval = setInterval(() => {
-      loadOrders();
-    }, 5000);
-    setRefreshInterval(interval);
-  }, [loadOrders, refreshInterval]);
-
+  // Stable polling controls
   const stopAutoRefresh = useCallback(() => {
-    if (refreshInterval) {
-      clearInterval(refreshInterval);
-      setRefreshInterval(null);
+    if (refreshTimerRef.current) {
+      clearInterval(refreshTimerRef.current);
+      refreshTimerRef.current = null;
     }
-  }, [refreshInterval]);
+  }, []);
 
+  const startAutoRefresh = useCallback(() => {
+    stopAutoRefresh();
+    refreshTimerRef.current = setInterval(() => {
+      loadOrders();
+    }, 5000); // 5 second poll
+  }, [loadOrders, stopAutoRefresh]);
+
+  // Lifecycle Management
   useEffect(() => {
     if (userData) {
       loadOrders();
       loadStats();
       startAutoRefresh();
+    } else {
+      stopAutoRefresh();
+      setActiveOrders([]);
+      setCompletedOrders([]);
+      prevActiveIdsRef.current = [];
     }
-    return () => {
-      if (refreshInterval) clearInterval(refreshInterval);
-    };
-  }, [userData]);
+
+    return () => stopAutoRefresh();
+  }, [userData, loadOrders, loadStats, startAutoRefresh, stopAutoRefresh]);
 
   const placeOrder = useCallback(async (orderData) => {
     setIsLoading(true);
     try {
       const response = await tradeAPI.placeOrder(orderData);
       if (response.success) {
+        toast.success('Order placed successfully');
         await loadOrders();
-        await loadStats();
         return response.data;
       }
-    } catch (error) {
-      console.error('Error placing order:', error);
-      throw error;
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to place order');
+      throw err;
     } finally {
       setIsLoading(false);
     }
-  }, [loadOrders, loadStats]);
+  }, [loadOrders]);
 
-  const cancelOrder = useCallback(async (orderId, reason) => {
-    try {
-      const response = await tradeAPI.cancelOrder(orderId, reason);
-      if (response.success) {
-        setActiveOrders(prev => prev.filter(order => order._id !== orderId));
-        await loadStats();
-        return response.data;
-      }
-    } catch (error) {
-      console.error('Error cancelling order:', error);
-      throw error;
-    }
-  }, [loadStats]);
-
-  const handleOrderComplete = useCallback(async (orderId, finalPrice) => {
-    await loadOrders();
-    await loadStats();
-  }, [loadOrders, loadStats]);
-
-  const refreshOrders = useCallback(() => {
-    loadOrders();
-    loadStats();
-  }, [loadOrders, loadStats]);
-
-  const clearCompletion = () => setRecentCompletion(null);
+  const clearCompletion = useCallback(() => setRecentCompletion(null), []);
 
   const value = {
     activeOrders,
     completedOrders,
-    recentCompletion, // Used by the popup component
-    clearCompletion,  // Used to close the popup
+    recentCompletion,
+    clearCompletion,
     stats,
     isLoading,
     lastUpdated,
     placeOrder,
-    cancelOrder,
-    handleOrderComplete,
-    refreshOrders,
+    refreshOrders: loadOrders,
     startAutoRefresh,
     stopAutoRefresh
   };
