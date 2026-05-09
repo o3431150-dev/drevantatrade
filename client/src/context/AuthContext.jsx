@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     const [orderLoading, setOrderLoading] = useState(false);
 
     //const backendUrl = "https://trading-app-fdzj.onrender.com/"
-    //const backendUrl = 'http://localhost:3000/'
+   // const backendUrl = 'http://localhost:3000/'
 
     const backendUrl = "https://drevantatrade-production-e27d.up.railway.app/"
 

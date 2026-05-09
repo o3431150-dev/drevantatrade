@@ -15,7 +15,7 @@ export const useOrders = () => {
 
 export const OrdersProvider = ({ children }) => {
   const { userData } = useAuth();
-  
+  const [lastCompletedOrder, setLastCompletedOrder] = useState(null);
   const [activeOrders, setActiveOrders] = useState([]);
   const [completedOrders, setCompletedOrders] = useState([]);
   const [stats, setStats] = useState({
@@ -59,13 +59,13 @@ export const OrdersProvider = ({ children }) => {
 
   const loadOrders = useCallback(async () => {
     if (!userData) return;
-    
+
     try {
       const [activeResponse, completedResponse] = await Promise.all([
         tradeAPI.getActiveOrders(),
         tradeAPI.getCompletedOrders({ limit: 10 })
       ]);
-      
+
       setActiveOrders(activeResponse.data?.orders || []);
       setCompletedOrders(completedResponse.data?.orders || []);
       setLastUpdated(new Date());
@@ -76,13 +76,13 @@ export const OrdersProvider = ({ children }) => {
 
   const loadStats = useCallback(async () => {
     if (!userData) return;
-    
+
     try {
       const [statsResponse, balanceResponse] = await Promise.all([
         ///tradeAPI.getTradingStats(),
-       // tradeAPI.getUserBalance()
+        // tradeAPI.getUserBalance()
       ]);
-      
+
       if (false) {
         setStats({
           totalTrades: statsResponse.data?.trading?.totalTrades || 0,
@@ -103,7 +103,7 @@ export const OrdersProvider = ({ children }) => {
     setIsLoading(true);
     try {
       const response = await tradeAPI.placeOrder(orderData);
-      
+
       if (response.success) {
         await loadOrders();
         await loadStats();
@@ -120,7 +120,7 @@ export const OrdersProvider = ({ children }) => {
   const cancelOrder = useCallback(async (orderId, reason) => {
     try {
       const response = await tradeAPI.cancelOrder(orderId, reason);
-      
+
       if (response.success) {
         setActiveOrders(prev => prev.filter(order => order._id !== orderId));
         await loadStats();
@@ -133,10 +133,47 @@ export const OrdersProvider = ({ children }) => {
   }, [loadStats]);
 
   // REMOVED TOAST FROM HERE - WebSocket will handle it
-  const handleOrderComplete = useCallback(async (orderId, finalPrice) => {
-    await loadOrders();
-    await loadStats();
-  }, [loadOrders, loadStats]);
+  /*
+    const handleOrderComplete = useCallback(async (orderId, finalPrice) => {
+ 
+     await loadOrders();
+ 
+     await loadStats();
+ 
+   }, [loadOrders, loadStats]);
+  */
+
+
+
+  const handleOrderComplete = useCallback(async (orderId) => {
+    try {
+      // 1. Fetch fresh data directly
+      const [activeRes, completedRes] = await Promise.all([
+        tradeAPI.getActiveOrders(),
+        tradeAPI.getCompletedOrders({ limit: 10 })
+      ]);
+
+      const newCompletedList = completedRes.data?.orders || [];
+
+      // 2. Update states
+      setActiveOrders(activeRes.data?.orders || []);
+      setCompletedOrders(newCompletedList);
+      setLastUpdated(new Date());
+
+      // 3. Find the specific order from the NEW list we just fetched
+      const justFinished = newCompletedList.find(o => o._id === orderId);
+
+      if (justFinished) {
+        setLastCompletedOrder(justFinished);
+      } else if (newCompletedList.length > 0) {
+        // Fallback: if ID doesn't match for some reason, show the most recent one
+        setLastCompletedOrder(newCompletedList[0]);
+      }
+    } catch (error) {
+      console.error('Error in handleOrderComplete:', error);
+    }
+  }, []); // Remove dependencies that might cause loops
+  /////
 
   const refreshOrders = useCallback(() => {
     loadOrders();
@@ -146,7 +183,7 @@ export const OrdersProvider = ({ children }) => {
   const value = {
     activeOrders,
     completedOrders,
-  //  stats,
+    //  stats,
     isLoading,
     lastUpdated,
     placeOrder,
@@ -154,7 +191,10 @@ export const OrdersProvider = ({ children }) => {
     handleOrderComplete,
     refreshOrders,
     startAutoRefresh,
-    stopAutoRefresh
+    stopAutoRefresh,
+
+    lastCompletedOrder,
+    setLastCompletedOrder
   };
 
   return (

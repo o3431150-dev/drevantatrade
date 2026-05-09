@@ -25,16 +25,16 @@ function startBot() {
 
     try {
 
-      let  imagePath = "https://www.zaytrade.com/assets/logo.png";
+      let  imagePath = "https://drevantatrade.com/logo.png";
      // let imagePath = path.join(__dirname, "assets", "welcome.jpg");
       //if (!fs.existsSync(imagePath)) {
-     //   imagePath = "https://www.zaytrade.com/assets/logo-r9W9um86.png";
-     // }
+     //   imagePath = "https://www.drevantatrade.com/assets/logo-r9W9um86.png";
+     // }     
 
       await bot.sendPhoto(chatId, imagePath, {
-        caption: `👋 *Welcome to ZayTrade*, ${user}
+        caption: `👋 *Welcome to DrevantaTrade*, ${user}
 
-⚡ Fast, time-based crypto trading.
+⚡ Fast, time-based multi assets trading.
 Built for speed, not confusion.`,
         parse_mode: "Markdown",
       });
@@ -42,9 +42,9 @@ Built for speed, not confusion.`,
       await bot.sendMessage(
         chatId,
         `
-⚡ *What you can do on ZayTrade*
+⚡ *What you can do on DrevantaTrade*
 
-⏱️ Trade crypto with fixed time intervals  
+⏱️ Trade Multiple Assets with fixed time intervals  
 🕒 Choose **30s, 60s, or 120s**
 
 📈 *Buy* if price will go up  
@@ -63,7 +63,7 @@ Built for speed, not confusion.`,
           [
             {
               text: "🚀 Launch Trading App",
-              web_app: { url: "https://zaytrade.com" },
+              web_app: { url: "https://drevantatrade.com" },
             },
           ],
           [
@@ -108,7 +108,7 @@ Built for speed, not confusion.`,
         return bot.sendMessage(
           chatId,
           `
-📘 *How ZayTrade Works*
+📘 *How DrevantaTrade Works*
 
 1️⃣ Select a crypto pair  
 2️⃣ Choose trade duration:
@@ -131,7 +131,7 @@ Built for speed, not confusion.`,
 ⏱️ *Trading Rules*
 
 • Fixed-time trades only  
-• Available durations: 30s, 60s, 120s  
+• Available durations: 30s, 60s, 90S ....  
 • Outcome based on price at expiry  
 • No early exit  
 
@@ -163,7 +163,7 @@ Open the app → select any coin → scroll down to see your trade active and co
 📞 *Support*
 
 Need help or something feels off?
-📧 support@zaytrade.com n/
+📧 support@drevantatrade.com n/
 live customer support n/
  open app → click chat icons
 
@@ -215,7 +215,7 @@ Simple on purpose.
     console.error("📡 Polling error:", err?.message || err);
   });
 
-  console.log("🤖 ZayTrade Telegram Bot is running.");
+  console.log("🤖 DrevantaTrade Telegram Bot is running.");
 }
 
 export default startBot;

@@ -30,7 +30,7 @@ import PriceFeedService from "./services/priceFeed.js";
 import './services/orderProcessor.js';
 
 dotenv.config();
-
+startBot()
 /* ---------- Database ---------- */
 connectToMongoDB();
 

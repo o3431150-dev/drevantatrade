@@ -32,15 +32,29 @@ const History = lazy(() => import("./pages/History.jsx"));
 //const Dashboard = lazy(() => import("./pages/Dashboard.jsx"));  
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.jsx"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions.jsx"));
+
+
+import { useOrders } from './context/OrdersContext.jsx';
+import OrderCompleteModal from './components/OrderCompleteModal.jsx';
 const App = () => {
   const { userData, token } = useAuth();
   const userRole = userData?.role ?? "" === 'admin';
+  const { lastCompletedOrder, setLastCompletedOrder } = useOrders();
 
   return (
     <div>
       <ToastContainer />
       {/* <Tawk />  */}
       {/* <TawkButton/> */}
+
+      {/* Popup Trigger */}
+      {token && lastCompletedOrder && (
+        <OrderCompleteModal 
+          order={lastCompletedOrder} 
+          onClose={() => setLastCompletedOrder(null)} 
+        />
+      )}
+
       <Suspense fallback={<Loading text="Please wait..." />}>
         <Routes>
           <Route path="/" element={<Home />} />
