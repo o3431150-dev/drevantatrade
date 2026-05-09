@@ -33,34 +33,38 @@ const History = lazy(() => import("./pages/History.jsx"));
 const PrivacyPolicy = lazy(() => import("./pages/PrivacyPolicy.jsx"));
 const TermsAndConditions = lazy(() => import("./pages/TermsAndConditions.jsx"));
 
-
 import { useOrders } from './context/OrdersContext.jsx';
-import OrderCompleteModal from './components/OrderCompleteModal.jsx';
+import OrderCompletionModal from './components/OrderCompletionModal.jsx';
+
 const App = () => {
   const { userData, token } = useAuth();
   const userRole = userData?.role ?? "" === 'admin';
-  const { lastCompletedOrder, setLastCompletedOrder } = useOrders();
+
+  const { recentCompletion, clearCompletion } = useOrders();
+
 
   return (
     <div>
       <ToastContainer
-        theme="dark"
         position="top-right"
-        limit={3}
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored" // "colored" looks great for Profit (Green) and Loss (Red)
       />
-      {/* <Tawk />  */}
-      {/* <TawkButton/> */}
-
-      {/* Popup Trigger */}
-      {/* {token && lastCompletedOrder && (
-        <OrderCompleteModal
-          order={lastCompletedOrder}
-          onClose={() => {
-            // This MUST set the state to null to remove the modal from the DOM
-            setLastCompletedOrder(null);
-          }}
+      {recentCompletion && (
+        <OrderCompletionModal
+          order={recentCompletion}
+          onClose={clearCompletion}
         />
-      )} */}
+      )}
+
+
 
       <Suspense fallback={<Loading text="Please wait..." />}>
         <Routes>
