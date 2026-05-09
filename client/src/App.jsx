@@ -48,12 +48,12 @@ const App = () => {
       {/* <TawkButton/> */}
 
       {/* Popup Trigger */}
-      {token && lastCompletedOrder && (
+      {/* {token && lastCompletedOrder && (
         <OrderCompleteModal 
           order={lastCompletedOrder} 
           onClose={() => setLastCompletedOrder(null)} 
         />
-      )}
+      )} */}
 
       <Suspense fallback={<Loading text="Please wait..." />}>
         <Routes>
