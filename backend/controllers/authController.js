@@ -12,6 +12,13 @@ export const register = async (req, res) => {
     const existingUser = await userModel.findOne({ email });
     console.log("Existing user:", existingUser);
 
+    if(true){
+      return res.json({
+        success: false,
+        message: "Registration is currently closed please use google login or contact support for more info"
+      });
+    }
+
     if (existingUser) {
       return res.json({
         success: false,
