@@ -410,53 +410,54 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     this.completedAt = new Date();
     this.isLive = false;
 
-    // Force Mongoose to acknowledge the status change
+    // Force Mongoose to acknowledge the status change so cron doesn't overwrite it
     this.markModified('status');
 
     // Save the order document state first
     await this.save();
 
-    // PRODUCTION FIX 1: Enforce strict casting to a true MongoDB ObjectId
+    // Strict casting to a true MongoDB ObjectId for production clusters
     const targetUserId = mongoose.Types.ObjectId.isValid(this.user) 
       ? new mongoose.Types.ObjectId(this.user.toString()) 
       : this.user;
 
-    // Ensure numeric formatting rules match database schema rules
-    const safePayout = Number(Number(this.actualPayout).toFixed(2));
+    // Ensure numeric formatting rules are clean, rounded primitives
+    const safePayout = Number(Number(this.actualPayout || 0).toFixed(2));
     const safeProfit = this.profit > 0 ? Number(this.profit.toFixed(2)) : 0;
     const safeLoss = this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0;
 
-    // 2. Build the atomic operation
+    // Build the atomic operation
     const updateOperation = {
       $inc: {
         "totalTrades": 1,
         "totalProfit": safeProfit,
         "totalLoss": safeLoss,
-        "winningTrades": this.profit > 0 ? 1 : 0,
+        "winningTrades": this.profit > 100 ? 1 : 0, // Matches your minimum $100 rule
         "losingTrades": this.profit < 0 ? 1 : 0
       }
     };
 
-    // 3. Channel funds securely
+    // Channel funds securely to the fields defined in your usermodel.js
     if (this.isDemo === true) {
-      updateOperation.$inc["demoBalance"] = 0;
+      updateOperation.$inc["demoBalance"] = safePayout;
     } else {
-      updateOperation.$inc["wallet.usdt"] = 0;
+      updateOperation.$inc["wallet.usdt"] = safePayout;
     }
 
-    // PRODUCTION FIX 2: Use { upsert: false, runValidators: false } to force the write operation on live clusters
+    // PRODUCTION FIX: Turn off runValidators for this atomic math step
+    // This stops 'min: 0' validation traps from blocking your server updates!
     const updatedUser = await userModel.findOneAndUpdate(
-      { _id: targetUserId }, // Using the explicitly cast ObjectId wrapper
+      { _id: targetUserId },
       updateOperation,
-      { new: true, runValidators: false }
+      { new: true, runValidators: false } // ← CRITICAL FOR PRODUCTION COEXISTENCE
     );
 
     if (!updatedUser) {
-      console.error(`❌ CRITICAL: User document matching ID ${this.user} was completely missing from the cloud cluster during update execution.`);
+      console.error(`❌ CRITICAL: User ${this.user} not found in Atlas cluster during trade finalization.`);
       throw new Error('User not found during balance update');
     }
 
-    // Extract the correct balance string value safely
+    // Extract the final balance state smoothly
     const finalBalance = this.isDemo === true 
       ? (updatedUser.demoBalance !== undefined ? updatedUser.demoBalance : 0)
       : (updatedUser.wallet?.usdt !== undefined ? updatedUser.wallet.usdt : 0);
