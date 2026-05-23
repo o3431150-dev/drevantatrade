@@ -404,7 +404,6 @@ orderSchema.methods.calculateProfitLoss = async function () {
 
 orderSchema.methods.completeOrder = async function (exitPrice) {
   try {
-    // 1. Establish data profiles and calculate values
     this.exitPrice = exitPrice;
     
     // Calculate P&L (Sets this.profit and this.actualPayout)
@@ -414,54 +413,69 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     this.completedAt = new Date();
     this.isLive = false;
 
-    // Force Mongoose to acknowledge the status change so pre-save middleware doesn't overwrite it
+    // Force Mongoose to acknowledge the status change
     this.markModified('status');
 
     // Save the order document state first
     await this.save();
 
-    // 2. Build the atomic increment operation explicitly to satisfy production environments
+    // PRODUCTION FIX 1: Enforce strict casting to a true MongoDB ObjectId
+    const targetUserId = mongoose.Types.ObjectId.isValid(this.user) 
+      ? new mongoose.Types.ObjectId(this.user.toString()) 
+      : this.user;
+
+    // Ensure numeric formatting rules match database schema rules
+    const safePayout = Number(Number(this.actualPayout).toFixed(2));
+    const safeProfit = this.profit > 0 ? Number(this.profit.toFixed(2)) : 0;
+    const safeLoss = this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0;
+
+    // 2. Build the atomic operation
     const updateOperation = {
       $inc: {
         "totalTrades": 1,
-        "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
-        "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
+        "totalProfit": safeProfit,
+        "totalLoss": safeLoss,
         "winningTrades": this.profit > 0 ? 1 : 0,
         "losingTrades": this.profit < 0 ? 1 : 0
       }
     };
 
-    // 3. Channel funds using explicit keys to prevent Mongoose traversal errors on the server
+    // 3. Channel funds securely
     if (this.isDemo === true) {
-      updateOperation.$inc["demoBalance"] = this.actualPayout;
+      updateOperation.$inc["demoBalance"] = safePayout;
     } else {
-      updateOperation.$inc["wallet.usdt"] = this.actualPayout;
+      updateOperation.$inc["wallet.usdt"] = safePayout;
     }
 
-    // 4. Update user statistics and balances atomically
+    // PRODUCTION FIX 2: Use { upsert: false, runValidators: false } to force the write operation on live clusters
     const updatedUser = await userModel.findOneAndUpdate(
-      { _id: this.user },
+      { _id: targetUserId }, // Using the explicitly cast ObjectId wrapper
       updateOperation,
-      { new: true }
+      { new: true, runValidators: false }
     );
 
-    if (!updatedUser) throw new Error('User not found during balance update');
+    if (!updatedUser) {
+      console.error(`❌ CRITICAL: User document matching ID ${this.user} was completely missing from the cloud cluster during update execution.`);
+      throw new Error('User not found during balance update');
+    }
 
-    // Extract the correct balance to return back to the application UI layouts
-    const finalBalance = this.isDemo === true ? updatedUser.demoBalance : updatedUser.wallet.usdt;
+    // Extract the correct balance string value safely
+    const finalBalance = this.isDemo === true 
+      ? (updatedUser.demoBalance !== undefined ? updatedUser.demoBalance : 0)
+      : (updatedUser.wallet?.usdt !== undefined ? updatedUser.wallet.usdt : 0);
 
     console.log(`👌👌👌 Balance update successful [${this.isDemo ? 'DEMO' : 'LIVE'}]:`, {
       userId: this.user,
-      oldBalance: finalBalance - this.actualPayout,
+      oldBalance: Number((finalBalance - safePayout).toFixed(2)),
       newBalance: finalBalance,
-      addedAmount: this.actualPayout
+      addedAmount: safePayout
     });
 
     return {
       order: this,
       userBalance: finalBalance,
       profit: this.profit,
-      actualPayout: this.actualPayout
+      actualPayout: safePayout
     };
 
   } catch (error) {
