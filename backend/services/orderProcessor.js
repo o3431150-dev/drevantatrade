@@ -7,89 +7,61 @@ class OrderProcessor {
     this.priceFeedService = null;
   }
 
-  // Inject the live server price feed service safely from server.js
   init(priceFeedServiceInstance) {
     this.priceFeedService = priceFeedServiceInstance;
     this.startAutoProcessor();
   }
 
-  // Process expired orders
   async processExpiredOrders() {
-    if (this.isProcessing) {
-      return;
-    }
-
+    if (this.isProcessing) return;
     this.isProcessing = true;
     
     try {
-      // Find active orders where the endTime has crossed the current server timestamp
       const expiredOrders = await Order.find({
         status: 'active',
         endTime: { $lte: new Date() }
       });
 
       if (expiredOrders.length > 0) {
-        console.log(`[Processor] Found ${expiredOrders.length} expired orders to resolve.`);
-        const results = [];
+        console.log(`[Processor] Processing batch of ${expiredOrders.length} expired orders.`);
 
         for (const order of expiredOrders) {
           try {
-            let currentMarketPrice = order.entryPrice; // Default fallback parameter
+            let currentMarketPrice = order.entryPrice; 
 
             if (this.priceFeedService && typeof this.priceFeedService.getPrices === 'function') {
-              // Fetch the entire price dictionary map safely
               const allPrices = this.priceFeedService.getPrices();
-              
-              // Extract the specific token asset symbol payload (e.g., 'BNBUSDT')
               const livePriceData = allPrices ? allPrices[order.symbol] : null;
 
               if (livePriceData) {
-                // Adapt to either an object wrapper structure { price: 643 } or a raw flat number string
                 const targetPrice = typeof livePriceData === 'object' ? livePriceData.price : livePriceData;
-                
                 if (targetPrice && !isNaN(parseFloat(targetPrice))) {
                   currentMarketPrice = parseFloat(targetPrice);
                 }
               }
             }
 
-            console.log(`[Processor] Finalizing ${order.isDemo ? 'DEMO' : 'LIVE'} order ${order._id}. Passing Live Exit Price: ${currentMarketPrice}`);
-
-            // Direct individual order database document execution sequence
+            console.log(`[Processor] Resolving ${order.isDemo ? 'DEMO' : 'LIVE'} trade reference: ${order._id}. Market Exit Price: ${currentMarketPrice}`);
             await order.completeOrder(currentMarketPrice);
-            results.push({ orderId: order._id, success: true });
 
           } catch (orderError) {
-            console.error(`[Processor] Failed resolving individual order ${order._id}:`, orderError.message);
-            results.push({ orderId: order._id, success: false, error: orderError.message });
+            console.error(`[Processor] Settlement exception caught on order ${order._id}:`, orderError.message);
           }
         }
-
-        const successful = results.filter(r => r.success).length;
-        const failed = results.filter(r => !r.success).length;
-        console.log(`[Processor] Batch run finished. Success: ${successful}, Failed: ${failed}`);
       }
-      
     } catch (error) {
-      console.error('Error in background order processor loop context:', error);
+      console.error('Error within database query process execution loop:', error);
     } finally {
       this.isProcessing = false;
     }
   }
 
-  // Start automatic processing
   startAutoProcessor() {
-    // Process orders every 10 seconds safely across production infrastructure threads
+    // Polls database collections every 10 seconds securely
     cron.schedule('*/10 * * * * *', () => {
       this.processExpiredOrders();
     });
-    
     console.log('🚀 Order processor background cron engine initialized.');
-  }
-
-  // Stop automatic processing
-  stopAutoProcessor() {
-    console.log('Order processor stopped');
   }
 }
 
