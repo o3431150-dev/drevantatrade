@@ -6,7 +6,7 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
-    
+
     const [userData, setUserData] = useState(() => {
         const saved = localStorage.getItem('userData');
         return saved ? JSON.parse(saved) : null;
@@ -15,10 +15,13 @@ export const AuthProvider = ({ children }) => {
     const [showProfile, setShowProfile] = useState(false);
     const [orderLoading, setOrderLoading] = useState(false);
 
-    //const backendUrl = "https://trading-app-fdzj.onrender.com/"
-   // const backendUrl = 'http://localhost:3000/'
+    const [isDemoMode, setIsDemoMode] = useState(false);
+    const [demoBalance, setDemoBalance] = useState({ btc: 1, eth: 0, usdt: 0 });
 
-    const backendUrl = "https://drevantatrade-production-e27d.up.railway.app/"
+    //const backendUrl = "https://trading-app-fdzj.onrender.com/"
+    /// const backendUrl = 'http://localhost:3000/'
+
+   const backendUrl = "https://drevantatrade-production-e27d.up.railway.app/"
 
 
     // Admin state
@@ -48,7 +51,7 @@ export const AuthProvider = ({ children }) => {
             });
 
             const data = await response.json();
-            
+
             if (!response.ok) {
                 throw new Error(data.message || 'Login failed');
             }
@@ -56,12 +59,12 @@ export const AuthProvider = ({ children }) => {
             // Save token and user data
             setToken(data.token);
             setUserData(data.user);
-            
+
             localStorage.setItem('token', data.token);
             localStorage.setItem('userData', JSON.stringify(data.user));
 
             toast.success('Login successful!');
-            
+
             return data;
         } catch (error) {
             console.error('Login error:', error);
@@ -82,13 +85,13 @@ export const AuthProvider = ({ children }) => {
             });
 
             const data = await response.json();
-            
+
             if (!response.ok) {
                 throw new Error(data.message || 'Registration failed');
             }
 
             toast.success('Registration successful! Please verify your email.');
-            
+
             return data;
         } catch (error) {
             console.error('Register error:', error);
@@ -103,10 +106,10 @@ export const AuthProvider = ({ children }) => {
         setUserData(null);
         setIsAdmin(false);
         AsetUserData(null);
-        
+
         localStorage.removeItem('token');
         localStorage.removeItem('userData');
-        
+
         toast.success('Logged out successfully');
     };
 
@@ -120,21 +123,21 @@ export const AuthProvider = ({ children }) => {
         isVerified,
         isKycVerified,
         isAdmin,
-        
+
         // User data
         userData,
         token,
         AuserData,
-        
+
         // UI state
         backendUrl,
         isOtpSend,
         showProfile,
-        
+
         // Setters
         setIsOtpSend,
         setShowProfile,
-        
+
         // Actions
         login,
         register,
@@ -145,12 +148,18 @@ export const AuthProvider = ({ children }) => {
         //order loading state
         orderLoading,
         setOrderLoading,
+
+        // Demo mode state
+        isDemoMode,
+        setIsDemoMode,
+        demoBalance,
+        setDemoBalance,
     };
 
     return (
         <AuthContext.Provider value={value}>
-                {children}
-           
+            {children}
+
         </AuthContext.Provider>
     );
 };

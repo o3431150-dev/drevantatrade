@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
     avatar: { type: String },
     password: { type: String },
     isPasswordSet: { type: Boolean, default: false },
-    
+
     verifyOtp: { type: String, default: "" },
     verifyOtpExpireAt: { type: Number, default: 0 },
     isAccountVerified: { type: Boolean, default: false },
@@ -38,7 +38,7 @@ const userSchema = new mongoose.Schema(
       default: null,
     },
     isKyc: { type: Boolean, default: false },
-    
+
     resetOtp: { type: String, default: "" },
     resetOtpExpireAt: { type: Number, default: 0 },
 
@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema(
 
     isBlocked: { type: Boolean, default: false },
     forceWin: { type: Boolean, default: false },
-    
+
     totalTrades: { type: Number, default: 0 },
     totalProfit: { type: Number, default: 0 },
     totalLoss: { type: Number, default: 0 },
@@ -70,12 +70,13 @@ const userSchema = new mongoose.Schema(
 
     deletedAt: { type: Date },
     deletedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    demoBalance: { type: Number, default: 10000 }
   },
-  { 
-    timestamps: true,
+{
+  timestamps: true,
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }
-  }
+  toObject: { virtuals: true }
+}
 );
 
 // Add virtual for net worth
@@ -86,7 +87,7 @@ userSchema.virtual('netWorth').get(function() {
 */
 
 // Add method to safely update balance
-userSchema.methods.updateBalance = async function(amount, operation = 'add') {
+userSchema.methods.updateBalance = async function (amount, operation = 'add') {
   if (operation === 'add') {
     this.wallet.usdt += amount;
   } else if (operation === 'subtract') {
@@ -99,7 +100,7 @@ userSchema.methods.updateBalance = async function(amount, operation = 'add') {
 };
 
 // Static method for atomic balance update
-userSchema.statics.addToBalance = async function(userId, amount) {
+userSchema.statics.addToBalance = async function (userId, amount) {
   return await this.findOneAndUpdate(
     { _id: userId },
     { $inc: { "wallet.usdt": amount } },
@@ -107,7 +108,7 @@ userSchema.statics.addToBalance = async function(userId, amount) {
   );
 };
 
-userSchema.statics.subtractFromBalance = async function(userId, amount) {
+userSchema.statics.subtractFromBalance = async function (userId, amount) {
   return await this.findOneAndUpdate(
     { _id: userId, "wallet.usdt": { $gte: amount } },
     { $inc: { "wallet.usdt": -amount } },

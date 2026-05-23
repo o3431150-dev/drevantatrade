@@ -11,7 +11,11 @@ export const tradeController = {
   placeOrder: async (req, res) => {
     try {
       const userId = req.user.id;
-      const { symbol, symbolName, coinId, direction, amount, leverage = 1, duration, entryPrice } = req.body;
+      // Extract isDemo along with the other parameters
+      const { symbol, symbolName, coinId, direction, amount, leverage = 1, duration, entryPrice, isDemo } = req.body;
+
+      // Convert isDemo explicitly to a boolean value
+      const isDemoMode = isDemo === true || isDemo === 'true';
 
       // Validations (keep your existing validation code)
       const requiredFields = ['symbol', 'direction', 'amount', 'duration'];
@@ -26,20 +30,28 @@ export const tradeController = {
       // Calculate required balance
       const feeRate = 0.02;
       const fee = parseFloat(amount) * feeRate;
-      const requiredBalance = parseFloat(amount) + fee;
+      const requiredBalance = parseFloat(amount) 
 
-      // CRITICAL FIX: Use atomic operation to deduct balance
+      // Dynamic setups for Atomic operation based on the trade profile
+      const filter = { _id: userId };
+      const updatePayload = {
+        $inc: { "totalTrades": 1 } // Increments for both modes
+      };
+
+      if (isDemoMode) {
+        // Demo Mode rules
+        filter["demoBalance"] = { $gte: requiredBalance };
+        updatePayload.$inc["demoBalance"] = -requiredBalance;
+      } else {
+        // Live Mode rules
+        filter["wallet.usdt"] = { $gte: requiredBalance };
+        updatePayload.$inc["wallet.usdt"] = -requiredBalance;
+      }
+
+      // Dynamic update operation execution
       const user = await userModel.findOneAndUpdate(
-        {
-          _id: userId,
-          "wallet.usdt": { $gte: requiredBalance } // Ensure sufficient balance
-        },
-        {
-          $inc: {
-            "wallet.usdt": -requiredBalance,
-            "totalTrades": 1
-          }
-        },
+        filter,
+        updatePayload,
         {
           new: true,
           runValidators: true
@@ -49,16 +61,21 @@ export const tradeController = {
       if (!user) {
         return res.status(400).json({
           success: false,
-          message: "Insufficient balance. Please check your wallet."
+          message: isDemoMode
+            ? "Insufficient Demo Balance. Please top up your demo account by contacting support."
+            : "Insufficient balance. Please check your live wallet."
         });
       }
 
-      // Create order
+      // Force leverage to 1 if it's disabled/restricted on the profile layout
+      const activeLeverage = isDemoMode ? 1 : parseInt(leverage);
+
+      // Create order calculation parameters
       const durationRates = {
         30: 12, 50: 12, 60: 18, 90: 20, 120: 22, 180: 25, 240: 28, 365: 30
       };
       const rate = durationRates[duration] || 12;
-      const expectedReturn = (parseFloat(amount) * (rate / 100)) * leverage;
+      const expectedReturn = (parseFloat(amount) * (rate / 100)) * activeLeverage;
 
       const orderData = {
         user: userId,
@@ -67,12 +84,13 @@ export const tradeController = {
         coinId: coinId || symbol.toLowerCase(),
         direction: direction.toLowerCase(),
         amount: parseFloat(amount),
-        leverage: parseInt(leverage),
+        leverage: activeLeverage,
         duration: parseInt(duration),
         entryPrice: parseFloat(entryPrice),
         fee: fee,
         expectedReturn: expectedReturn,
         status: 'active',
+        isDemo: isDemoMode, // Save the state directly inside the order document schema
         startTime: new Date(),
         endTime: new Date(Date.now() + (parseInt(duration) * 1000))
       };
@@ -82,7 +100,7 @@ export const tradeController = {
 
       res.status(201).json({
         success: true,
-        message: "Order placed successfully",
+        message: isDemoMode ? "Demo order placed successfully" : "Order placed successfully",
         data: {
           order: {
             id: order._id,
@@ -93,10 +111,13 @@ export const tradeController = {
             entryPrice: order.entryPrice,
             expectedReturn: order.expectedReturn,
             endTime: order.endTime,
-            status: order.status
+            status: order.status,
+            isDemo: order.isDemo
           },
           user: {
-            balance: user.wallet.usdt
+            // Return the matching balance payload context to the frontend UI layout
+            balance: isDemoMode ? user.demoBalance : user.wallet.usdt,
+            isDemoMode: isDemoMode
           }
         }
       });
@@ -665,7 +686,7 @@ export const tradeController = {
 
 
       const [user, balance] = await Promise.all([
-        userModel.findById(userId).select('wallet forceWin totalTrades totalProfit totalLoss'),
+        userModel.findById(userId).select('wallet forceWin totalTrades totalProfit totalLoss demoBalance'),
         // Transaction.getUserBalance(userId, 'USDT')
       ]);
 
@@ -676,6 +697,7 @@ export const tradeController = {
         });
       }
 
+
       res.json({
         success: true,
         data: {
@@ -685,7 +707,7 @@ export const tradeController = {
             eth: user.wallet.eth || 0,
             loanUsdt: user.wallet.loanUsdt || 0
           },
-
+          demoBalance: user.demoBalance || 0,
           lastUpdated: new Date()
         }
       });

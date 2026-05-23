@@ -15,45 +15,48 @@ import hero1 from './hero1.jpg';
 import hero2 from './hero2.jpg';
 import logo from './logo.png';
 
-// REMOTE ASSETS (Coingecko)
+// REMOTE ASSETS (Migrated to CryptoLogos where available)
 const remoteIcons = {
-    tron: "https://assets.coingecko.com/coins/images/1094/small/tron.png",
-    polygon: "https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png",
-    avalanche: "https://assets.coingecko.com/coins/images/12559/small/Avalanche_Circle_RedWhite_Trans.png",
-    near: "https://assets.coingecko.com/coins/images/10365/small/near.png",
-    cosmos: "https://assets.coingecko.com/coins/images/1481/small/cosmos_hub.png",
-    aptos: "https://assets.coingecko.com/coins/images/26455/small/aptos_round.png",
-    sui: "https://assets.coingecko.com/coins/images/26375/small/sui_asset.png",
-    optimism: "https://assets.coingecko.com/coins/images/25244/small/Optimism.png",
-    arbitrum: "https://assets.coingecko.com/coins/images/16547/small/photo_2023-03-29_21.47.00.jpeg",
-    fantom: "https://assets.coingecko.com/coins/images/4001/small/Fantom_round.png",
-    stacks: "https://assets.coingecko.com/coins/images/2069/small/Stacks_logo_full.png",
-    celestia: "https://assets.coingecko.com/coins/images/31967/small/tia.png",
-    uniswap: "https://assets.coingecko.com/coins/images/12504/small/uniswap-uni.png",
-    aave: "https://assets.coingecko.com/coins/images/12645/small/AAVE.png",
-    chainlink: "https://assets.coingecko.com/coins/images/877/small/chainlink-new-logo.png",
-    "lido-dao": "https://assets.coingecko.com/coins/images/13573/small/LDO.png",
-    thorchain: "https://assets.coingecko.com/coins/images/6595/small/RUNE.png",
-    pancakeswap: "https://assets.coingecko.com/coins/images/12632/small/pancakeswap-cake-logo_copy.png",
-    "internet-computer": "https://assets.coingecko.com/coins/images/14495/small/Internet_Computer_logo.png",
-    "fetch-ai": "https://assets.coingecko.com/coins/images/5681/small/Fetch.png",
-    pepe: "https://assets.coingecko.com/coins/images/31358/small/pepe.png",
-    "shiba-inu": "https://assets.coingecko.com/coins/images/11939/small/shiba.png",
-    dogwifhat: "https://assets.coingecko.com/coins/images/33503/small/dogwifhat.png",
-    litecoin: "https://assets.coingecko.com/coins/images/2/small/litecoin.png",
-    "bitcoin-cash": "https://assets.coingecko.com/coins/images/780/small/bitcoin-cash.png",
-    "ethereum-classic": "https://assets.coingecko.com/coins/images/453/small/ethereum-classic.png",
-    stellar: "https://assets.coingecko.com/coins/images/100/small/stellar.png",
-    algorand: "https://assets.coingecko.com/coins/images/4380/small/download.png",
-    vechain: "https://assets.coingecko.com/coins/images/1167/small/Vechain-Logo-700x700.png",
-    "hedera-hashgraph": "https://assets.coingecko.com/coins/images/3688/small/hbar.png",
-    filecoin: "https://assets.coingecko.com/coins/images/12817/small/filecoin.png",
+    dogecoin: "https://cryptologos.cc/logos/dogecoin-doge-logo.png",
+    tron: "https://cryptologos.cc/logos/tron-trx-logo.png",
+    polygon: "https://cryptologos.cc/logos/polygon-matic-logo.png",
+    avalanche: "https://cryptologos.cc/logos/avalanche-avax-logo.png",
+    near: "https://cryptologos.cc/logos/near-protocol-near-logo.png",
+    cosmos: "https://cryptologos.cc/logos/cosmos-atom-logo.png",
+    optimism: "https://cryptologos.cc/logos/optimism-ethereum-op-logo.png",
+    fantom: "https://cryptologos.cc/logos/fantom-ftm-logo.png",
+    stacks: "https://cryptologos.cc/logos/stacks-stx-logo.png",
+    celestia: "https://cryptologos.cc/logos/celestia-tia-logo.png",
+    uniswap: "https://cryptologos.cc/logos/uniswap-uni-logo.png",
+    aave: "https://cryptologos.cc/logos/aave-aave-logo.png",
+    chainlink: "https://cryptologos.cc/logos/chainlink-link-logo.png",
+    "lido-dao": "https://cryptologos.cc/logos/lido-dao-ldo-logo.png",
+    thorchain: "https://cryptologos.cc/logos/thorchain-rune-logo.png",
+    pancakeswap: "https://cryptologos.cc/logos/pancakeswap-cake-logo.png",
+    "internet-computer": "https://cryptologos.cc/logos/internet-computer-icp-logo.png",
+    "fetch-ai": "https://cryptologos.cc/logos/fetch-ai-fet-logo.png",
+    pepe: "https://cryptologos.cc/logos/pepe-pepe-logo.png",
+    "shiba-inu": "https://cryptologos.cc/logos/shiba-inu-shib-logo.png",
+    litecoin: "https://cryptologos.cc/logos/litecoin-ltc-logo.png",
+    "bitcoin-cash": "https://cryptologos.cc/logos/bitcoin-cash-bch-logo.png",
+    "ethereum-classic": "https://cryptologos.cc/logos/ethereum-classic-etc-logo.png",
+    stellar: "https://cryptologos.cc/logos/stellar-xlm-logo.png",
+    algorand: "https://cryptologos.cc/logos/algorand-algo-logo.png",
+    vechain: "https://cryptologos.cc/logos/vechain-vet-logo.png",
+  //  "hedera-hashgraph": "https://cryptologos.cc/logos/hedera-hashgraph-hbar-logo.png",
+     "hedera-hashgraph": "https://assets.coingecko.com/coins/images/3688/small/hbar.png",
+    filecoin: "https://cryptologos.cc/logos/filecoin-fil-logo.png",
+
+    // High-quality Fallbacks for items missing from CryptoLogos catalog
+    sui: "https://s2.coinmarketcap.com/static/img/coins/64x64/20947.png",
+    aptos: "https://s2.coinmarketcap.com/static/img/coins/64x64/21805.png",
+    dogwifhat: "https://s2.coinmarketcap.com/static/img/coins/64x64/28752.png",
+    arbitrum: "https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png",
     default: "https://assets.codepen.io/ss/placeholder.svg"
 };
 
 // EXPORT COMBINED ASSETS
 export const assets = {
-    // UI Elements
     logo,
     hero,
     hero1,
@@ -61,7 +64,6 @@ export const assets = {
     google,
     telegram,
 
-    // Coins (Local Overrides)
     bitcoin,
     ethereum,
     solana,
@@ -70,14 +72,11 @@ export const assets = {
     tether,
     usdc,
     
-    // Aligned keys for logic consistency
     binancecoin: binance,
     ripple: xrp,
-    dogecoin: dogs,
     xrp,
     binance,
     dogs,
 
-    // Spread the remote icons to cover the rest of the list
     ...remoteIcons
 };

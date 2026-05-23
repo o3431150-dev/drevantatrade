@@ -1,12 +1,21 @@
 // components/OrderModal.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { X, TrendingUp, TrendingDown, Clock, Zap, Shield, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "react-toastify";
 import ConvertModal from "./ConvertModal";
-import { assets } from "../assets/assets"
-import { conversionAPI } from "../services/api";
+import { assets } from "../assets/assets";
 import { useAuth } from "../context/AuthContext";
 import { ClipLoader } from "react-spinners";
+
+const DURATIONS = [
+    { id: 30, rate: 12, min: 100, max: 5000 },
+    { id: 60, rate: 18, min: 5000, max: 10000 },
+    { id: 120, rate: 22, min: 15000, max: 20000 },
+    { id: 180, rate: 25, min: 20000, max: 30000 },
+    { id: 240, rate: 28, min: 30000, max: 40000 },
+    { id: 365, rate: 30, min: 40000, max: 60000 }
+];
+
 export default function OrderModal({
     open,
     onClose,
@@ -18,60 +27,65 @@ export default function OrderModal({
     isCheckingEligibility = false,
     userBalance,
     marketPrices
-
 }) {
+    const { 
+        orderLoading, 
+        setOrderLoading, 
+        isDemoMode 
+    } = useAuth();
 
-    // console.log({  userBalance});
-    const { orderLoading, setOrderLoading } = useAuth();
     const [selected, setSelected] = useState(30);
     const [amount, setAmount] = useState("");
-    const [leverage, setLeverage] = useState(1);
+    const [leverage] = useState(1);
     const [error, setError] = useState("");
     const [calculating, setCalculating] = useState(false);
-    // Add state for convert modal
     const [openConvert, setOpenConvert] = useState(false);
-    const [convertAmount, setConvertAmount] = useState("");
-    const [convertFrom, setConvertFrom] = useState("BTC");
-
-
-
-    const durations = [
-        { id: 30, rate: 12, min: 100, max: 5000 },
-        { id: 60, rate: 18, min: 5000, max: 10000 },
-        { id: 90, rate: 20, min: 10000, max: 15000 },
-        { id: 120, rate: 22, min: 15000, max: 20000 },
-        { id: 180, rate: 25, min: 20000, max: 30000 },
-        { id: 240, rate: 28, min: 30000, max: 40000 },
-        { id: 365, rate: 30, min: 40000, max: 60000 }
-
-    ];
 
     useEffect(() => {
         if (open) {
             setAmount("");
             setError("");
-            setLeverage(1);
             setSelected(30);
         }
     }, [open]);
 
-    const selectedItem = durations.find((d) => d.id === selected);
+    const selectedItem = useMemo(() => DURATIONS.find((d) => d.id === selected), [selected]);
+
+    const cryptoAssets = useMemo(() => ({
+        BTC: {
+            icon: assets?.bitcoin,
+            color: "text-orange-500",
+            bgColor: "bg-orange-500/10",
+            borderColor: "border-orange-500/30",
+            price: marketPrices?.BTC?.price || 0,
+            change: marketPrices?.BTC?.change24h || 0,
+            name: "Bitcoin"
+        },
+        ETH: {
+            icon: assets?.ethereum,
+            color: "text-purple-500",
+            bgColor: "bg-purple-500/10",
+            borderColor: "border-purple-500/30",
+            price: marketPrices?.ETH?.price || 0,
+            change: marketPrices?.ETH?.change24h || 0,
+            name: "Ethereum"
+        }
+    }), [marketPrices]);
 
     const calculateReturn = () => {
-        if (!amount || parseFloat(amount) === 0) return 0;
-        const base = parseFloat(amount) * (selectedItem.rate / 100);
+        const numAmount = parseFloat(amount);
+        if (isNaN(numAmount) || numAmount === 0 || !selectedItem) return "0.00";
+        const base = numAmount * (selectedItem.rate / 100);
         return (base * leverage).toFixed(2);
     };
 
-    const calculateFee = () => {
-        if (!amount || parseFloat(amount) === 0) return "0.00";
-        return (parseFloat(amount) * 0.02).toFixed(2);
-    };
+    const calculateFee = () => "0.00";
 
     const calculateTotalPayout = () => {
-        if (!amount || parseFloat(amount) === 0) return "0.00";
+        const numAmount = parseFloat(amount);
+        if (isNaN(numAmount) || numAmount === 0) return "0.00";
         const returnAmount = parseFloat(calculateReturn());
-        return (parseFloat(amount) + returnAmount - calculateFee()).toFixed(2);
+        return (numAmount + returnAmount).toFixed(2);
     };
 
     const handleAmountChange = (value) => {
@@ -81,7 +95,6 @@ export default function OrderModal({
 
         if (value && selectedItem) {
             const numValue = parseFloat(value);
-
             if (numValue < selectedItem.min) {
                 setError(`Minimum amount is $${selectedItem.min}`);
             } else if (numValue > selectedItem.max) {
@@ -91,70 +104,32 @@ export default function OrderModal({
             }
         }
 
-        // Simulate calculation delay
-        setTimeout(() => setCalculating(false), 300);
-    };
-
-    const handleLeverageChange = (value) => {
-        const newLeverage = parseInt(value);
-        setLeverage(newLeverage);
-        setError("");
-
-        if (amount) {
-            const numAmount = parseFloat(amount);
-            if (numAmount > availableAmount * newLeverage) {
-                setError(`Insufficient available balance for ${newLeverage}x leverage`);
-            }
-        }
+        const timer = setTimeout(() => setCalculating(false), 250);
+        return () => clearTimeout(timer);
     };
 
     const handleConfirm = () => {
-        if (!amount || parseFloat(amount) === 0) {
-            setError("Please enter an amount");
+        const numAmount = parseFloat(amount);
+        if (isNaN(numAmount) || numAmount === 0) {
+            setError("Please enter a valid amount");
             return;
         }
-
-        if (error) {
-            return;
-        }
+        if (error) return;
 
         if (onConfirm) {
-            const orderData = {
+            onConfirm({
                 symbol,
                 price,
                 duration: selected,
-                amount: parseFloat(amount),
+                amount: numAmount,
                 leverage,
                 expectedReturn: parseFloat(calculateReturn()),
                 fee: parseFloat(calculateFee()),
                 totalPayout: parseFloat(calculateTotalPayout()),
-                direction
-            };
-            onConfirm(orderData);
+                direction,
+            });
         }
-
         setOrderLoading(true);
-
-
-    };
-
-    // Handle convert confirmation
-    const handleConvert = () => {
-        if (!convertAmount || parseFloat(convertAmount) <= 0) {
-            toast.error("Please enter a valid amount");
-            return;
-        }
-
-        // Here you would typically call an API to convert crypto to USDT
-        toast.success(`Converting ${convertAmount} ${convertFrom} to USDT...`);
-
-        // Simulate conversion
-        setTimeout(() => {
-            toast.success(`Successfully converted ${convertAmount} ${convertFrom} to USDT`);
-            setOpenConvert(false);
-            setConvertAmount("");
-            // You might want to refresh the availableAmount here
-        }, 1500);
     };
 
     const formatCurrency = (value) => {
@@ -166,324 +141,147 @@ export default function OrderModal({
 
     if (!open) return null;
 
-
-    const cryptoAssets = {
-        BTC: {
-            icon: assets.bitcoin, // Your Bitcoin icon component
-            color: "text-orange-500",
-            bgColor: "bg-orange-500/10",
-            borderColor: "border-orange-500/30",
-            price: marketPrices?.BTC?.price || 0,
-            change: marketPrices?.BTC?.change24h || 0,
-            name: "Bitcoin"
-        },
-        ETH: {
-            icon: assets.ethereum, // Your Ethereum icon component
-            color: "text-purple-500",
-            bgColor: "bg-purple-500/10",
-            borderColor: "border-purple-500/30",
-            price: marketPrices?.ETH?.price || 0,
-            change: marketPrices?.ETH?.change24h || 0,
-            name: "Ethereum"
-        }
-    };
-
     return (
         <>
-            {/* Main Order Modal */}
-            <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-2 sm:p-4 mb-25  z-50 backdrop-blur-sm  sm:mb-0">
+            <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-2 sm:p-4 z-50 backdrop-blur-sm">
                 <div
-                    className="bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto  [scrollbar-width:none] [-ms-overflow-style:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+                    className="bg-white dark:bg-gray-900 rounded-xl sm:rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
                     onClick={(e) => e.stopPropagation()}
                 >
-                    {/* Header */}
-                    <div className="sticky top-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-4">
+                    <div className="sticky top-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 py-4 z-10">
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${direction === 'buy' ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'
-                                    }`}>
-                                    {direction === 'buy' ?
-                                        <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" /> :
+                                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${direction === 'buy' ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
+                                    {direction === 'buy' ? 
+                                        <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" /> : 
                                         <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 dark:text-red-400" />
                                     }
                                 </div>
                                 <div>
-                                    <h2 className="font-bold text-lg sm:text-xl">
-                                        {direction === 'buy' ? 'Buy' : 'Sell'} {symbol}
+                                    <h2 className="font-bold text-lg sm:text-xl flex items-center gap-1.5">
+                                        {direction === 'buy' ? 'Buy' : 'Sell'} {symbol} 
+                                        {isDemoMode && <span className="text-[10px] font-normal text-amber-500 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded">Demo</span>}
                                     </h2>
-                                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
-                                        ${formatCurrency(price)}
-                                    </p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">${formatCurrency(price)}</p>
                                 </div>
                             </div>
-                            <button
-                                onClick={onClose}
-                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
-                            >
+                            <button onClick={onClose} className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
                                 <X className="w-5 h-5 sm:w-6 sm:h-6" />
                             </button>
                         </div>
                     </div>
 
-                    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-                        {/* Available Balance - Updated with Convert Button */}
-                        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-                            <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm text-green-700 dark:text-green-300">
-                                    Available USDT Balance
-                                </span>
-                                <span className="font-bold text-green-700 dark:text-green-300">
-                                    {formatCurrency(availableAmount)} USDT
-                                </span>
+                    <div className="p-4 sm:p-6 space-y-5">
+                        <div className="bg-green-50 dark:bg-green-900/10 border border-green-100 dark:border-green-900/30 rounded-xl p-3.5">
+                            <div className="flex items-center justify-between text-sm">
+                                <span className="text-green-700 dark:text-green-400">Available Balance</span>
+                                <span className="font-bold text-green-700 dark:text-green-300">{formatCurrency(availableAmount)} USDT</span>
                             </div>
-
-                            {availableAmount <= 0 && (
-                                <div className="flex items-center justify-between mt-2">
-                                    <div className="text-xs text-green-600 dark:text-green-400">
-                                        Deposit or convert crypto to start trading
-                                    </div>
-                                    <button
-                                        onClick={() => setOpenConvert(true)}
-                                        className="flex items-center gap-1 text-xs px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
-                                    >
-                                        <RefreshCw className="w-3 h-3" />
-                                        Convert
+                            <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-green-200/40 dark:border-green-900/40 text-xs">
+                                <span className="text-gray-500 dark:text-gray-400">
+                                    {availableAmount < (selectedItem?.min || 0) ? `Minimum allocation requires $${selectedItem?.min}` : "Standard profile verification rules apply."}
+                                </span>
+                                {!isDemoMode && (
+                                    <button onClick={() => setOpenConvert(true)} className="flex items-center gap-1 font-medium text-green-600 dark:text-green-400 hover:underline">
+                                        <RefreshCw className="w-3 h-3" /> Convert Funds
                                     </button>
-                                </div>
-                            )}
-
-                            {availableAmount > 0 && (
-                                <div className="flex items-center justify-between mt-2">
-                                    {/* availableAmount < selectedItem.min &&
-                                    <div className="text-xs text-amber-600 dark:text-amber-400">
-                                        Minimum investment is ${selectedItem.min}
-                                    </div> */}
-
-                                    {/* {availableAmount < selectedItem.min ? `Minimum investment is ${selectedItem.min}`:'add funds to trade'} */}
-
-                                    {availableAmount < selectedItem.min ?
-                                        <div className="text-xs text-amber-600 dark:text-amber-400">
-                                            Minimum investment is ${selectedItem.min}
-                                        </div>
-                                        :
-                                        <div className="text-xs text-white-600 dark:text-white-400">
-                                            You can add fund to increase <br />your trading capacity.
-                                        </div>
-
-                                    }
-
-
-                                    <button
-                                        onClick={() => setOpenConvert(true)}
-                                        className="flex items-center gap-1 text-xs px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors"
-                                    >
-                                        <RefreshCw className="w-3 h-3" />
-                                        Add Funds
-                                    </button>
-                                </div>
-                            )}
-
-
-
+                                )}
+                            </div>
                         </div>
-                       
-                        
 
-
-                        {/* Duration Selection */}
                         <div>
-                            <label className="block text-sm sm:text-base font-medium mb-3">Select Duration</label>
-                            <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                                {durations.map((item) => (
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Term Duration</label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {DURATIONS.map((item) => (
                                     <button
                                         key={item.id}
                                         onClick={() => {
-                                            setError('')
-                                            setAmount('')
-                                            setSelected(item.id)
+                                            setError('');
+                                            setAmount('');
+                                            setSelected(item.id);
                                         }}
-                                        className={`p-3 sm:p-4 rounded-lg border transition-colors ${selected === item.id
-                                            ? "border-green-500 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400"
-                                            : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
-                                            }`}
+                                        className={`p-3 rounded-xl border text-center transition-all ${selected === item.id
+                                            ? "border-green-500 bg-green-500/5 text-green-600 dark:text-green-400 font-semibold"
+                                            : "border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:hover:border-gray-700"
+                                        }`}
                                     >
-                                        <div className="text-center">
-                                            <div className="font-bold text-base sm:text-lg">{item.id}s</div>
-                                            <div className="text-xs sm:text-sm mt-1 sm:mt-2">+{item.rate}%</div>
-                                        </div>
+                                        <div className="text-sm">{item.id}s</div>
+                                        <div className="text-xs opacity-80 mt-0.5">+{item.rate}%</div>
                                     </button>
                                 ))}
                             </div>
-                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-2 sm:mt-3 text-center">
-                                Min: ${selectedItem.min} • Max: ${selectedItem.max}
-                            </p>
                         </div>
 
-                        {/* Leverage Selection */}
                         <div>
-                            <label className="block text-sm sm:text-base font-medium mb-2">Leverage</label>
-                            <div className="space-y-3">
-                                <input
-                                    disabled={true}
-                                    type="range"
-                                    min="1"
-                                    max="20"
-                                    value={leverage}
-                                    onChange={(e) => handleLeverageChange(e.target.value)}
-                                    className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-green-500"
-                                />
-                                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
-                                    {[1, 5, 10, 15, 20].map((value) => (
-                                        <button
-
-                                            key={value}
-                                            onClick={() => {
-                                                // handleLeverageChange(value)
-                                                if (value > 1) {
-                                                    toast.warn("Leverage trading is currently disabled");
-                                                }
-                                            }}
-                                            //  disabled={true}
-                                            className={`px-2 py-1 rounded ${leverage === value ? 'bg-green-500 text-white' : 'hover:text-green-400'}`}
-                                        >
-                                            {value}x
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                            {leverage > 1 && (
-                                <div className="mt-2 text-sm text-amber-600 dark:text-amber-400">
-                                    <AlertCircle className="w-4 h-4 inline mr-1" />
-                                    Higher leverage increases both potential profit and risk
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Amount Input */}
-                        <div>
-                            <label className="block text-sm sm:text-base font-medium mb-2">
-                                Investment Amount (USDT)
-                            </label>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Order Position Size (USDT)</label>
                             <div className="relative">
+                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
                                 <input
                                     value={amount}
                                     onChange={(e) => handleAmountChange(e.target.value)}
-                                    placeholder="Enter amount"
+                                    placeholder={`Range: ${selectedItem?.min} - ${selectedItem?.max}`}
                                     type="number"
-                                    min={selectedItem.min}
-                                    max={selectedItem.max}
-                                    className="w-full p-3 sm:p-4 pl-10 text-base sm:text-lg rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    className="w-full p-3 pl-8 text-base rounded-xl border border-gray-200 dark:border-gray-400 bg-transparent focus:outline-none focus:border-green-500 transition-colors"
                                 />
-                                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-lg">
-                                    $
-                                </div>
                             </div>
-                            {error && (
-                                <p className="text-red-500 text-sm sm:text-base mt-2">{error}</p>
-                            )}
+                            {error && <p className="text-red-500 text-xs mt-2 flex items-center gap-1"><AlertCircle className="w-3.5 h-3.5" /> {error}</p>}
                         </div>
 
-                        {/* Effective Position */}
-                        {leverage > 1 && amount && (
-                            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-3 border border-green-200 dark:border-green-800">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-sm text-green-700 dark:text-green-300">Effective Position</span>
-                                    <span className="font-bold text-green-700 dark:text-green-300">
-                                        ${formatCurrency(amount * leverage)}
-                                    </span>
-                                </div>
-                                <div className="text-xs text-green-600 dark:text-green-400 mt-1">
-                                    {amount} × {leverage} leverage
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Order Summary */}
-                        <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 sm:p-5 space-y-3 sm:space-y-4">
-                            <h3 className="font-medium text-gray-900 dark:text-white">Order Summary</h3>
-
+                        <div className="bg-gray-50 dark:bg-gray-800/40 rounded-xl p-4 space-y-2.5 text-sm">
                             {calculating ? (
-                                <div className="text-center py-4">
-                                    <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-green-500"></div>
-                                    <p className="text-sm text-gray-500 mt-2">Calculating...</p>
+                                <div className="text-center py-2 text-gray-400 text-xs flex items-center justify-center gap-2">
+                                    <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-green-500"></div> Re-pricing allocation...
                                 </div>
                             ) : (
                                 <>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">Expected Return</span>
-                                        <span className="font-medium text-base sm:text-lg text-green-600 dark:text-green-400">
-                                            +${calculateReturn()}
-                                        </span>
+                                    <div className="flex justify-between text-gray-500">
+                                        <span>Yield Return</span>
+                                        <span className="text-green-500 font-medium">+${formatCurrency(calculateReturn())}</span>
                                     </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="text-sm text-gray-600 dark:text-gray-400">Trading Fee (2%)</span>
-                                        <span className="font-medium text-base sm:text-lg text-red-500 dark:text-red-40">
-                                            -${calculateFee()}
-                                        </span>
+                                    <div className="flex justify-between text-gray-500">
+                                        <span>Processing Fee (Free)</span>
+                                        <span className="text-green-500 font-medium">$0.00</span>
                                     </div>
-                                    <div className="pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-600">
-                                        <div className="flex justify-between items-center">
-                                            <span className="font-medium text-base sm:text-lg">Total Payout</span>
-                                            <span className="font-bold text-lg sm:text-xl text-gray-900 dark:text-white">
-                                                ${calculateTotalPayout()}
-                                            </span>
-                                        </div>
+                                    <div className="pt-2 border-t border-gray-200 dark:border-gray-800 flex justify-between font-semibold text-base">
+                                        <span>Total Account Payout</span>
+                                        <span>${formatCurrency(calculateTotalPayout())}</span>
                                     </div>
                                 </>
                             )}
                         </div>
 
-                        {/* Features */}
-                        <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
-                            <div className="flex items-center gap-2">
-                                <Zap className="w-4 h-4" />
-                                <span>Fast Execution</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Shield className="w-4 h-4" />
-                                <span>Secure</span>
-                            </div>
-                        </div>
-
-                        {/* Confirm Button */}
                         <button
                             onClick={handleConfirm}
                             disabled={!!error || !amount || parseFloat(amount) === 0 || isCheckingEligibility || orderLoading}
-                            className={`w-full py-3 sm:py-4 rounded-lg font-medium text-base sm:text-lg text-white transition-colors flex items-center justify-center gap-2 ${direction === 'buy'
-                                ? 'bg-green-500 hover:bg-green-600'
-                                : 'bg-red-500 hover:bg-red-600'
-                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                            className={`w-full py-3.5 rounded-xl font-medium text-white transition-all flex items-center justify-center gap-2 shadow-sm ${direction === 'buy' ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'} disabled:opacity-40 disabled:cursor-not-allowed`}
                         >
                             {isCheckingEligibility ? (
                                 <>
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                    Checking Eligibility...
+                                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                                    Evaluating Eligibility...
                                 </>
-                            ) : ( orderLoading ? (
+                            ) : orderLoading ? (
                                 <>
-                                    <ClipLoader color="#ffffff" size={20} />
-                                    Placing Order...
+                                    <ClipLoader color="#ffffff" size={16} />
+                                    Routing To Ledger...
                                 </>
-                            ) :
-                                `Confirm ${direction === 'buy' ? 'Buy' : 'Sell'} Order`
+                            ) : (
+                                `Confirm Execution (${direction === 'buy' ? 'Buy' : 'Sell'})`
                             )}
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Convert Modal */}
-            {openConvert && (
+            {openConvert && !isDemoMode && (
                 <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
                     <ConvertModal
                         open={openConvert}
                         onClose={() => setOpenConvert(false)}
                         onConvertSuccess={(conversionData) => {
-                            // Handle successful conversion
                             toast.success(`Converted ${conversionData.amount} ${conversionData.from} to USDT`);
-                            // You might want to refresh user balance here
                         }}
-                        cryptoAssets={cryptoAssets} // Pass the configuration
+                        cryptoAssets={cryptoAssets}
                         userBalance={userBalance}
                     />
                 </div>

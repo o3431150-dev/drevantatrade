@@ -25,6 +25,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 
 const OrdersDisplay = ({ tradeHistory }) => {
+ 
   const { activeOrders, completedOrders, handleOrderComplete, stats, refreshOrders, isLoading } = useOrders();
   const { prices } = usePriceFeed();
   let x = tradeHistory ? 'completed' :'active'
@@ -47,6 +48,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
   };
 
   const calculateLivePnl = (order) => {
+   
     const currentPrice = getCurrentPrice(order.coinId);
     if (!currentPrice || !order.entryPrice) return { pnl: 0, percentage: 0 };
     
@@ -387,7 +389,10 @@ const OrdersDisplay = ({ tradeHistory }) => {
             )
           ) : (
             // Completed Orders
+
+            
             completedOrders.length === 0 ? (
+              
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
