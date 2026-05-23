@@ -445,7 +445,7 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     }
 
     // PRODUCTION FIX: Turn off runValidators for this atomic math step
-    // This stops 'min: 0' validation traps from blocking your server updates!
+    
     const updatedUser = await userModel.findOneAndUpdate(
       { _id: targetUserId },
       updateOperation,
