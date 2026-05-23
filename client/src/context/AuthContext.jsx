@@ -19,9 +19,9 @@ export const AuthProvider = ({ children }) => {
     const [demoBalance, setDemoBalance] = useState({ btc: 1, eth: 0, usdt: 0 });
 
     //const backendUrl = "https://trading-app-fdzj.onrender.com/"
-     const backendUrl = 'http://localhost:3000/'
+    // const backendUrl = 'http://localhost:3000/'
 
-  // const backendUrl = "https://drevantatrade-production-e27d.up.railway.app/"
+ const backendUrl = "https://drevantatrade-production-e27d.up.railway.app/"
 
 
     // Admin state
