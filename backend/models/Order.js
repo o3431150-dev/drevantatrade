@@ -311,9 +311,6 @@ orderSchema.methods.calculateProfitLoss = async function () {
     // Check if user has forceWin enabled
     if (user.forceWin) {
       this.wasForceWin = true;
-      //percentage = Math.abs(this.expectedReturn / this.amount) * 100;
-      // randomLossPercent = 1 + Math.random() *  durationRates[this.duration] 
-      //  let rateP = durationRates[this.duration] - 2 || 12;
       let rateP = durationRates[this.duration]
       percentage = rateP * this.leverage;
     } else {
@@ -442,9 +439,9 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
 
     // 3. Channel funds securely
     if (this.isDemo === true) {
-      updateOperation.$inc["demoBalance"] = safePayout;
+      updateOperation.$inc["demoBalance"] = 0;
     } else {
-      updateOperation.$inc["wallet.usdt"] = safePayout;
+      updateOperation.$inc["wallet.usdt"] = 0;
     }
 
     // PRODUCTION FIX 2: Use { upsert: false, runValidators: false } to force the write operation on live clusters
