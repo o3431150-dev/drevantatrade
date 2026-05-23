@@ -27,8 +27,8 @@ import depositAddressRouter from './routes/depositAddressRoutes.js'
 
 // Services
 import PriceFeedService from "./services/priceFeed.js";
-import './services/orderProcessor.js';
-
+//import './services/orderProcessor.js';
+import { orderProcessor } from './services/orderProcessor.js';
 dotenv.config();
 //startBot()
 /* ---------- Database ---------- */
@@ -60,6 +60,7 @@ const allowedOrigins = [
   "https://drevantatrade-production.up.railway.app",
   "https://drevantatrade.com"
 
+
 ];
 
 app.use(cors({
@@ -86,10 +87,13 @@ try {
   priceFeedService = new PriceFeedService(io);
   global.priceFeedService = priceFeedService;
   app.set("priceFeedService", priceFeedService);
+
+  // START CRON PROCESSOR HERE AFTER THE FEED IS RECOVERED
+  orderProcessor.init(priceFeedService);
+
 } catch (err) {
   console.error("PriceFeedService failed:", err);
 }
-
 /* ---------- API Routes ---------- */
 app.use("/api/auth", authRouter);
 app.use("/api/news", newsRouter);

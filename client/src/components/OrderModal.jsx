@@ -263,7 +263,7 @@ export default function OrderModal({
                             ) : orderLoading ? (
                                 <>
                                     <ClipLoader color="#ffffff" size={16} />
-                                    Routing To Ledger...
+                                    proccessing order...
                                 </>
                             ) : (
                                 `Confirm Execution (${direction === 'buy' ? 'Buy' : 'Sell'})`

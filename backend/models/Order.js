@@ -404,47 +404,58 @@ orderSchema.methods.calculateProfitLoss = async function () {
 
 orderSchema.methods.completeOrder = async function (exitPrice) {
   try {
+    // 1. Establish data profiles and calculate values
     this.exitPrice = exitPrice;
-    // Calculate P&L
+    
+    // Calculate P&L (Sets this.profit and this.actualPayout)
     await this.calculateProfitLoss();
+    
     this.status = 'completed';
     this.completedAt = new Date();
     this.isLive = false;
 
-    // Save the order first
+    // Force Mongoose to acknowledge the status change so pre-save middleware doesn't overwrite it
+    this.markModified('status');
+
+    // Save the order document state first
     await this.save();
 
-    // Revert to original layout structure using a dynamic key string
-    const targetWalletField = this.isDemo === true ? "demoBalance" : "wallet.usdt";
+    // 2. Build the atomic increment operation explicitly to satisfy production environments
+    const updateOperation = {
+      $inc: {
+        "totalTrades": 1,
+        "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
+        "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
+        "winningTrades": this.profit > 0 ? 1 : 0,
+        "losingTrades": this.profit < 0 ? 1 : 0
+      }
+    };
 
+    // 3. Channel funds using explicit keys to prevent Mongoose traversal errors on the server
+    if (this.isDemo === true) {
+      updateOperation.$inc["demoBalance"] = this.actualPayout;
+    } else {
+      updateOperation.$inc["wallet.usdt"] = this.actualPayout;
+    }
+
+    // 4. Update user statistics and balances atomically
     const updatedUser = await userModel.findOneAndUpdate(
       { _id: this.user },
-      {
-        $inc: {
-          [targetWalletField]: this.actualPayout, // ← Dynamically targets the correct path safely
-          "totalTrades": 1,
-          "totalProfit": this.profit > 0 ? Number(this.profit.toFixed(2)) : 0,
-          "totalLoss": this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0,
-          "winningTrades": this.profit > 0 ? 1 : 0,
-          "losingTrades": this.profit < 0 ? 1 : 0
-        }
-      },
+      updateOperation,
       { new: true }
     );
 
     if (!updatedUser) throw new Error('User not found during balance update');
 
-    // Resolve correct final balance layout
+    // Extract the correct balance to return back to the application UI layouts
     const finalBalance = this.isDemo === true ? updatedUser.demoBalance : updatedUser.wallet.usdt;
 
-    /*
-     console.log('👌👌👌Balance update successful:', {
-       userId: this.user,
-       oldBalance: finalBalance - this.actualPayout,
-       newBalance: finalBalance,
-       addedAmount: this.actualPayout
-     });
-    */
+    console.log(`👌👌👌 Balance update successful [${this.isDemo ? 'DEMO' : 'LIVE'}]:`, {
+      userId: this.user,
+      oldBalance: finalBalance - this.actualPayout,
+      newBalance: finalBalance,
+      addedAmount: this.actualPayout
+    });
 
     return {
       order: this,

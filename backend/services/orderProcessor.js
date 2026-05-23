@@ -1,58 +1,62 @@
-// services/orderProcessor.js
 import cron from 'node-cron';
 import Order from '../models/Order.js';
 
 class OrderProcessor {
   constructor() {
     this.isProcessing = false;
+    this.priceFeedService = null; // Will be injected from server.js
+  }
+
+  // Inject the live server price feed service
+  init(priceFeedServiceInstance) {
+    this.priceFeedService = priceFeedServiceInstance;
     this.startAutoProcessor();
   }
 
-  // Process expired orders
   async processExpiredOrders() {
-    if (this.isProcessing) {
-      console.log('Already processing orders, skipping...');
-      return;
-    }
-
+    if (this.isProcessing) return;
     this.isProcessing = true;
     
     try {
-      const results = await Order.processExpiredOrders();
-      
-      if (results.length > 0) {
-        const successful = results.filter(r => r.success).length;
-        const failed = results.filter(r => !r.success).length;
-        
-        console.log(`Order processor: Processed ${successful} orders successfully, ${failed} failed`);
-        
-        // Log details for failed orders
-        if (failed > 0) {
-          console.error('Failed orders:', results.filter(r => !r.success));
+      const expiredOrders = await Order.find({
+        status: 'active',
+        endTime: { $lte: new Date() }
+      });
+
+      if (expiredOrders.length > 0) {
+        for (const order of expiredOrders) {
+          try {
+            // PRODUCTION FIX: Dynamically pull the REAL live market price from your feed!
+            let currentMarketPrice = order.entryPrice; // default fallback
+            
+            if (this.priceFeedService) {
+              // Try pulling the asset rate (e.g., "BNBUSDT" or "BTCUSDT")
+              const livePriceData = this.priceFeedService.getPrice(order.symbol);
+              if (livePriceData && livePriceData.price) {
+                currentMarketPrice = parseFloat(livePriceData.price);
+              }
+            }
+
+            console.log(`[Processor] Finalizing ${order.isDemo ? 'DEMO' : 'LIVE'} order ${order._id}. Passing Live Exit Price: ${currentMarketPrice}`);
+
+            await order.completeOrder(currentMarketPrice);
+          } catch (orderError) {
+            console.error(`[Processor] Failed resolving order ${order._id}:`, orderError.message);
+          }
         }
       }
-      
     } catch (error) {
-      console.error('Error in order processor:', error);
+      console.error('Error in background order processor:', error);
     } finally {
       this.isProcessing = false;
     }
   }
 
-  // Start automatic processing
   startAutoProcessor() {
-    // Process orders every 10 seconds
     cron.schedule('*/10 * * * * *', () => {
       this.processExpiredOrders();
     });
-    
-    console.log('Order processor started: checking every 10 seconds');
-  }
-
-  // Stop automatic processing
-  stopAutoProcessor() {
-    // You can implement this if needed
-    console.log('Order processor stopped');
+    console.log('✅ Order background cron processor bound safely to real-time price feeds.');
   }
 }
 
