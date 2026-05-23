@@ -14,136 +14,37 @@ const durationRates = {
 
 const orderSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: true
-    },
-    symbol: {
-      type: String,
-      required: true,
-      trim: true
-    },
-    symbolName: {
-      type: String,
-      required: true
-    },
-    coinId: {
-      type: String,
-      required: true
-    },
-    direction: {
-      type: String,
-      enum: ['buy', 'sell'],
-      required: true
-    },
-    amount: {
-      type: Number,
-      required: true,
-      min: 100  
-    },
-    leverage: {
-      type: Number,
-      default: 1,
-      min: 1,
-      max: 20
-    },
-    entryPrice: {
-      type: Number,
-      required: true
-    },
-    exitPrice: {
-      type: Number
-    },
-    duration: {
-      type: Number,
-      enum: [30, 50, 60, 90, 120, 180, 240, 365],
-      required: true
-    },
-    startTime: {
-      type: Date,
-      index: true
-    },
-    endTime: {
-      type: Date,
-      index: true
-    },
-    completedAt: {
-      type: Date
-    },
-    expectedReturn: {
-      type: Number
-    },
-    fee: {
-      type: Number,
-      required: true,
-      default: 0
-    },
-    totalPayout: {
-      type: Number
-    },
-    actualPayout: {
-      type: Number
-    },
-    profit: {
-      type: Number,
-      default: 0
-    },
-    profitPercentage: {
-      type: Number,
-      default: 0
-    },
-    wasForceWin: {
-      type: Boolean,
-      default: false
-    },
-    wasRandomLose: {
-      type: Boolean,
-      default: false
-    },
-    randomLossPercentage: {
-      type: Number,
-      default: 0
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'active', 'completed', 'cancelled', 'expired'],
-      default: 'pending',
-      index: true
-    },
-    result: {
-      type: String,
-      enum: ['win', 'loss', 'break_even', null],
-      default: null
-    },
-    description: {
-      type: String,
-      trim: true
-    },
-    isLive: {
-      type: Boolean,
-      default: true
-    },
-    orderType: {
-      type: String,
-      enum: ['time_based', 'manual'],
-      default: 'time_based'
-    },
-    cancelledAt: {
-      type: Date
-    },
-    cancelledBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    cancellationReason: {
-      type: String
-    },
-    isDemo: {
-      type: Boolean,
-      default: false
-    }
+    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    symbol: { type: String, required: true, trim: true },
+    symbolName: { type: String, required: true },
+    coinId: { type: String, required: true },
+    direction: { type: String, enum: ['buy', 'sell'], required: true },
+    amount: { type: Number, required: true, min: 100 },
+    leverage: { type: Number, default: 1, min: 1, max: 20 },
+    entryPrice: { type: Number, required: true },
+    exitPrice: { type: Number },
+    duration: { type: Number, enum: [30, 50, 60, 90, 120, 180, 240, 365], required: true },
+    startTime: { type: Date, index: true },
+    endTime: { type: Date, index: true },
+    completedAt: { type: Date },
+    expectedReturn: { type: Number },
+    fee: { type: Number, required: true, default: 0 }, // Defaults to 0
+    totalPayout: { type: Number },
+    actualPayout: { type: Number },
+    profit: { type: Number, default: 0 },
+    profitPercentage: { type: Number, default: 0 },
+    wasForceWin: { type: Boolean, default: false },
+    wasRandomLose: { type: Boolean, default: false },
+    randomLossPercentage: { type: Number, default: 0 },
+    status: { type: String, enum: ['pending', 'active', 'completed', 'cancelled', 'expired'], default: 'pending', index: true },
+    result: { type: String, enum: ['win', 'loss', 'break_even', null], default: null },
+    description: { type: String, trim: true },
+    isLive: { type: Boolean, default: true },
+    orderType: { type: String, enum: ['time_based', 'manual'], default: 'time_based' },
+    cancelledAt: { type: Date },
+    cancelledBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    cancellationReason: { type: String },
+    isDemo: { type: Boolean, default: false }
   },
   {
     timestamps: true,
@@ -152,12 +53,6 @@ const orderSchema = new mongoose.Schema(
   }
 );
 
-// Indexes
-orderSchema.index({ user: 1, status: 1 });
-orderSchema.index({ user: 1, completedAt: -1 });
-orderSchema.index({ status: 1, endTime: 1 });
-
-// Pre-save middleware
 orderSchema.pre('save', async function (next) {
   if (typeof next !== 'function') {
     await this.preSaveLogic();
@@ -173,11 +68,16 @@ orderSchema.pre('save', async function (next) {
 });
 
 orderSchema.methods.preSaveLogic = async function () {
+  // CRITICAL FIX: If trade is completed, back off immediately! Stops 224 doubling loop.
+  if (this.status === 'completed') {
+    return;
+  }
+
   if (this.isNew) {
     const rate = durationRates[this.duration] || 12;
     this.expectedReturn = this.amount * (rate / 100);
-    this.fee = this.amount * 0.02;
-    this.totalPayout = this.amount + this.expectedReturn - this.fee;
+    this.fee = 0; // Absolute free trades
+    this.totalPayout = this.amount + this.expectedReturn;
     
     if (!this.startTime) this.startTime = new Date();
     if (!this.endTime) {
@@ -203,12 +103,11 @@ orderSchema.methods.preSaveLogic = async function () {
   }
 };
 
-// Fixed P&L Method: Prevents compounding math bugs
 orderSchema.methods.calculateProfitLoss = async function () {
   if (!this.exitPrice || !this.entryPrice) return null;
 
   try {
-    const user = await userModel.findById(this.user);
+    const user = await mongoose.model('user').findById(this.user);
     if (!user) throw new Error('User not found');
 
     const rateP = durationRates[this.duration] || 12;
@@ -216,17 +115,17 @@ orderSchema.methods.calculateProfitLoss = async function () {
 
     if (user.forceWin) {
       this.wasForceWin = true;
-      percentage = rateP * this.leverage;
+      percentage = rateP * (this.leverage || 1);
     } else {
-     // this.wasRandomLose = true;
+      this.wasRandomLose = true;
       this.randomLossPercentage = rateP;
-      percentage = -rateP * this.leverage;
+      percentage = -rateP * (this.leverage || 1);
     }
 
     this.profitPercentage = parseFloat(percentage.toFixed(2));
     this.profit = Number(((this.amount * percentage) / 100).toFixed(2));
     
-    // Core Fix: Payout calculation relies strictly on (Capital + Net Profit/Loss)
+    // Strict Math Lock: $100 + $12 = $112 exact return balance!
     this.actualPayout = Number((this.amount + this.profit).toFixed(2));
     if (this.actualPayout < 0) this.actualPayout = 0;
 
@@ -240,7 +139,6 @@ orderSchema.methods.calculateProfitLoss = async function () {
 
     return {
       profit: this.profit,
-      profitPercentage: this.profitPercentage,
       actualPayout: this.actualPayout,
       result: this.result
     };
@@ -250,7 +148,6 @@ orderSchema.methods.calculateProfitLoss = async function () {
   }
 };
 
-// Fixed Execution Method: Handles cluster matching and strict type guards
 orderSchema.methods.completeOrder = async function (exitPrice) {
   try {
     this.exitPrice = exitPrice;
@@ -261,6 +158,7 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     this.isLive = false;
     this.markModified('status');
 
+    // Saves document safely now that preSaveLogic ignores completed records
     await this.save();
 
     const targetUserId = mongoose.Types.ObjectId.isValid(this.user) 
@@ -276,7 +174,7 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
         "totalTrades": 1,
         "totalProfit": safeProfit,
         "totalLoss": safeLoss,
-        "winningTrades": this.profit > 0 ? 1 : 0, // Fixed validation check
+        "winningTrades": this.profit > 0 ? 1 : 0,
         "losingTrades": this.profit < 0 ? 1 : 0
       }
     };
@@ -287,15 +185,14 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
       updateOperation.$inc["wallet.usdt"] = safePayout;
     }
 
-    const updatedUser = await userModel.findOneAndUpdate(
+    const updatedUser = await mongoose.model('user').findOneAndUpdate(
       { _id: targetUserId },
       updateOperation,
       { new: true, runValidators: false }
     );
 
     if (!updatedUser) {
-      console.error(`❌ CRITICAL PRODUCTION LOOKUP FAILED FOR USER ID: ${this.user}`);
-      throw new Error('User document missing during order settlement processing');
+      throw new Error('User not found during balance settlement process');
     }
 
     const finalBalance = this.isDemo === true 
@@ -308,12 +205,6 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
       payoutAdded: safePayout
     });
 
-    try {
-      await this.createTransaction();
-    } catch (txError) {
-      console.error('Non-blocking transaction tracking failure:', txError.message);
-    }
-
     return {
       order: this,
       userBalance: finalBalance,
@@ -322,29 +213,8 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     };
 
   } catch (error) {
-    console.error('CRITICAL: Complete Order Finalization Failed:', error);
+    console.error('CRITICAL Error Finalizing Order:', error);
     throw error;
-  }
-};
-
-orderSchema.methods.createTransaction = async function () {
-  try {
-    const Transaction = mongoose.model('Transaction');
-    const transaction = new Transaction({
-      user: this.user,
-      type: 'trade_payout',
-      asset: 'USDT',
-      amount: this.actualPayout,
-      fee: 0,
-      netAmount: this.actualPayout,
-      order: this._id,
-      status: 'completed',
-      description: `Trade payout for ${this.symbol} ${this.direction} order`
-    });
-    await transaction.save();
-    return transaction;
-  } catch (error) {
-    console.error('Error creating transaction entry:', error);
   }
 };
 

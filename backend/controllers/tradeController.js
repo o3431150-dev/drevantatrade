@@ -6,18 +6,13 @@ import Transaction from "../models/Transaction.js";
 
 
 export const tradeController = {
-  // Place a new order with balance check - FIXED VERSION\
-  // controllers/tradeController.js - FIXED placeOrder method
   placeOrder: async (req, res) => {
     try {
       const userId = req.user.id;
-      // Extract isDemo along with the other parameters
       const { symbol, symbolName, coinId, direction, amount, leverage = 1, duration, entryPrice, isDemo } = req.body;
 
-      // Convert isDemo explicitly to a boolean value
       const isDemoMode = isDemo === true || isDemo === 'true';
 
-      // Validations (keep your existing validation code)
       const requiredFields = ['symbol', 'direction', 'amount', 'duration'];
       const missingFields = requiredFields.filter(field => !req.body[field]);
       if (missingFields.length > 0) {
@@ -27,35 +22,26 @@ export const tradeController = {
         });
       }
 
-      // Calculate required balance
-      const feeRate = 0.02;
-      const fee = parseFloat(amount) * feeRate;
-      const requiredBalance = parseFloat(amount) 
+      // Calculate required balance - FEES REMOVED
+      const requiredBalance = parseFloat(amount);
 
-      // Dynamic setups for Atomic operation based on the trade profile
       const filter = { _id: userId };
       const updatePayload = {
-        $inc: { "totalTrades": 1 } // Increments for both modes
+        $inc: { "totalTrades": 1 }
       };
 
       if (isDemoMode) {
-        // Demo Mode rules
         filter["demoBalance"] = { $gte: requiredBalance };
         updatePayload.$inc["demoBalance"] = -requiredBalance;
       } else {
-        // Live Mode rules
         filter["wallet.usdt"] = { $gte: requiredBalance };
         updatePayload.$inc["wallet.usdt"] = -requiredBalance;
       }
 
-      // Dynamic update operation execution
       const user = await userModel.findOneAndUpdate(
         filter,
         updatePayload,
-        {
-          new: true,
-          runValidators: true
-        }
+        { new: true, runValidators: true }
       );
 
       if (!user) {
@@ -67,10 +53,8 @@ export const tradeController = {
         });
       }
 
-      // Force leverage to 1 if it's disabled/restricted on the profile layout
       const activeLeverage = isDemoMode ? 1 : parseInt(leverage);
 
-      // Create order calculation parameters
       const durationRates = {
         30: 12, 50: 12, 60: 18, 90: 20, 120: 22, 180: 25, 240: 28, 365: 30
       };
@@ -87,10 +71,10 @@ export const tradeController = {
         leverage: activeLeverage,
         duration: parseInt(duration),
         entryPrice: parseFloat(entryPrice),
-        fee: fee,
+        fee: 0, // Set to 0 permanently
         expectedReturn: expectedReturn,
         status: 'active',
-        isDemo: isDemoMode, // Save the state directly inside the order document schema
+        isDemo: isDemoMode,
         startTime: new Date(),
         endTime: new Date(Date.now() + (parseInt(duration) * 1000))
       };
@@ -115,7 +99,6 @@ export const tradeController = {
             isDemo: order.isDemo
           },
           user: {
-            // Return the matching balance payload context to the frontend UI layout
             balance: isDemoMode ? user.demoBalance : user.wallet.usdt,
             isDemoMode: isDemoMode
           }
