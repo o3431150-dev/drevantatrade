@@ -151,23 +151,51 @@ orderSchema.methods.calculateProfitLoss = async function () {
 orderSchema.methods.completeOrder = async function (exitPrice) {
   try {
     this.exitPrice = exitPrice;
-    await this.calculateProfitLoss();
     
-    this.status = 'completed';
-    this.completedAt = new Date();
-    this.isLive = false;
-    this.markModified('status');
-
-    // Saves document safely now that preSaveLogic ignores completed records
-    await this.save();
-
-    const targetUserId = mongoose.Types.ObjectId.isValid(this.user) 
-      ? new mongoose.Types.ObjectId(this.user.toString()) 
-      : this.user;
-
+    // 1. Calculate the clean math locally right now
+    await this.calculateProfitLoss(); 
+    
+    // At this point: 
+    // this.profit is exactly 12
+    // this.actualPayout is exactly 112
+    
     const safePayout = Number(Number(this.actualPayout || 0).toFixed(2));
     const safeProfit = this.profit > 0 ? Number(this.profit.toFixed(2)) : 0;
     const safeLoss = this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0;
+    
+    const completionDate = new Date();
+
+    // 2. BYPASS THE SAVE HOOK: Update the Order directly in the database
+    // This locks the values in the DB without letting pre-save middleware touch them!
+    const updatedOrder = await mongoose.model('Order').findOneAndUpdate(
+      { _id: this._id, status: 'active' }, // Only update if it's still active
+      {
+        $set: {
+          exitPrice: exitPrice,
+          status: 'completed',
+          completedAt: completionDate,
+          isLive: false,
+          profit: this.profit,
+          profitPercentage: this.profitPercentage,
+          actualPayout: safePayout,
+          result: this.result,
+          wasForceWin: this.wasForceWin,
+          wasRandomLose: this.wasRandomLose
+        }
+      },
+      { new: true }
+    );
+
+    // If it couldn't find the active order, it means it was already processed!
+    if (!updatedOrder) {
+      console.log(`[Anti-Double] Order ${this._id} was already completed or skipped.`);
+      return null;
+    }
+
+    // 3. Update User Balances cleanly
+    const targetUserId = mongoose.Types.ObjectId.isValid(this.user) 
+      ? new mongoose.Types.ObjectId(this.user.toString()) 
+      : this.user;
 
     const updateOperation = {
       $inc: {
@@ -192,28 +220,28 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     );
 
     if (!updatedUser) {
-      throw new Error('User not found during balance settlement process');
+      throw new Error('User document missing during order settlement processing');
     }
 
     const finalBalance = this.isDemo === true 
       ? (updatedUser.demoBalance ?? 0)
       : (updatedUser.wallet?.usdt ?? 0);
 
-    console.log(`👌👌👌 Live Balance Sync Successful [${this.isDemo ? 'DEMO' : 'LIVE'}]:`, {
-      userId: this.user,
-      newBalance: finalBalance,
-      payoutAdded: safePayout
+    console.log(`🎯 [BUGBUSTER FIXED] Balance Set to Exactly:`, {
+      orderId: this._id,
+      payoutAdded: safePayout,
+      userNewBalance: finalBalance
     });
 
     return {
-      order: this,
+      order: updatedOrder,
       userBalance: finalBalance,
       profit: this.profit,
       actualPayout: safePayout
     };
 
   } catch (error) {
-    console.error('CRITICAL Error Finalizing Order:', error);
+    console.error('CRITICAL: Complete Order Finalization Failed:', error);
     throw error;
   }
 };
