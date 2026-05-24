@@ -18,7 +18,9 @@ import {
   PiggyBank,
   CircleDollarSign,
   Newspaper,
-  Clock
+  Clock,
+  History
+
 
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -41,7 +43,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, mobileMenuOpen, 
     //{ tab: 'predictions', icon: LineChart, label: 'Predictions' },
     { tab: 'loans', icon: PiggyBank, label: 'Loans' },
     {tab:'AdminLoanPaymentReview', icon:CircleDollarSign , label: 'Loan Payment Reviews' },
-     { tab: 'trades-panel', icon: Settings, label: 'trade panel' },
+     { tab: 'trades-panel', icon: History, label: 'trade panel' },
   //  { tab: 'settings', icon: Settings, label: 'System Settings' },
    
   ];
