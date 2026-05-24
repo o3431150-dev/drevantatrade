@@ -1,9 +1,7 @@
 // context/AuthContext.jsx (Updated)
 import { createContext, useContext, useState, useEffect } from "react";
 //import { TradingProvider } from "./TradingContext";
-
 const AuthContext = createContext();
-
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
 
@@ -14,16 +12,11 @@ export const AuthProvider = ({ children }) => {
     const [isOtpSend, setIsOtpSend] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
     const [orderLoading, setOrderLoading] = useState(false);
-
     const [isDemoMode, setIsDemoMode] = useState(false);
     const [demoBalance, setDemoBalance] = useState({ btc: 1, eth: 0, usdt: 0 });
-
     //const backendUrl = "https://trading-app-fdzj.onrender.com/"
-    // const backendUrl = 'http://localhost:3000/'
-
- const backendUrl = "https://drevantatrade-production-e27d.up.railway.app/"
-
-
+    //const backendUrl = 'http://localhost:3000/'
+    const backendUrl = "https://drevantatrade-production-e27d.up.railway.app/"
     // Admin state
     const [AuserData, AsetUserData] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);

@@ -4,7 +4,6 @@ import userModel from "../models/usermodel.js";
 import Transaction from "../models/Transaction.js";
 //import PriceFeedService from "../services/priceFeed.js";
 
-
 export const tradeController = {
   placeOrder: async (req, res) => {
     try {
@@ -155,8 +154,6 @@ export const tradeController = {
               actualPrice = currentPrice.usd;
             }
 
-
-            //   const currentPrice = PriceFeedService.getPrice(order.coinId) || order.entryPrice;
             let livePnl = 0;
             let livePercentage = 0;
 
@@ -172,11 +169,11 @@ export const tradeController = {
             } else {
               // Normal calculation
               if (order.direction === 'buy') {
-                const priceChange = ((currentPrice - order.entryPrice) / order.entryPrice) * 100;
+                const priceChange = ((actualPrice - order.entryPrice) / order.entryPrice) * 100;
                 livePercentage = priceChange * order.leverage;
                 livePnl = (order.amount * livePercentage) / 100;
               } else {
-                const priceChange = ((order.entryPrice - currentPrice) / order.entryPrice) * 100;
+                const priceChange = ((order.entryPrice - actualPrice) / order.entryPrice) * 100;
                 livePercentage = priceChange * order.leverage;
                 livePnl = (order.amount * livePercentage) / 100;
               }
@@ -193,7 +190,7 @@ export const tradeController = {
 
             return {
               ...order,
-              currentPrice,
+              currentPrice: actualPrice,
               livePnl: parseFloat(livePnl.toFixed(2)),
               livePercentage: parseFloat(livePercentage.toFixed(2)),
               timeLeft,
@@ -339,30 +336,18 @@ export const tradeController = {
         });
       }
 
-      // Get related transaction
-      /*
-       const transaction = await Transaction.findOne({
-         order: orderId,
-         user: userId
-       }).lean();
-      */
-
       // Get current price for active orders
       let currentPrice = order.entryPrice;
       if (order.status === 'active') {
-
-        // First, check if global instance exists
         const priceService = global.priceFeedService;
-        currentPrice = (priceService && priceService.getPrice)
+        const fetchedPrice = (priceService && priceService.getPrice)
           ? priceService.getPrice(order.coinId)
           : order.entryPrice;
 
-        // If getPrice returns an object with usd property
-        let actualPrice = currentPrice;
-        if (currentPrice && typeof currentPrice === 'object' && currentPrice.usd) {
-          actualPrice = currentPrice.usd;
+        currentPrice = fetchedPrice;
+        if (fetchedPrice && typeof fetchedPrice === 'object' && fetchedPrice.usd) {
+          currentPrice = fetchedPrice.usd;
         }
-        //currentPrice = PriceFeedService.getPrice(order.coinId) || order.entryPrice;
       }
 
       const formattedOrder = {
@@ -375,8 +360,7 @@ export const tradeController = {
         exitPrice: order.exitPrice ? parseFloat(order.exitPrice.toFixed(8)) : 0,
         actualPayout: order.actualPayout ? parseFloat(order.actualPayout.toFixed(2)) : 0,
         timeLeft: order.timeLeft || 0,
-        progress: order.progress || 0,
-        relatedTransaction: transaction
+        progress: order.progress || 0
       };
 
       res.json({
@@ -439,30 +423,10 @@ export const tradeController = {
       order.isLive = false;
       order.completedAt = now;
 
-      // Create refund transaction
-      /*
-      const transaction = new Transaction({
-        user: userId,
-        type: 'refund',
-        asset: 'USDT',
-        amount: refundAmount,
-        fee: 0,
-        netAmount: refundAmount,
-        order: order._id,
-        status: 'completed',
-        description: `Order cancellation refund for ${order.symbol} trade`,
-        metadata: {
-          originalFee: order.fee,
-          cancellationTime: now
-        }
-      });
-      */
-
       // Save all changes
       await Promise.all([
         user.save(),
-        order.save(),
-        // transaction.save()
+        order.save()
       ]);
 
       res.json({
@@ -486,83 +450,6 @@ export const tradeController = {
       });
     }
   },
-  /*
-  getTradingStats: async (req, res) => {
-      try {
-        const userId = req.user.id;
-  
-        const [orderStats, user, balance, activeOrdersCount] = await Promise.all([
-          Order.getUserStats(userId),
-          userModel.findById(userId).select('wallet totalTrades totalProfit totalLoss winningTrades losingTrades forceWin isBlocked kycStatus'),
-          Transaction.getUserBalance(userId, 'USDT'),
-          Order.countDocuments({ user: userId, status: 'active' })
-        ]);
-  
-        // Calculate additional stats
-        const netProfit = (orderStats.totalProfit || 0) - (orderStats.totalLoss || 0);
-        const netReturn = orderStats.totalInvested > 0 ?
-          (netProfit / orderStats.totalInvested) * 100 : 0;
-  
-        const avgProfitPerTrade = orderStats.totalTrades > 0 ?
-          netProfit / orderStats.totalTrades : 0;
-  
-        const response = {
-          success: true,
-          data: {
-            wallet: {
-              usdt: user.wallet.usdt,
-              btc: user.wallet.btc || 0,
-              eth: user.wallet.eth || 0,
-              availableBalance: balance.availableBalance || 0,
-              loanUsdt: user.wallet.loanUsdt || 0
-            },
-            trading: {
-              totalTrades: orderStats.totalTrades || 0,
-              activeTrades: activeOrdersCount,
-              completedTrades: (orderStats.totalTrades || 0) - activeOrdersCount,
-              winningTrades: orderStats.winningTrades || 0,
-              losingTrades: orderStats.losingTrades || 0,
-              breakEvenTrades: orderStats.breakEvenTrades || 0,
-              forceWinTrades: orderStats.forceWinTrades || 0,
-              randomLossTrades: orderStats.randomLossTrades || 0,
-              winRate: parseFloat((orderStats.winRate || 0).toFixed(2)),
-              lossRate: parseFloat((orderStats.lossRate || 0).toFixed(2)),
-              successRate: parseFloat((orderStats.successRate || 0).toFixed(2)),
-              totalProfit: parseFloat((orderStats.totalProfit || 0).toFixed(2)),
-              totalLoss: parseFloat((orderStats.totalLoss || 0).toFixed(2)),
-              netProfit: parseFloat(netProfit.toFixed(2)),
-              totalInvested: parseFloat((orderStats.totalInvested || 0).toFixed(2)),
-              totalPayout: parseFloat((orderStats.totalPayout || 0).toFixed(2)),
-              totalFees: parseFloat((orderStats.totalFees || 0).toFixed(2)),
-              averageProfit: parseFloat((orderStats.averageProfit || 0).toFixed(2)),
-              averageProfitPercentage: parseFloat((orderStats.averageProfitPercentage || 0).toFixed(2)),
-              netReturn: parseFloat(netReturn.toFixed(2)),
-              avgProfitPerTrade: parseFloat(avgProfitPerTrade.toFixed(2)),
-              maxProfit: parseFloat((orderStats.maxProfit || 0).toFixed(2)),
-              minProfit: parseFloat((orderStats.minProfit || 0).toFixed(2))
-            },
-            account: {
-              forceWin: user.forceWin || false,
-              isBlocked: user.isBlocked || false,
-              kycStatus: user.kycStatus || 'pending'
-            }
-          }
-        };
-  
-        res.json(response);
-  
-      } catch (error) {
-        console.error("Get trading stats error:", error);
-        res.status(500).json({
-          success: false,
-          message: "Error fetching trading statistics",
-          error: error.message
-        });
-      }
-    },
-  */
-  // Get user trading statistics - FIXED VERSION
-
 
   // Admin: Toggle force win for user
   toggleForceWin: async (req, res) => {
@@ -667,10 +554,8 @@ export const tradeController = {
 
       console.log('Fetching balance for user:', userId);
 
-
-      const [user, balance] = await Promise.all([
+      const [user] = await Promise.all([
         userModel.findById(userId).select('wallet forceWin totalTrades totalProfit totalLoss demoBalance'),
-        // Transaction.getUserBalance(userId, 'USDT')
       ]);
 
       if (!user) {
@@ -679,7 +564,6 @@ export const tradeController = {
           message: "User not found"
         });
       }
-
 
       res.json({
         success: true,
@@ -789,6 +673,93 @@ export const tradeController = {
       res.status(500).json({
         success: false,
         message: "Error fetching order history",
+        error: error.message
+      });
+    }
+  },
+
+  // Get All Orders (With optional filtering by status and pagination)
+  getAllOrdersAdmin: async (req, res) => {
+    try {
+      const { status, page = 1, limit = 50, isDemo } = req.query;
+
+      // Build dynamic query filter
+      const queryFilter = {};
+      if (status) queryFilter.status = status;
+      if (isDemo !== undefined) queryFilter.isDemo = isDemo === 'true';
+
+      // Calculate pagination parameters
+      const skip = (parseInt(page) - 1) * parseInt(limit);
+
+      // Fetch orders and total count for frontend pagination metrics
+      const [orders, totalOrders] = await Promise.all([
+        Order.find(queryFilter)
+          .sort({ createdAt: -1 }) // Newest trades first
+          .skip(skip)
+          .limit(parseInt(limit))
+          // FIXED: Passing userModel class directly to prevent MissingSchemaError
+          .populate({ path: 'user', select: 'username email wallet demoBalance', model: userModel }),
+        Order.countDocuments(queryFilter)
+      ]);
+
+      res.status(200).json({
+        success: true,
+        data: {
+          orders,
+          pagination: {
+            total: totalOrders,
+            page: parseInt(page),
+            pages: Math.ceil(totalOrders / parseInt(limit)),
+            limit: parseInt(limit)
+          }
+        }
+      });
+
+    } catch (error) {
+      console.error("Admin Get All Orders Error:", error);
+      res.json({
+        success: false,
+        message: "Error fetching system orders",
+        error: error.message
+      });
+    }
+  },
+
+  // Delete Completed Orders Only
+  deleteCompletedOrdersAdmin: async (req, res) => {
+    try {
+      const { orderId } = req.body;
+
+      const deleteFilter = { status: 'completed' };
+
+      if (orderId) {
+        deleteFilter._id = orderId;
+      }
+
+      const deletionReport = await Order.deleteMany(deleteFilter);
+
+      if (deletionReport.deletedCount === 0) {
+        return res.status(444).json({
+          success: false,
+          message: orderId
+            ? "Target order not found or is not marked as completed."
+            : "No completed orders found to clear."
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: orderId
+          ? "Completed order deleted successfully."
+          : `Successfully purged ${deletionReport.deletedCount} completed orders from the cluster.`,
+        deletedCount: deletionReport.deletedCount
+      });
+
+    } catch (error) {
+      console.error("Admin Order Deletion Error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error clearing completed orders from database",
         error: error.message
       });
     }

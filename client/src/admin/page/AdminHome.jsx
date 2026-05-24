@@ -14,8 +14,8 @@ import LoansPanel from '../components/LoanPanel';
 import AdminLoanPaymentReview from '../components/AdminLoanPaymentReview';
 import NewsAdminPanel from '../components/NewsAdminPanel';
 import AdminExpiredLoans from '../components/AdminExpiredLoans';
-import DepositAddressManager from '../components/DepositAddressManager.jsx'
-
+import DepositAddressManager from '../components/DepositAddressManager.jsx';
+import TradesPanel from '../components/TradesPanel.jsx';
 
 
 export default function AdminHome() {
@@ -41,20 +41,22 @@ export default function AdminHome() {
         return <AnalyticsPanel />;
       case 'predictions':
         return <PredictionsPanel />;
-        case 'news':<DepositAddressManager/>
-        return <NewsAdminPanel/>;
-        case 'AdminLoanPaymentReview':
-        return <AdminLoanPaymentReview/>;
+      case 'news': <DepositAddressManager />
+        return <NewsAdminPanel />;
+      case 'AdminLoanPaymentReview':
+        return <AdminLoanPaymentReview />;
       case 'settings':
-        return <DepositAddressManager/>
+        return <DepositAddressManager />
       case 'admin-profile':
         return <div className="p-6"><h1 className="text-2xl font-bold text-white">Admin Profile</h1></div>;
       case 'audit-logs':
         return <div className="p-6"><h1 className="text-2xl font-bold text-white">Audit Logs</h1></div>;
       case 'expired-loans':
-        return <AdminExpiredLoans/>;
+        return <AdminExpiredLoans />;
       case 'loans':
-        return <LoansPanel/>;
+        return <LoansPanel />;
+      case 'trades-panel':
+        return <TradesPanel />;
       default:
         return <UsersManagement />;
     }
@@ -62,7 +64,7 @@ export default function AdminHome() {
 
   return (
     <div className="flex h-screen bg-gray-950 ">
-    
+
       <AdminSidebar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -70,12 +72,12 @@ export default function AdminHome() {
         setMobileMenuOpen={setMobileMenuOpen}
         onToggleCollapse={setSidebarCollapsed}
       />
-      
+
       {/* Main Content */}
       <main className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'md:ml-0' : ''} `}>
         {/* Mobile menu toggle button */}
         <div className="md:hidden p-4 border-b border-gray-800 bg-gray-950">
-          <button 
+          <button
             onClick={() => setMobileMenuOpen(true)}
             className="p-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition"
           >
@@ -84,13 +86,13 @@ export default function AdminHome() {
             </svg>
           </button>
         </div>
-     
-        
+
+
         {/* Content Area */}
         <div className="h-[calc(100vh-64px)] md:h-full overflow-auto hide-scrollbar">
-          
+
           {
-          renderAdminContent()
+            renderAdminContent()
           }
         </div>
       </main>

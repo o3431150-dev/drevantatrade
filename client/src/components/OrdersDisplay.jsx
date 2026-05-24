@@ -1,4 +1,3 @@
-// src/components/OrdersDisplay.jsx
 import React, { useState, useEffect } from 'react';
 import { useOrders } from '../context/OrdersContext';
 import { usePriceFeed } from '../context/PriceFeedContext';
@@ -8,31 +7,26 @@ import {
   CheckCircle,
   TrendingUp,
   TrendingDown,
-  DollarSign,
-  Timer,
   ChevronRight,
-  AlertCircle,
   Package,
-  Filter,
-  BarChart3,
-  Target,
-  TrendingUp as TrendingUpIcon,
-  TrendingDown as TrendingDownIcon,
-  RefreshCw
+  RefreshCw,
+  Layers
 } from 'lucide-react';
 import { assets } from '../assets/assets';
 import { motion, AnimatePresence } from 'framer-motion';
 
-
 const OrdersDisplay = ({ tradeHistory }) => {
- 
   const { activeOrders, completedOrders, handleOrderComplete, stats, refreshOrders, isLoading } = useOrders();
   const { prices } = usePriceFeed();
-  let x = tradeHistory ? 'completed' :'active'
-  const [activeTab, setActiveTab] = useState(x);
+
+  // Set initial tab state based on tradeHistory prop
+  const [activeTab, setActiveTab] = useState(tradeHistory ? 'completed' : 'active');
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-
+  // Sync tab if tradeHistory prop changes dynamically
+  useEffect(() => {
+    setActiveTab(tradeHistory ? 'completed' : 'active');
+  }, [tradeHistory]);
 
   const getCurrentPrice = (coinId) => {
     return prices[coinId]?.usd || 0;
@@ -48,28 +42,20 @@ const OrdersDisplay = ({ tradeHistory }) => {
   };
 
   const calculateLivePnl = (order) => {
-   
     const currentPrice = getCurrentPrice(order.coinId);
     if (!currentPrice || !order.entryPrice) return { pnl: 0, percentage: 0 };
     
     let pnl = 0;
     let percentage = 0;
     
-    // If user has force win, show positive P&L
-    if (false) {
-      percentage = Math.abs(order.expectedReturn / order.amount) * 100;
-      pnl = order.expectedReturn;
+    if (order.direction === 'buy') {
+      const priceChange = ((currentPrice - order.entryPrice) / order.entryPrice) * 100;
+      percentage = priceChange;
+      pnl = (order.amount * percentage) / 100;
     } else {
-      // Normal calculation
-      if (order.direction === 'buy') {
-        const priceChange = ((currentPrice - order.entryPrice) / order.entryPrice) * 100;
-        percentage = priceChange;
-        pnl = (order.amount * percentage) / 100;
-      } else {
-        const priceChange = ((order.entryPrice - currentPrice) / order.entryPrice) * 100;
-        percentage = priceChange;
-        pnl = (order.amount * percentage) / 100;
-      }
+      const priceChange = ((order.entryPrice - currentPrice) / order.entryPrice) * 100;
+      percentage = priceChange;
+      pnl = (order.amount * percentage) / 100;
     }
     
     return { 
@@ -84,8 +70,8 @@ const OrdersDisplay = ({ tradeHistory }) => {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
-  // Format date for display
   const formatTime = (dateString) => {
+    if (!dateString) return '--:--';
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { 
       hour: '2-digit', 
@@ -126,7 +112,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
             <button
               onClick={handleRefresh}
               disabled={isRefreshing || isLoading}
-              className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm transition-colors"
+              className="flex items-center gap-2 px-3 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg text-sm transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
@@ -146,7 +132,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-2 border border-gray-200 dark:border-gray-700">
             <div className="text-xs text-gray-500 dark:text-gray-400">Win Rate</div>
-            {/* <div className="text-sm font-bold text-green-500">{stats.winRate?.toFixed(1) || '0'}%</div> */}
+            <div className="text-sm font-bold text-green-500">{stats?.winRate?.toFixed(1) || '0.0'}%</div>
           </div>
         </div>
       </div>
@@ -226,13 +212,14 @@ const OrdersDisplay = ({ tradeHistory }) => {
             ) : (
               <div className="space-y-4">
                 {activeOrders.map((order) => {
+                  const orderId = order._id || order.id;
                   const livePnl = calculateLivePnl(order);
                   const currentPrice = getCurrentPrice(order.coinId);
                   const isProfitable = livePnl.pnl > 0;
                   
                   return (
                     <motion.div
-                      key={order._id || order.id}
+                      key={orderId}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300"
@@ -244,14 +231,19 @@ const OrdersDisplay = ({ tradeHistory }) => {
                             <img 
                               src={assets[order.coinId]} 
                               alt={order.coinId}
-                              className="w-10 h-10 rounded-lg"
+                              className="w-10 h-10 rounded-lg object-cover"
                             />
                             <div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="font-bold text-gray-900 dark:text-white">{order.symbolName}</span>
-                                <span className={`text-xs px-2 py-1 rounded ${order.direction === 'buy' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}>
+                                <span className={`text-[10px] px-1.5 py-0.5 rounded font-semibold ${order.direction === 'buy' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}>
                                   {order.direction === 'buy' ? 'LONG' : 'SHORT'}
                                 </span>
+                                {order.isDemo && (
+                                  <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                    Demo
+                                  </span>
+                                )}
                               </div>
                               <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 <span>Entry: ${formatNumber(order.entryPrice)}</span>
@@ -281,7 +273,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
                             <OrderTimer
                               startTime={new Date(order.startTime)}
                               duration={order.duration}
-                              orderId={order._id || order.id}
+                              orderId={orderId}
                               onComplete={handleOrderComplete}
                             />
                           </div>
@@ -311,9 +303,9 @@ const OrdersDisplay = ({ tradeHistory }) => {
                             <div className="flex items-center gap-3">
                               <div className="relative">
                                 <img 
-                                  src={assets[order.coinId] } 
+                                  src={assets[order.coinId]} 
                                   alt={order.coinId}
-                                  className="w-10 h-10 rounded-lg"
+                                  className="w-10 h-10 rounded-lg object-cover"
                                 />
                                 <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white dark:border-gray-800 flex items-center justify-center ${
                                   order.direction === 'buy' ? 'bg-green-500' : 'bg-red-500'
@@ -334,6 +326,11 @@ const OrdersDisplay = ({ tradeHistory }) => {
                                   }`}>
                                     {order.direction === 'buy' ? 'LONG' : 'SHORT'}
                                   </span>
+                                  {order.isDemo && (
+                                    <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[11px] px-2 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
+                                      <Layers className="w-3 h-3" /> Demo
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="text-xs text-gray-600 dark:text-gray-400">
                                   Entry: ${formatNumber(order.entryPrice)} • Live: ${formatNumber(currentPrice)}
@@ -348,7 +345,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
                               <OrderTimer
                                 startTime={new Date(order.startTime)}
                                 duration={order.duration}
-                                orderId={order._id || order.id}
+                                orderId={orderId}
                                 onComplete={handleOrderComplete}
                               />
                             </div>
@@ -376,9 +373,11 @@ const OrdersDisplay = ({ tradeHistory }) => {
                             <div className={`text-sm ${isProfitable ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                               {livePnl.percentage >= 0 ? '+' : ''}{formatNumber(livePnl.percentage)}%
                             </div>
-                            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                              {order.leverage}x leverage
-                            </div>
+                            {order.leverage && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                {order.leverage}x leverage
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -389,10 +388,7 @@ const OrdersDisplay = ({ tradeHistory }) => {
             )
           ) : (
             // Completed Orders
-
-            
             completedOrders.length === 0 ? (
-              
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -411,11 +407,12 @@ const OrdersDisplay = ({ tradeHistory }) => {
             ) : (
               <div className="space-y-4">
                 {completedOrders.slice(0, 10).map((order) => {
+                  const orderId = order._id || order.id;
                   const isProfitable = order.profit > 0;
                   
                   return (
                     <motion.div
-                      key={order._id || order.id}
+                      key={orderId}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow duration-300"
@@ -427,16 +424,21 @@ const OrdersDisplay = ({ tradeHistory }) => {
                             <img 
                               src={assets[order.coinId]} 
                               alt={order.coinId}
-                              className="w-10 h-10 rounded-lg"
+                              className="w-10 h-10 rounded-lg object-cover"
                             />
                             <div>
-                              <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1.5 flex-wrap">
                                 <span className="font-bold text-gray-900 dark:text-white">{order.symbolName}</span>
-                                <span className={`text-xs px-2 py-1 rounded ${order.direction === 'buy' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}>
+                                <span className={`text-xs px-2 py-1 rounded font-semibold ${order.direction === 'buy' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'}`}>
                                   {order.direction === 'buy' ? 'LONG' : 'SHORT'}
                                 </span>
+                                {order.isDemo && (
+                                  <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                                    Demo
+                                  </span>
+                                )}
                               </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mt-1">
                                 ${formatNumber(order.entryPrice)} → ${formatNumber(order.finalPrice)}
                               </div>
                             </div>
@@ -496,21 +498,26 @@ const OrdersDisplay = ({ tradeHistory }) => {
                               <img 
                                 src={assets[order.coinId]} 
                                 alt={order.coinId}
-                                className="w-10 h-10 rounded-lg"
+                                className="w-10 h-10 rounded-lg object-cover"
                               />
                               <div>
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="font-bold text-gray-900 dark:text-white">{order.symbolName}</span>
                                   <span className={`text-xs px-2 py-1 rounded font-medium ${
-                                    order.direction === 'buy' 
-                                      ? isProfitable ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
-                                      : isProfitable ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
+                                    isProfitable 
+                                      ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' 
+                                      : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400'
                                   }`}>
                                     {order.direction === 'buy' ? 'LONG' : 'SHORT'}
                                   </span>
+                                  {order.isDemo && (
+                                    <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[11px] px-2 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
+                                      <Layers className="w-3 h-3" /> Demo
+                                    </span>
+                                  )}
                                 </div>
                                 <div className="text-xs text-gray-600 dark:text-gray-400">
-                                  ${formatNumber(order.entryPrice)} → ${formatNumber(order.finalPrice)}
+                                  {/* ${formatNumber(order.entryPrice)} → ${formatNumber(order.finalPrice)} */}
                                 </div>
                               </div>
                             </div>
@@ -543,13 +550,13 @@ const OrdersDisplay = ({ tradeHistory }) => {
                               </div>
                               <div className="flex items-center justify-between">
                                 <div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">Amount</div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">Net Profit</div>
                                   <div className={`text-sm font-bold ${isProfitable ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                                     {order.profit >= 0 ? '+' : ''}${formatNumber(order.profit)}
                                   </div>
                                 </div>
                                 <div>
-                                  <div className="text-xs text-gray-500 dark:text-gray-400">Percentage</div>
+                                  <div className="text-xs text-gray-500 dark:text-gray-400">Return</div>
                                   <div className={`text-sm font-bold ${isProfitable ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
                                     {order.profitPercentage >= 0 ? '+' : ''}{formatNumber(order.profitPercentage)}%
                                   </div>

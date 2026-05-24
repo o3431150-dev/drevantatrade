@@ -41,8 +41,9 @@ export default function AdminSidebar({ activeTab, setActiveTab, mobileMenuOpen, 
     //{ tab: 'predictions', icon: LineChart, label: 'Predictions' },
     { tab: 'loans', icon: PiggyBank, label: 'Loans' },
     {tab:'AdminLoanPaymentReview', icon:CircleDollarSign , label: 'Loan Payment Reviews' },
+     { tab: 'trades-panel', icon: Settings, label: 'trade panel' },
   //  { tab: 'settings', icon: Settings, label: 'System Settings' },
-    
+   
   ];
 
   const adminToolsItems = [
