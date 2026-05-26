@@ -10,6 +10,7 @@ import { ClipLoader } from "react-spinners";
 const DURATIONS = [
     { id: 30, rate: 12, min: 100, max: 5000 },
     { id: 60, rate: 18, min: 5000, max: 10000 },
+    { id: 90, rate: 20, min: 10000, max: 15000 },
     { id: 120, rate: 22, min: 15000, max: 20000 },
     { id: 180, rate: 25, min: 20000, max: 30000 },
     { id: 240, rate: 28, min: 30000, max: 40000 },
@@ -28,10 +29,10 @@ export default function OrderModal({
     userBalance,
     marketPrices
 }) {
-    const { 
-        orderLoading, 
-        setOrderLoading, 
-        isDemoMode 
+    const {
+        orderLoading,
+        setOrderLoading,
+        isDemoMode
     } = useAuth();
 
     const [selected, setSelected] = useState(30);
@@ -152,14 +153,14 @@ export default function OrderModal({
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                                 <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center ${direction === 'buy' ? 'bg-green-100 dark:bg-green-900' : 'bg-red-100 dark:bg-red-900'}`}>
-                                    {direction === 'buy' ? 
-                                        <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" /> : 
+                                    {direction === 'buy' ?
+                                        <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" /> :
                                         <TrendingDown className="w-5 h-5 sm:w-6 sm:h-6 text-red-500 dark:text-red-400" />
                                     }
                                 </div>
                                 <div>
                                     <h2 className="font-bold text-lg sm:text-xl flex items-center gap-1.5">
-                                        {direction === 'buy' ? 'Buy' : 'Sell'} {symbol} 
+                                        {direction === 'buy' ? 'Buy' : 'Sell'} {symbol}
                                         {isDemoMode && <span className="text-[10px] font-normal text-amber-500 border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 rounded">Demo</span>}
                                     </h2>
                                     <p className="text-sm text-gray-500 dark:text-gray-400">${formatCurrency(price)}</p>
@@ -203,7 +204,7 @@ export default function OrderModal({
                                         className={`p-3 rounded-xl border text-center transition-all ${selected === item.id
                                             ? "border-green-500 bg-green-500/5 text-green-600 dark:text-green-400 font-semibold"
                                             : "border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:hover:border-gray-700"
-                                        }`}
+                                            }`}
                                     >
                                         <div className="text-sm">{item.id}s</div>
                                         <div className="text-xs opacity-80 mt-0.5">+{item.rate}%</div>
@@ -263,7 +264,7 @@ export default function OrderModal({
                             ) : orderLoading ? (
                                 <>
                                     <ClipLoader color="#ffffff" size={16} />
-                                    proccessing order...   
+                                    proccessing order...
                                 </>
                             ) : (
                                 `Confirm Execution (${direction === 'buy' ? 'Buy' : 'Sell'})`
