@@ -7,7 +7,7 @@ export const PriceFeedProvider = ({ children }) => {
   const [prices, setPrices] = useState({});
 
   useEffect(() => {
-    // FIX: Point to port 5000 (your backend port)
+    //??? FIX: Point to port 5000 (your backend port)
    const backendUrl = "https://drevantatrade-production-e27d.up.railway.app"
    //const backendUrl = "http://localhost:3000";
     const socket = io(backendUrl, { 
