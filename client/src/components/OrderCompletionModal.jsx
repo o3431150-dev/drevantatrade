@@ -31,19 +31,39 @@ const OrderCompletionModal = ({ order, onClose }) => {
     } else if (order.direction === 'sell') {
       displayExitPrice = cleanEntryPrice * (1 + deviationPercent);
     }
-
   }
 
   // 3. Dynamic Fee & PNL Calculations
-  //const feeRate = 0.02; // 2%
-  const feeRate = 0
+  const feeRate = 0;
   const calculatedFee = amount * feeRate;
   const returnRate = order.expectedReturn || 12;
   const expectedReturnAmount = (amount * returnRate) / 100;
 
   const displayProfit = order.wasForceWin && order.profit <= 0 ? expectedReturnAmount : order.profit;
   const payout = order.wasForceWin ? (amount + displayProfit) : order.actualPayout;
-  const startDate = order.formattedDate || new Date(order.startTime).toLocaleString();
+
+  // 4. Country & Locale Based Time Formatting
+  const getLocalizedDate = () => {
+    if (order.formattedDate) return order.formattedDate;
+    if (!order.startTime) return '';
+    
+    try {
+      // Auto-detect browser locale and system timezone
+      const browserLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+      const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      
+      return new Date(order.startTime).toLocaleString(browserLocale, {
+        timeZone: browserTimezone,
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
+    } catch (e) {
+      // Clean fallback if Intl API throws error
+      return new Date(order.startTime).toLocaleString();
+    }
+  };
+
+  const startDate = getLocalizedDate();
 
   // Responsive device view variant animation
   const modalVariants = {
@@ -92,22 +112,11 @@ const OrderCompletionModal = ({ order, onClose }) => {
           </button>
 
           {/* Content Wrapper */}
-          <div className="p-5  overflow-y-auto no-scrollbar hide-scrollbar .hide-scrollbar::-webkit-scrollbar">
+          <div className="p-5 overflow-y-auto no-scrollbar hide-scrollbar .hide-scrollbar::-webkit-scrollbar">
 
             {/* Header Module */}
             <div className="flex flex-col items-center text-center mb-6">
-              {/* <motion.div 
-                initial={{ scale: 0, rotate: -20 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.15 }}
-                className={`flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 mb-3 rounded-2xl ${
-                  isWin ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'
-                }`}
-              >
-                {isWin ? <TrendingUp size={28} className="sm:size-8" /> : <TrendingDown size={28} className="sm:size-8" />}
-              </motion.div> */}
-
-              <h2 className="text-xl  font-black text-white tracking-tight">
+              <h2 className="text-xl font-black text-white tracking-tight">
                 {isWin ? 'TRADE SUCCESS' : 'TRADE CLOSED'}
               </h2>
 
@@ -148,7 +157,6 @@ const OrderCompletionModal = ({ order, onClose }) => {
                   <span className={`font-mono text-base font-black ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
                     ${displayExitPrice.toFixed(6)}
                   </span>
-
                 </div>
               </div>
             </div>
@@ -172,42 +180,19 @@ const OrderCompletionModal = ({ order, onClose }) => {
             </div>
 
             {/* Mini Detail Breakdown Area */}
-            <div className="mb-5 rounded-xl bg-slate-950/20 border border-slate-800 text-xs text-slate-400 overflow-hidden divide-y divide-slate-800/40">
-              <div className="flex justify-between items-center p-2.5 px-3">
-                <span className="flex items-center gap-1"><Percent size={12} className="text-slate-500" /> Trading Fee (free)</span>
-                <span className="font-mono text-amber-400 font-semibold">${calculatedFee.toFixed(2)}</span>
+            <div className="mb-5 rounded-xl bg-slate-950/20 border border-slate-800 text-xs text-slate-400">
+              <div className="flex items-center justify-between p-3 border-b border-slate-800/50">
+                <span>Execution Time</span>
+                <span className="text-slate-300 font-mono">{startDate}</span>
               </div>
-              <div className="flex justify-between items-center p-2.5 px-3">
-                <span>Return Rate / Expected</span>
-                <span className="font-mono text-slate-300 font-medium">{returnRate}% (${expectedReturnAmount.toFixed(2)})</span>
-              </div>
-              <div className="flex justify-between items-center p-2.5 px-3 text-[11px] text-slate-500">
-                <span>Started At</span>
-                <span className="font-mono text-right truncate pl-4">{startDate}</span>
+              <div className="flex items-center justify-between p-3">
+                <span>Total Payout</span>
+                <span className={`font-mono font-bold ${isWin ? 'text-emerald-400' : 'text-slate-300'}`}>
+                  ${payout.toFixed(2)}
+                </span>
               </div>
             </div>
 
-            {/* Payout Metric Callout */}
-            <div className="mb-6 px-4 py-3 bg-slate-800/40 rounded-xl border border-slate-800 flex justify-between items-center text-xs sm:text-sm">
-              <span className="text-slate-400 font-medium">Total Account Payout</span>
-              <span className={`font-mono font-bold text-base ${isWin ? 'text-emerald-400' : 'text-white'}`}>
-                ${Math.max(0, payout).toFixed(2)}
-              </span>
-            </div>
-
-            {/* Premium Interactive Trigger Action */}
-            <motion.button
-              whileHover={{ scale: 1.015, y: -0.5 }}
-              whileTap={{ scale: 0.985 }}
-              onClick={onClose}
-              className={`group w-full py-3.5 px-6 text-white text-xs sm:text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg ${isWin
-                  ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 shadow-emerald-950/40'
-                  : 'bg-slate-800 hover:bg-slate-700 border border-slate-700 shadow-slate-950/50'
-                }`}
-            >
-              Continue Trading
-              <ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-            </motion.button>
           </div>
         </motion.div>
       </div>
@@ -216,3 +201,4 @@ const OrderCompletionModal = ({ order, onClose }) => {
 };
 
 export default OrderCompletionModal;
+ 
