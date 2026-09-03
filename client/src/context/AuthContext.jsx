@@ -1,22 +1,27 @@
 // context/AuthContext.jsx (Updated)
 import { createContext, useContext, useState, useEffect } from "react";
+const API_URL = import.meta.env.VITE_API_URL;
 //import { TradingProvider } from "./TradingContext";
+
 const AuthContext = createContext();
+
 export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(localStorage.getItem('token') || '');
-
     const [userData, setUserData] = useState(() => {
         const saved = localStorage.getItem('userData');
         return saved ? JSON.parse(saved) : null;
     });
     const [isOtpSend, setIsOtpSend] = useState(false);
     const [showProfile, setShowProfile] = useState(false);
+
+    ////
+
     const [orderLoading, setOrderLoading] = useState(false);
     const [isDemoMode, setIsDemoMode] = useState(false);
     const [demoBalance, setDemoBalance] = useState({ btc: 1, eth: 0, usdt: 0 });
-    //const backendUrl = "https://trading-app-fdzj.onrender.com/"
-   // const backendUrl = 'http://localhost:3000/'
-    const backendUrl = "https://drevantatrade-production-e27d.up.railway.app/"
+
+    
+    const backendUrl = `${API_URL}/`;
     // Admin state
     const [AuserData, AsetUserData] = useState(null);
     const [isAdmin, setIsAdmin] = useState(false);
@@ -138,7 +143,6 @@ export const AuthProvider = ({ children }) => {
         setToken,
         setUserData,
 
-        //order loading state
         orderLoading,
         setOrderLoading,
 
@@ -147,14 +151,15 @@ export const AuthProvider = ({ children }) => {
         setIsDemoMode,
         demoBalance,
         setDemoBalance,
-    };
+    
+};
 
-    return (
-        <AuthContext.Provider value={value}>
-            {children}
+return (
+    <AuthContext.Provider value={value}>
+        {children}
 
-        </AuthContext.Provider>
-    );
+    </AuthContext.Provider>
+);
 };
 
 export const useAuth = () => {

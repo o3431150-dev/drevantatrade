@@ -1,39 +1,20 @@
 import { createContext, useContext, useEffect, useState } from "react";
+const API_URL = import.meta.env.VITE_API_URL;
 import io from "socket.io-client";
 
 const PriceFeedContext = createContext();
+ const socket = io(API_URL, { transports: ["websocket"] });
 
 export const PriceFeedProvider = ({ children }) => {
   const [prices, setPrices] = useState({});
 
   useEffect(() => {
-    //??? FIX: Point to port 5000 (your backend port)
-   const backendUrl = "https://drevantatrade-production-e27d.up.railway.app"
-   //const backendUrl = "http://localhost:3000";
-    const socket = io(backendUrl, { 
-      transports: ["websocket", "polling"], // Allow fallback
-      withCredentials: true 
-    });
-
-    socket.on("connect", () => {
-      console.log("Connected to Backend Socket.IO");
-    });
-
     socket.on("priceUpdate", (data) => {
-      ///console.log("Received update:", data);
-      
-      setPrices(data); 
-  
+      setPrices({ ...data }); // always new reference
+     // console.log("Received price update:", data);
     });
 
-    socket.on("connect_error", (err) => {
-      console.error("Socket Connection Error:", err.message);
-    });
-
-    return () => {
-      socket.off("priceUpdate");
-      socket.disconnect();
-    };
+    return () => socket.off("priceUpdate");
   }, []);
 
   return (
@@ -44,3 +25,5 @@ export const PriceFeedProvider = ({ children }) => {
 };
 
 export const usePriceFeed = () => useContext(PriceFeedContext);
+
+

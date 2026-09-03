@@ -10,7 +10,7 @@ import { useState } from 'react'
 import VerifyAccountModal from '../components/VerifyAccountModal'
 import TawkButton from '../components/TawkButton.jsx' 
 import Loading from '../components/Loading.jsx'
-
+import HighlightsSection from "../components/HighlightsSection";
 
 const Home = () => {
   const { isLogin,userData } = useAuth();
@@ -25,6 +25,7 @@ const Home = () => {
       <CoinList />
       <MobileNav />
       {/* <TawkButton/> */}
+      <HighlightsSection/>
       
 
 

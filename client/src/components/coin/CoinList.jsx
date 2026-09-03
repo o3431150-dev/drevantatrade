@@ -67,13 +67,13 @@ export default function CoinList() {
   );
 
   return (
-    <div className="bg-[#030712] min-h-screen p-4 pb-24">
+    <div id='pd' className="bg-[#03071200] min-h-screen p-4 pb-24 ">
       <div className="max-w-2xl mx-auto">
         {/* Header Section */}
         <div className="py-10 text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
-                <TrendingUp className="w-3 h-3 text-green-500" />
-                <span className="text-[10px] font-black text-green-500 uppercase tracking-widest">Top Movers</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 mb-4">
+                <TrendingUp className="w-3 h-3 text-blue-500" />
+                <span className="text-[10px] font-black text-blue-500 uppercase tracking-widest">Top Movers</span>
             </div>
             <h2 className="text-3xl font-black text-white tracking-tighter uppercase">
                 Featured Assets
@@ -100,13 +100,13 @@ export default function CoinList() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="mt-12 text-center"
+          className=" text-center"
         >
-          <button
+          {/* <button
             onClick={() => navigate('/markets')}
-            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-green-500/10"
+            className="group relative inline-flex items-center gap-3 px-8 py-4 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-white rounded-2xl font-bold transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10"
           >
-            <LayoutGrid className="w-5 h-5 text-green-500 group-hover:rotate-90 transition-transform duration-500" />
+            <LayoutGrid className="w-5 h-5 text-blue-500 group-hover:rotate-90 transition-transform duration-500" />
             <span>Explore All Markets</span>
             <svg 
               className="w-4 h-4 transform group-hover:translate-x-1 transition-transform text-slate-500" 
@@ -114,7 +114,7 @@ export default function CoinList() {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
-          </button>
+          </button> */}
         </motion.div>
       </div>
     </div>

@@ -1,10 +1,9 @@
 // src/services/api.js
 import axios from 'axios';
-//const API_BASE_URL = 'https://trading-app-fdzj.onrender.com/api';
-const API_BASE_URL = "https://drevantatrade-production-e27d.up.railway.app/api";
-//const API_BASE_URL = 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL;
+const API_BASE_URL = API_URL + '/api'
 // Create axios instance
-const api = axios.create({ 
+const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',

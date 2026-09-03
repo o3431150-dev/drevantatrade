@@ -22,6 +22,38 @@ const coinIcons = {
     cardano: assets.cardano,
     polkadot: assets.polkadot,
     //uniswap: assets.uniswap,
+    tron: assets.tron,
+    polygon: assets.polygon,
+    avalanche: assets.avalanche,
+    near: assets.near,
+    cosmos: assets.cosmos,
+    aptos: assets.aptos,
+    sui: assets.sui,
+    optimism: assets.optimism,
+    arbitrum: assets.arbitrum,
+    fantom: assets.fantom,
+    stacks: assets.stacks,
+    celestia: assets.celestia,
+    uniswap: assets.uniswap,
+    aave: assets.aave,
+    chainlink: assets.chainlink,
+    "lido-dao": assets["lido-dao"],
+    thorchain: assets.thorchain,
+    pancakeswap: assets.pancakeswap,
+    "internet-computer": assets["internet-computer"],
+    "fetch-ai": assets["fetch-ai"],
+    pepe: assets.pepe,
+    "shiba-inu": assets["shiba-inu"],
+    dogwifhat: assets.dogwifhat,
+    litecoin: assets.litecoin,
+    "bitcoin-cash": assets["bitcoin-cash"],
+    "ethereum-classic": assets["ethereum-classic"],
+    stellar: assets.stellar,
+    algorand: assets.algorand,
+    vechain: assets.vechain,
+    "hedera-hashgraph": assets["hedera-hashgraph"],
+    filecoin: assets.filecoin,
+    default: assets.default
     
 
 
@@ -52,7 +84,7 @@ export default function CoinCard({ name, symbol, price, change, onClick }) {
                             <h2 className="font-semibold">
 
                                 {name == 'Loading...' && (
-                                    <ClipLoader color="#32a852" size={25} />
+                                    <ClipLoader color="#2196F3" size={25} />
                                 )}
                                 {name !== 'Loading...' && (
                                     name.charAt(0).toUpperCase() + name.slice(1)

@@ -20,11 +20,11 @@ import { Helmet } from "react-helmet-async";
 
 // API configuration
 ///const API_URL = 'https://trading-app-fdzj.onrender.com/api';
-const API_URL = 'https://drevantatrade-production-e27d.up.railway.app/api';
+//const API_URL = 'https://drevantatrade-production-e27d.up.railway.app/api';
 
-// Create axios instance
+const API_URL = import.meta.env.VITE_API_URL;
 const api = axios.create({
-    baseURL: API_URL,
+    baseURL: API_URL + '/api',
     timeout: 30000,
     headers: {
         'Content-Type': 'application/json'
