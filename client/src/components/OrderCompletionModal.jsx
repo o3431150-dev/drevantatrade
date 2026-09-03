@@ -8,49 +8,74 @@ const OrderCompletionModal = ({ order, onClose }) => {
   useEffect(() => {
     if (!order) return;
     
-    // 1. Safely extract date from MongoDB object structures or strings
-    const rawTime = order.startTime?.$date || order.startTime;
+    console.group("🚨 ORDER SYSTEM TIME DIAGNOSTIC");
+    console.log("1. Full Input Payload:", order);
+    console.log("2. Timestamp Summary:", {
+      startTime: order.startTime,
+      updatedAt: order.updatedAt,
+      completedAt: order.completedAt,
+      formattedDate: order.formattedDate
+    });
+
+    const rawTimeField = order.completedAt || order.updatedAt || order.startTime;
+    console.log("3. Selected Fallback Target Field:", rawTimeField);
+
+    const extractedTarget = rawTimeField?.$date || rawTimeField;
+    console.log("4. Extracted Date String:", extractedTarget);
     
     if (order.formattedDate) {
+      console.log("👉 Using order.formattedDate:", order.formattedDate);
       setLocalizedDate(order.formattedDate);
-    } else if (rawTime) {
+    } else if (extractedTarget) {
       try {
-        const date = new Date(rawTime);
+        const dateObj = new Date(extractedTarget);
+        const processedDate = isNaN(dateObj.getTime()) ? new Date(Number(extractedTarget)) : dateObj;
 
-        if (!isNaN(date.getTime())) {
-          // 2. Automatically grab visitor country locale and time zone
-          const browserLocale = navigator.language || 'en-US';
-          const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        console.log("5. Parsed Date Object Instance:", processedDate.toString());
+        console.log("6. Epoch Milliseconds:", processedDate.getTime());
+        console.log("7. UTC String Representation:", processedDate.toUTCString());
+
+        if (!isNaN(processedDate.getTime())) {
+          const clientLanguage = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+          const clientSystemTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           
-          const formatted = date.toLocaleString(browserLocale, {
-            timeZone: browserTimezone,
+          console.log("8. Browser Environment Setup:", { clientLanguage, clientSystemTimezone });
+
+          const targetConfiguredFormatting = processedDate.toLocaleString(clientLanguage, {
+            timeZone: clientSystemTimezone,
             dateStyle: 'medium', 
             timeStyle: 'short',  
-            hourCycle: 'h12' // Enforces clean matching AM/PM layout
+            hourCycle: 'h12'
           });
-          setLocalizedDate(formatted);
+
+          console.log("9. Final Calculated String:", targetConfiguredFormatting);
+          setLocalizedDate(targetConfiguredFormatting);
+        } else {
+          console.error("❌ Conversion Failure: Date is NaN");
+          setLocalizedDate('--:--');
         }
-      } catch (e) {
+      } catch (runtimeError) {
+        console.error("❌ Processing Exception caught:", runtimeError);
         setLocalizedDate('--:--');
       }
+    } else {
+      console.warn("⚠️ Data Mismatch: No parsing target available");
+      setLocalizedDate('--:--');
     }
+    console.groupEnd();
   }, [order]);
 
   if (!order) return null;
 
-  // 2. Core State Identification
   const isWin = order.wasForceWin || order.profit > 0;
   const statusColor = isWin ? 'emerald' : 'rose';
 
-  // Parse numerical metrics safely
   const amount = parseFloat(order.amount) || 0;
   const cleanEntryPrice = parseFloat(order.entryPrice) || 0;
   let displayExitPrice = parseFloat(order.exitPrice) || cleanEntryPrice;
 
-  // 3. Clear visual path separation (0.1% ensures a recognizable difference on screen)
   if (order.wasForceWin) {
     const deviationPercent = 0.001; 
-
     if (order.direction === 'buy') {
       displayExitPrice = cleanEntryPrice * (1 + deviationPercent);
     } else if (order.direction === 'sell') {
@@ -58,7 +83,6 @@ const OrderCompletionModal = ({ order, onClose }) => {
     }
   } else {
     const deviationPercent = 0.001;
-
     if (order.direction === 'buy') {
       displayExitPrice = cleanEntryPrice * (1 - deviationPercent);
     } else if (order.direction === 'sell') {
@@ -66,11 +90,9 @@ const OrderCompletionModal = ({ order, onClose }) => {
     }
   }
 
-  // 4. Dynamic Fee & PNL Calculations
   const displayProfit = order.wasForceWin && order.profit <= 0 ? ((amount * (order.expectedReturn || 12)) / 100) : order.profit;
   const payout = order.wasForceWin ? (amount + displayProfit) : order.actualPayout;
 
-  // Responsive device view variant animation
   const modalVariants = {
     hidden: {
       opacity: 0,
@@ -94,8 +116,6 @@ const OrderCompletionModal = ({ order, onClose }) => {
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-950/85 backdrop-blur-md">
-
-        {/* Dynamic ambient background blur glow */}
         <div className={`hidden sm:block absolute w-80 h-80 rounded-full blur-[130px] opacity-25 transition-all duration-500 bg-${statusColor}-500`} />
 
         <motion.div
@@ -105,10 +125,8 @@ const OrderCompletionModal = ({ order, onClose }) => {
           exit="exit"
           className="relative w-full max-w-md overflow-hidden bg-slate-900 sm:rounded-[2.5rem] rounded-t-[2rem] border-t sm:border border-slate-800 shadow-2xl max-h-[96vh] flex flex-col"
         >
-          {/* Top Status Gradient Trim */}
           <div className={`h-1.5 w-full flex-shrink-0 ${isWin ? 'bg-gradient-to-r from-emerald-500 to-teal-500' : 'bg-gradient-to-r from-rose-500 to-red-500'}`} />
 
-          {/* Close Trigger Icon */}
           <button
             onClick={onClose}
             className="absolute top-5 right-5 p-2 rounded-full text-slate-500 hover:bg-slate-800 hover:text-white transition-all z-10"
@@ -116,16 +134,12 @@ const OrderCompletionModal = ({ order, onClose }) => {
             <X size={18} />
           </button>
 
-          {/* Content Wrapper */}
           <div className="p-5 overflow-y-auto no-scrollbar hide-scrollbar">
-
-            {/* Header Module */}
             <div className="flex flex-col items-center text-center mb-6">
               <h2 className="text-xl font-black text-white tracking-tight">
                 {isWin ? 'TRADE SUCCESS' : 'TRADE CLOSED'}
               </h2>
 
-              {/* Asset Identity Badging */}
               <div className="flex items-center gap-1.5 mt-2 px-2.5 py-1 bg-slate-950/40 rounded-full border border-slate-800 text-[11px] sm:text-xs">
                 <span className="font-bold text-white font-mono">{order.symbol}</span>
                 <span className="w-1 h-1 rounded-full bg-slate-700" />
@@ -139,7 +153,6 @@ const OrderCompletionModal = ({ order, onClose }) => {
               </div>
             </div>
 
-            {/* Price Visualization Panel */}
             <div className="mb-4 p-4 rounded-2xl bg-slate-950/60 border border-slate-800/80">
               <div className="flex items-center justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">
                 <span>Entry Price</span>
@@ -152,7 +165,7 @@ const OrderCompletionModal = ({ order, onClose }) => {
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-slate-200 font-mono text-base font-semibold">
-                    ${cleanEntryPrice.toFixed(2)}
+                    ${cleanEntryPrice.toFixed(6)}
                   </span>
                 </div>
 
@@ -160,13 +173,12 @@ const OrderCompletionModal = ({ order, onClose }) => {
 
                 <div className="flex flex-col items-end">
                   <span className={`font-mono text-base font-black ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    ${displayExitPrice.toFixed(2)}
+                    ${displayExitPrice.toFixed(6)}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Core Stats Metric Matrix */}
             <div className="grid grid-cols-2 gap-2.5 mb-4">
               <div className="p-3.5 rounded-xl bg-slate-800/20 border border-slate-800/60">
                 <span className="text-slate-500 text-[10px] sm:text-[11px] font-bold uppercase tracking-wider block mb-0.5">Amount</span>
@@ -184,7 +196,6 @@ const OrderCompletionModal = ({ order, onClose }) => {
               </div>
             </div>
 
-            {/* Mini Detail Breakdown Area */}
             <div className="mb-5 rounded-xl bg-slate-950/20 border border-slate-800 text-xs text-slate-400">
               <div className="flex items-center justify-between p-3 border-b border-slate-800/50">
                 <span>Execution Time</span>
