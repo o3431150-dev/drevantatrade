@@ -5,41 +5,40 @@ import { X, Wallet, ArrowRightLeft, ShieldAlert, Clock } from 'lucide-react';
 const OrderCompletionModal = ({ order, onClose }) => {
   const [localizedDate, setLocalizedDate] = useState('--:--');
 
-    useEffect(() => {
+  useEffect(() => {
     if (!order) return;
+
+    // Use endTime or completedAt for trade execution/expiry time
+    const rawTimeField = order.endTime || order.completedAt || order.updatedAt || order.startTime;
     
-    // FORCE the modal to prioritize startTime over completedAt so the minutes match your dashboard card
-    const rawTimeField = order.startTime || order.completedAt || order.updatedAt;
+    // Extract string value safely from MongoDB $date object or string directly
     const extractedTarget = rawTimeField?.$date || rawTimeField;
-    
+
     if (extractedTarget) {
       try {
         const dateObj = new Date(extractedTarget);
-        const processedDate = isNaN(dateObj.getTime()) ? new Date(Number(extractedTarget)) : dateObj;
 
-        if (!isNaN(processedDate.getTime())) {
+        if (!isNaN(dateObj.getTime())) {
           const clientLanguage = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
           const clientSystemTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          
-          const targetConfiguredFormatting = processedDate.toLocaleString(clientLanguage, {
+
+          const formattedDate = dateObj.toLocaleString(clientLanguage, {
             timeZone: clientSystemTimezone,
-            dateStyle: 'medium', 
-            timeStyle: 'short',  
+            dateStyle: 'medium',
+            timeStyle: 'medium', // Changed to medium to include seconds (e.g., May 15, 2026, 10:36:50 PM)
             hourCycle: 'h12'
           });
 
-          setLocalizedDate(targetConfiguredFormatting);
-        } else {
-          setLocalizedDate('--:--');
+          setLocalizedDate(formattedDate);
+          return;
         }
       } catch (runtimeError) {
-        setLocalizedDate('--:--');
+        console.error('Error parsing execution time:', runtimeError);
       }
-    } else {
-      setLocalizedDate('--:--');
     }
+    
+    setLocalizedDate('--:--');
   }, [order]);
-
 
   if (!order) return null;
 
