@@ -5,42 +5,22 @@ import { X, Wallet, ArrowRightLeft, ShieldAlert, Clock } from 'lucide-react';
 const OrderCompletionModal = ({ order, onClose }) => {
   const [localizedDate, setLocalizedDate] = useState('--:--');
 
-  useEffect(() => {
+    useEffect(() => {
     if (!order) return;
     
-    console.group("🚨 ORDER SYSTEM TIME DIAGNOSTIC");
-    console.log("1. Full Input Payload:", order);
-    console.log("2. Timestamp Summary:", {
-      startTime: order.startTime,
-      updatedAt: order.updatedAt,
-      completedAt: order.completedAt,
-      formattedDate: order.formattedDate
-    });
-
-    const rawTimeField = order.completedAt || order.updatedAt || order.startTime;
-    console.log("3. Selected Fallback Target Field:", rawTimeField);
-
+    // FORCE the modal to prioritize startTime over completedAt so the minutes match your dashboard card
+    const rawTimeField = order.startTime || order.completedAt || order.updatedAt;
     const extractedTarget = rawTimeField?.$date || rawTimeField;
-    console.log("4. Extracted Date String:", extractedTarget);
     
-    if (order.formattedDate) {
-      console.log("👉 Using order.formattedDate:", order.formattedDate);
-      setLocalizedDate(order.formattedDate);
-    } else if (extractedTarget) {
+    if (extractedTarget) {
       try {
         const dateObj = new Date(extractedTarget);
         const processedDate = isNaN(dateObj.getTime()) ? new Date(Number(extractedTarget)) : dateObj;
-
-        console.log("5. Parsed Date Object Instance:", processedDate.toString());
-        console.log("6. Epoch Milliseconds:", processedDate.getTime());
-        console.log("7. UTC String Representation:", processedDate.toUTCString());
 
         if (!isNaN(processedDate.getTime())) {
           const clientLanguage = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
           const clientSystemTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           
-          console.log("8. Browser Environment Setup:", { clientLanguage, clientSystemTimezone });
-
           const targetConfiguredFormatting = processedDate.toLocaleString(clientLanguage, {
             timeZone: clientSystemTimezone,
             dateStyle: 'medium', 
@@ -48,22 +28,18 @@ const OrderCompletionModal = ({ order, onClose }) => {
             hourCycle: 'h12'
           });
 
-          console.log("9. Final Calculated String:", targetConfiguredFormatting);
           setLocalizedDate(targetConfiguredFormatting);
         } else {
-          console.error("❌ Conversion Failure: Date is NaN");
           setLocalizedDate('--:--');
         }
       } catch (runtimeError) {
-        console.error("❌ Processing Exception caught:", runtimeError);
         setLocalizedDate('--:--');
       }
     } else {
-      console.warn("⚠️ Data Mismatch: No parsing target available");
       setLocalizedDate('--:--');
     }
-    console.groupEnd();
   }, [order]);
+
 
   if (!order) return null;
 
