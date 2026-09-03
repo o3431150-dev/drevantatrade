@@ -50,14 +50,13 @@ const getLocalizedDate = () => {
   try {
     const date = new Date(order.startTime);
     
-    const browserLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
-    const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    
-    return date.toLocaleString(browserLocale, {
-      timeZone: browserTimezone,
+    // Fallback if timestamp string format is custom/numeric
+    const safeDate = isNaN(date.getTime()) ? new Date(Number(order.startTime)) : date;
+
+    return safeDate.toLocaleString('en-US', {
       dateStyle: 'medium', 
       timeStyle: 'short',  
-      hourCycle: 'h12' // Enforces a standardized 12-hour AM/PM system globally
+      hourCycle: 'h12' // Keeps AM/PM consistent
     });
   } catch (e) {
     return '--:--';

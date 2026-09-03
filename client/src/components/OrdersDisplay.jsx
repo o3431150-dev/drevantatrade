@@ -75,19 +75,17 @@ const formatTime = (dateString) => {
   
   try {
     const date = new Date(dateString);
-    
-    const browserLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
-    const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const safeDate = isNaN(date.getTime()) ? new Date(Number(dateString)) : date;
 
-    return date.toLocaleTimeString(browserLocale, { 
-      timeZone: browserTimezone,
+    return safeDate.toLocaleTimeString('en-US', { 
       hour: '2-digit', 
       minute: '2-digit',
-      hourCycle: 'h12' // Enforces exact matching AM/PM layouts
+      hourCycle: 'h12' // Enforces absolute layout parity
     });
   } catch (error) {
     return '--:--';
-  }};
+  }
+};
 
 
   return (
