@@ -1,11 +1,44 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, TrendingUp, TrendingDown, ArrowRight, Wallet, ArrowRightLeft, ShieldAlert, Percent, Clock } from 'lucide-react';
+import { X, Wallet, ArrowRightLeft, ShieldAlert, Clock } from 'lucide-react';
 
 const OrderCompletionModal = ({ order, onClose }) => {
+  const [localizedDate, setLocalizedDate] = useState('--:--');
+
+  useEffect(() => {
+    if (!order) return;
+    
+    // 1. Safely extract date from MongoDB object structures or strings
+    const rawTime = order.startTime?.$date || order.startTime;
+    
+    if (order.formattedDate) {
+      setLocalizedDate(order.formattedDate);
+    } else if (rawTime) {
+      try {
+        const date = new Date(rawTime);
+
+        if (!isNaN(date.getTime())) {
+          // 2. Automatically grab visitor country locale and time zone
+          const browserLocale = navigator.language || 'en-US';
+          const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          
+          const formatted = date.toLocaleString(browserLocale, {
+            timeZone: browserTimezone,
+            dateStyle: 'medium', 
+            timeStyle: 'short',  
+            hourCycle: 'h12' // Enforces clean matching AM/PM layout
+          });
+          setLocalizedDate(formatted);
+        }
+      } catch (e) {
+        setLocalizedDate('--:--');
+      }
+    }
+  }, [order]);
+
   if (!order) return null;
 
-  // 1. Core State Identification
+  // 2. Core State Identification
   const isWin = order.wasForceWin || order.profit > 0;
   const statusColor = isWin ? 'emerald' : 'rose';
 
@@ -14,9 +47,9 @@ const OrderCompletionModal = ({ order, onClose }) => {
   const cleanEntryPrice = parseFloat(order.entryPrice) || 0;
   let displayExitPrice = parseFloat(order.exitPrice) || cleanEntryPrice;
 
-  // 2. Clear visual path separation (0.1% ensures a recognizable difference on screen)
+  // 3. Clear visual path separation (0.1% ensures a recognizable difference on screen)
   if (order.wasForceWin) {
-    const deviationPercent = 0.001; // 0.1% difference makes the win visually obvious
+    const deviationPercent = 0.001; 
 
     if (order.direction === 'buy') {
       displayExitPrice = cleanEntryPrice * (1 + deviationPercent);
@@ -24,7 +57,7 @@ const OrderCompletionModal = ({ order, onClose }) => {
       displayExitPrice = cleanEntryPrice * (1 - deviationPercent);
     }
   } else {
-     const deviationPercent = 0.001;
+    const deviationPercent = 0.001;
 
     if (order.direction === 'buy') {
       displayExitPrice = cleanEntryPrice * (1 - deviationPercent);
@@ -33,37 +66,9 @@ const OrderCompletionModal = ({ order, onClose }) => {
     }
   }
 
-  // 3. Dynamic Fee & PNL Calculations
-  const feeRate = 0;
-  const calculatedFee = amount * feeRate;
-  const returnRate = order.expectedReturn || 12;
-  const expectedReturnAmount = (amount * returnRate) / 100;
-
-  const displayProfit = order.wasForceWin && order.profit <= 0 ? expectedReturnAmount : order.profit;
+  // 4. Dynamic Fee & PNL Calculations
+  const displayProfit = order.wasForceWin && order.profit <= 0 ? ((amount * (order.expectedReturn || 12)) / 100) : order.profit;
   const payout = order.wasForceWin ? (amount + displayProfit) : order.actualPayout;
-
-  // 4. Country & Locale Based Time Formatting
-const getLocalizedDate = () => {
-  if (order.formattedDate) return order.formattedDate;
-  if (!order.startTime) return '--:--';
-  
-  try {
-    const date = new Date(order.startTime);
-    
-    // Fallback if timestamp string format is custom/numeric
-    const safeDate = isNaN(date.getTime()) ? new Date(Number(order.startTime)) : date;
-
-    return safeDate.toLocaleString('en-US', {
-      dateStyle: 'medium', 
-      timeStyle: 'short',  
-      hourCycle: 'h12' // Keeps AM/PM consistent
-    });
-  } catch (e) {
-    return '--:--';
-  }
-};
-
-  const startDate = getLocalizedDate();
 
   // Responsive device view variant animation
   const modalVariants = {
@@ -112,7 +117,7 @@ const getLocalizedDate = () => {
           </button>
 
           {/* Content Wrapper */}
-          <div className="p-5 overflow-y-auto no-scrollbar hide-scrollbar .hide-scrollbar::-webkit-scrollbar">
+          <div className="p-5 overflow-y-auto no-scrollbar hide-scrollbar">
 
             {/* Header Module */}
             <div className="flex flex-col items-center text-center mb-6">
@@ -147,7 +152,7 @@ const getLocalizedDate = () => {
               <div className="flex items-center justify-between">
                 <div className="flex flex-col">
                   <span className="text-slate-200 font-mono text-base font-semibold">
-                    ${cleanEntryPrice.toFixed(6)}
+                    ${cleanEntryPrice.toFixed(2)}
                   </span>
                 </div>
 
@@ -155,7 +160,7 @@ const getLocalizedDate = () => {
 
                 <div className="flex flex-col items-end">
                   <span className={`font-mono text-base font-black ${isWin ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    ${displayExitPrice.toFixed(6)}
+                    ${displayExitPrice.toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -183,7 +188,7 @@ const getLocalizedDate = () => {
             <div className="mb-5 rounded-xl bg-slate-950/20 border border-slate-800 text-xs text-slate-400">
               <div className="flex items-center justify-between p-3 border-b border-slate-800/50">
                 <span>Execution Time</span>
-                <span className="text-slate-300 font-mono">{startDate}</span>
+                <span className="text-slate-300 font-mono">{localizedDate}</span>
               </div>
               <div className="flex items-center justify-between p-3">
                 <span>Total Payout</span>
@@ -201,4 +206,3 @@ const getLocalizedDate = () => {
 };
 
 export default OrderCompletionModal;
- 

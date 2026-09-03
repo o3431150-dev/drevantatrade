@@ -70,22 +70,33 @@ const OrdersDisplay = ({ tradeHistory }) => {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
-const formatTime = (dateString) => {
-  if (!dateString) return '--:--';
+const formatTime = (dateInput) => {
+  if (!dateInput) return '--:--';
   
   try {
-    const date = new Date(dateString);
-    const safeDate = isNaN(date.getTime()) ? new Date(Number(dateString)) : date;
+    // 1. Extract the raw string if MongoDB nests it under $date
+    const rawTime = dateInput.$date || dateInput;
+    const date = new Date(rawTime);
+    
+    // 2. Safe check for invalid/numeric timestamp formats
+    const safeDate = isNaN(date.getTime()) ? new Date(Number(rawTime)) : date;
+    if (isNaN(safeDate.getTime())) return '--:--';
 
-    return safeDate.toLocaleTimeString('en-US', { 
+    // 3. Detect visitor country settings dynamically
+    const browserLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+    const browserTimezone = typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC';
+
+    return safeDate.toLocaleTimeString(browserLocale, { 
+      timeZone: browserTimezone, // Converts UTC to the user's country timezone
       hour: '2-digit', 
       minute: '2-digit',
-      hourCycle: 'h12' // Enforces absolute layout parity
+      hourCycle: 'h12'          // Keeps AM/PM consistent
     });
   } catch (error) {
     return '--:--';
   }
 };
+
 
 
   return (
