@@ -70,27 +70,24 @@ const OrdersDisplay = ({ tradeHistory }) => {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
-  const formatTime = (dateString) => {
+const formatTime = (dateString) => {
   if (!dateString) return '--:--';
   
   try {
     const date = new Date(dateString);
     
-    // Auto-detect browser settings safely
     const browserLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
     const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     return date.toLocaleTimeString(browserLocale, { 
+      timeZone: browserTimezone,
       hour: '2-digit', 
       minute: '2-digit',
-      timeZone: browserTimezone,
-      hour12: true // Force 'true' for AM/PM format, or 'false' for 24-hour style
+      hourCycle: 'h12' // Enforces exact matching AM/PM layouts
     });
   } catch (error) {
-    // Fail-safe backup if the dateString format is corrupted
     return '--:--';
-  }
-};
+  }};
 
 
   return (

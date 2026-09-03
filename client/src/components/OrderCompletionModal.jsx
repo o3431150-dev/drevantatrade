@@ -45,23 +45,21 @@ const OrderCompletionModal = ({ order, onClose }) => {
   // 4. Country & Locale Based Time Formatting
 const getLocalizedDate = () => {
   if (order.formattedDate) return order.formattedDate;
-  if (!order.startTime) return '';
+  if (!order.startTime) return '--:--';
   
   try {
     const date = new Date(order.startTime);
     
-    // Auto-detect browser locale and system timezone safely
     const browserLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
     const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     
     return date.toLocaleString(browserLocale, {
       timeZone: browserTimezone,
-      dateStyle: 'medium', // Formats as "Jan 1, 2026" or "1 Jan 2026" depending on country
-      timeStyle: 'short',  // Formats as "3:30 PM" or "15:30"
-      hour12: true         // Keeps AM/PM consistent with your formatTime function
+      dateStyle: 'medium', 
+      timeStyle: 'short',  
+      hourCycle: 'h12' // Enforces a standardized 12-hour AM/PM system globally
     });
   } catch (e) {
-    // Fail-safe backup if database string or Intl rules crash
     return '--:--';
   }
 };
