@@ -43,25 +43,28 @@ const OrderCompletionModal = ({ order, onClose }) => {
   const payout = order.wasForceWin ? (amount + displayProfit) : order.actualPayout;
 
   // 4. Country & Locale Based Time Formatting
-  const getLocalizedDate = () => {
-    if (order.formattedDate) return order.formattedDate;
-    if (!order.startTime) return '';
+const getLocalizedDate = () => {
+  if (order.formattedDate) return order.formattedDate;
+  if (!order.startTime) return '';
+  
+  try {
+    const date = new Date(order.startTime);
     
-    try {
-      // Auto-detect browser locale and system timezone
-      const browserLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
-      const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      
-      return new Date(order.startTime).toLocaleString(browserLocale, {
-        timeZone: browserTimezone,
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      });
-    } catch (e) {
-      // Clean fallback if Intl API throws error
-      return new Date(order.startTime).toLocaleString();
-    }
-  };
+    // Auto-detect browser locale and system timezone safely
+    const browserLocale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+    const browserTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    
+    return date.toLocaleString(browserLocale, {
+      timeZone: browserTimezone,
+      dateStyle: 'medium', // Formats as "Jan 1, 2026" or "1 Jan 2026" depending on country
+      timeStyle: 'short',  // Formats as "3:30 PM" or "15:30"
+      hour12: true         // Keeps AM/PM consistent with your formatTime function
+    });
+  } catch (e) {
+    // Fail-safe backup if database string or Intl rules crash
+    return '--:--';
+  }
+};
 
   const startDate = getLocalizedDate();
 
